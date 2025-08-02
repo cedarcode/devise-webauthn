@@ -3,3 +3,13 @@ en:
     failure:
       passkey_not_found: "Your passkey doesn't exist or is not valid."
       passkey_verification_failed: "Passkey verification failed."
+    webauthn:
+      passkey:
+        created: "Your passkey has been added successfully."
+        creation_failed: "There was an error adding this passkey."
+      webauthn_errors:
+        not_allowed: "You didn't select the authenticator or cancelled the operation."
+        invalid_state: "You already registered this passkey with your account."
+        security_error: "Security error processing the passkey."
+        not_supported: "Your browser doesn't support WebAuthn/passkeys."
+        aborted: "The operation was cancelled."
