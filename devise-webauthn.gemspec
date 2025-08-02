@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-rails", "~> 2.32"
   spec.add_development_dependency "rubocop-rspec", "~> 3.6"
   spec.add_development_dependency "sqlite3", "~> 2.7"
+  spec.add_development_dependency "stimulus-rails"
 
   spec.add_dependency "devise", "~> 4.9"
   spec.add_dependency "webauthn", "~> 3.0"
