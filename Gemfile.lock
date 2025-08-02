@@ -3,6 +3,7 @@ PATH
   specs:
     devise-webauthn (0.0.0)
       devise (~> 4.9)
+      stimulus-rails (~> 1.0)
       webauthn (~> 3.0)
 
 GEM
