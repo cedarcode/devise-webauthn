@@ -18,6 +18,12 @@ module Devise
           }
         )
       end
+
+      initializer "devise.webauthn.helpers" do
+        ActiveSupport.on_load(:action_view) do
+          include Devise::Webauthn::PasskeysHelper
+        end
+      end
     end
   end
 end
