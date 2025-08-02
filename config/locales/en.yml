@@ -3,3 +3,6 @@ en:
     failure:
       passkey_not_found: "Your passkey doesn't exist or is not valid."
       passkey_verification_failed: "Passkey verification failed."
+    webauthn:
+      passkey_created: "Passkey created successfully."
+      passkey_creation_failed: "Passkey creation failed."
