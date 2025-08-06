@@ -4,3 +4,12 @@ es:
       errors:
         passkey_not_found: "Tu passkey no existe o no es válida."
         verification_failed: "La verificación de la passkey falló."
+      passkey:
+        created: "Tu passkey ha sido agregada correctamente."
+        creation_failed: "Hubo un error agregando esta passkey."
+      webauthn_errors:
+        not_allowed: "No seleccionaste el autenticador o cancelaste la operación."
+        invalid_state: "Ya registraste esta passkey con tu cuenta."
+        security_error: "Error de seguridad al procesar la passkey."
+        not_supported: "Tu navegador no soporta WebAuthn/passkeys."
+        aborted: "La operación fue cancelada."

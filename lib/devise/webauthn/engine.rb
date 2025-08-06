@@ -9,12 +9,18 @@ module Devise
 
       initializer "devise.webauthn.add_module" do
         Devise.add_module(
-          :passkey_authenticatable, 
+          :passkey_authenticatable,
           {
             model: "devise/models/passkey_authenticatable",
             strategy: true
           }
         )
+      end
+
+      initializer "devise.webauthn.helpers" do
+        ActiveSupport.on_load(:action_view) do
+          include Devise::Webauthn::PasskeysHelper
+        end
       end
     end
   end
