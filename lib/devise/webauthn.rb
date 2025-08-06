@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
-require "devise/webauthn/version"
+require "devise"
+require "webauthn"
+
+require_relative "webauthn/version"
+require_relative "webauthn/engine"
+require_relative "models/passkey_authenticatable"
+require_relative "strategies/passkey_authenticatable"
 
 module Devise
   module Webauthn
-    class Error < StandardError; end
-    # Your code goes here...
   end
 end
