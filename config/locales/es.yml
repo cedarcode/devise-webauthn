@@ -1,0 +1,6 @@
+es:
+  devise:
+    webauthn:
+      errors:
+        passkey_not_found: "Tu passkey no existe o no es válida."
+        verification_failed: "La verificación de la passkey falló."
