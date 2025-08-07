@@ -6,8 +6,8 @@ require "devise/webauthn/version"
 Gem::Specification.new do |spec|
   spec.name          = "devise-webauthn"
   spec.version       = Devise::Webauthn::VERSION
-  spec.authors       = ["Braulio Martinez"]
-  spec.email         = ["braulio@cedarcode.com"]
+  spec.authors       = ["Cedarcode"]
+  spec.email         = ["webauthn@cedarcode.com"]
 
   spec.summary       = %q{Devise extension to support WebAuthn.}
   spec.license       = "MIT"
