@@ -12,9 +12,6 @@ Style/Documentation:
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 Metrics/MethodLength:
   Max: 20
 
