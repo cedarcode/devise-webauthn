@@ -56,10 +56,11 @@ module Devise
       private
 
       def passkey_model_content
-        <<~RUBY
-          belongs_to :#{options[:resource_name]}
-          validates :external_id, :public_key, :name, :sign_count, presence: true
-          validates :external_id, uniqueness: true
+        <<-RUBY
+  belongs_to :#{options[:resource_name]}
+
+  validates :external_id, :public_key, :name, :sign_count, presence: true
+  validates :external_id, uniqueness: true
         RUBY
       end
 
