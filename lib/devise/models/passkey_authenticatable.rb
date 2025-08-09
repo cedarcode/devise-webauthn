@@ -11,6 +11,10 @@ module Devise
         has_many :passkeys, dependent: :destroy
 
         validates :webauthn_id, uniqueness: true, allow_blank: true
+
+        after_initialize do
+          self.webauthn_id ||= WebAuthn.generate_user_id
+        end
       end
     end
   end
