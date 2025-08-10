@@ -1,3 +1,5 @@
+--require rails_helper
+--format progress
 --format documentation
 --color
 --require spec_helper
