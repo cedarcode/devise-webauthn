@@ -19,20 +19,20 @@ module Devise
       end
 
       def generate_model
-        invoke "active_record:model", ["Passkey"], migration: false
+        invoke "active_record:model", [
+          "passkey",
+          "external_id:string:uniq",
+          "name:string",
+          "public_key:text",
+          "sign_count:bigint",
+          "#{user_model_name}:references"
+        ]
       end
 
       def inject_passkey_content
-        inject_into_class("app/models/passkey.rb", "Passkey") do
+        inject_into_file("app/models/passkey.rb", before: /^end\s*$/) do
           passkey_model_content
         end
-      end
-
-      def generate_migration
-        migration_template(
-          "migration.rb.erb",
-          "db/migrate/devise_webauthn_create_passkeys.rb"
-        )
       end
 
       def show_instructions
@@ -57,7 +57,6 @@ module Devise
 
       def passkey_model_content
         <<-RUBY
-  belongs_to :#{options[:resource_name]}
 
   validates :external_id, :public_key, :name, :sign_count, presence: true
   validates :external_id, uniqueness: true
