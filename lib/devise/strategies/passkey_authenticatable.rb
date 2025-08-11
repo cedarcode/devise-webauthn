@@ -11,11 +11,11 @@ module Devise
         webauthn_passkey = parse_webauthn_credential
         passkey = find_passkey(webauthn_passkey.id)
 
-        return fail!(I18n.t("devise.webauthn.errors.passkey_not_found")) if passkey.blank?
+        return fail!(:passkey_not_found) if passkey.blank?
 
         verify_and_authenticate(webauthn_passkey, passkey)
       rescue WebAuthn::Error
-        fail!(I18n.t("devise.webauthn.errors.verification_failed"))
+        fail!(:verification_failed)
       ensure
         session.delete(:authentication_challenge)
       end

@@ -1,6 +1,5 @@
 en:
   devise:
-    webauthn:
-      errors:
-        passkey_not_found: "Your passkey doesn't exist or is not valid."
-        verification_failed: "Passkey verification failed."
+    failure:
+      passkey_not_found: "Your passkey doesn't exist or is not valid."
+      verification_failed: "Passkey verification failed."
