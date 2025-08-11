@@ -64,10 +64,6 @@ module Devise
         RUBY
       end
 
-      def migration_version
-        "[#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}]"
-      end
-
       def user_model_name
         options[:resource_name].underscore
       end

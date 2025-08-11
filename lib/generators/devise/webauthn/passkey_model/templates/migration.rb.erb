@@ -1,4 +1,4 @@
-class DeviseWebauthnCreatePasskeys < ActiveRecord::Migration<%= migration_version %>
+class DeviseWebauthnCreatePasskeys < ActiveRecord::Migration<%= Rails.version.to_f %>
   def change
     create_table :passkeys do |t|
       t.string :external_id, null: false

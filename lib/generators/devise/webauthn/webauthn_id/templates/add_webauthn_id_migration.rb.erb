@@ -1,4 +1,4 @@
-class AddWebauthnIdTo<%= user_table_name.camelize %> < ActiveRecord::Migration<%= "[#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}]" %>
+class AddWebauthnIdTo<%= user_table_name.camelize %> < ActiveRecord::Migration<%= Rails.version.to_f %>
   def change
     add_column :<%= user_table_name %>, :webauthn_id, :string
     add_index :<%= user_table_name %>, :webauthn_id, unique: true
