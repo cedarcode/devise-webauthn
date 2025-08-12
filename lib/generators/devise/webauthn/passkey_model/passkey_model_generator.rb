@@ -42,14 +42,8 @@ module Devise
           1. Run the migration:
              rails db:migrate
 
-          2. Add webauthn_id field to your User model if not already done:
-             rails generate devise:webauthn:webauthn_id
-
-          3. Make sure your User model includes :passkey_authenticatable in the devise line:
+          2. Make sure your User model includes :passkey_authenticatable in the devise line:
              devise :database_authenticatable, :passkey_authenticatable, ...
-
-          4. Your Passkey model is ready to use with DeviseWebauthn!
-             (The has_many :passkeys association is automatically added by the PasskeyAuthenticatable module)
         MSG
       end
 
