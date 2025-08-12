@@ -6,3 +6,5 @@ require_relative "dummy/config/environment"
 require "rspec/rails"
 
 ActiveRecord::Schema.verbose = false
+
+load Rails.root.join("db/schema.rb")
