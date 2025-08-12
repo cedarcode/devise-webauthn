@@ -6,19 +6,13 @@ require "rails/generators/active_record"
 module Devise
   module Webauthn
     class PasskeyModelGenerator < Rails::Generators::Base
-      include Rails::Generators::Migration
-
       namespace "devise:webauthn:passkey_model"
       source_root File.expand_path("templates", __dir__)
 
       desc "Generate a Passkey model with the required fields for WebAuthn"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
 
-      def self.next_migration_number(dirname)
-        ActiveRecord::Generators::Base.next_migration_number(dirname)
-      end
-
-      def generate_model
+      def passkey_model
         invoke "active_record:model", [
           "passkey",
           "external_id:string:uniq",
@@ -27,6 +21,8 @@ module Devise
           "sign_count:bigint",
           "#{user_model_name}:references"
         ]
+
+        inject_passkey_content
       end
 
       def inject_passkey_content
@@ -50,10 +46,9 @@ module Devise
       private
 
       def passkey_model_content
-        <<-RUBY
-
-  validates :external_id, :public_key, :name, :sign_count, presence: true
-  validates :external_id, uniqueness: true
+        <<~RUBY.indent(2)
+          validates :external_id, :public_key, :name, :sign_count, presence: true
+          validates :external_id, uniqueness: true
         RUBY
       end
 
