@@ -17,3 +17,9 @@ Metrics/MethodLength:
 
 Gemspec/DevelopmentDependencies:
   Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 3
+
+RSpec/ExampleLength:
+  Max: 20
