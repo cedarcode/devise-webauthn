@@ -12,7 +12,7 @@ module Devise
       desc "Add webauthn_id field to User model"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
 
-      def webauthn_id
+      def generate_migration
         invoke "active_record:migration", [
           "add_webauthn_id_to_#{user_table_name}",
           "webauthn_id:string:uniq"

@@ -12,7 +12,7 @@ module Devise
       desc "Generate a Passkey model with the required fields for WebAuthn"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
 
-      def passkey_model
+      def generate_model
         invoke "active_record:model", [
           "passkey",
           "external_id:string:uniq",
@@ -21,8 +21,6 @@ module Devise
           "sign_count:bigint",
           "#{user_model_name}:references"
         ]
-
-        inject_passkey_content
       end
 
       def inject_passkey_content
