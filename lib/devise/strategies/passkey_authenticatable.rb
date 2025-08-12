@@ -8,12 +8,14 @@ module Devise
       end
 
       def authenticate!
-        webauthn_passkey = parse_webauthn_credential
-        passkey = find_passkey(webauthn_passkey.id)
+        passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
+        stored_passkey = Passkey.find_by(external_id: passkey_from_params.id)
 
-        return fail!(:passkey_not_found) if passkey.blank?
+        return fail!(:passkey_not_found) if stored_passkey.blank?
 
-        verify_and_authenticate(webauthn_passkey, passkey)
+        verify_passkeys(passkey_from_params, stored_passkey)
+
+        success!(stored_passkey.user)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)
       ensure
@@ -26,24 +28,15 @@ module Devise
         params.dig(:user, :passkey_public_key)
       end
 
-      def parse_webauthn_credential
-        WebAuthn::Credential.from_get(JSON.parse(passkey_param))
-      end
-
-      def find_passkey(external_id)
-        Passkey.find_by(external_id:)
-      end
-
-      def verify_and_authenticate(webauthn_passkey, passkey)
-        webauthn_passkey.verify(
+      def verify_passkeys(passkey_from_params, stored_passkey)
+        passkey_from_params.verify(
           session[:authentication_challenge],
-          public_key: passkey.public_key,
-          sign_count: passkey.sign_count,
+          public_key: stored_passkey.public_key,
+          sign_count: stored_passkey.sign_count,
           user_verification: true
         )
 
-        passkey.update!(sign_count: webauthn_passkey.sign_count)
-        success!(passkey.user)
+        stored_passkey.update!(sign_count: passkey_from_params.sign_count)
       end
     end
   end

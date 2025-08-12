@@ -25,7 +25,10 @@ module Devise
 
       def inject_passkey_content
         inject_into_file("app/models/passkey.rb", before: /^end\s*$/) do
-          passkey_model_content
+          <<~RUBY.indent(2)
+            validates :external_id, :public_key, :name, :sign_count, presence: true
+            validates :external_id, uniqueness: true
+          RUBY
         end
       end
 
@@ -42,13 +45,6 @@ module Devise
       end
 
       private
-
-      def passkey_model_content
-        <<~RUBY.indent(2)
-          validates :external_id, :public_key, :name, :sign_count, presence: true
-          validates :external_id, uniqueness: true
-        RUBY
-      end
 
       def user_model_name
         options[:resource_name].underscore
