@@ -61,7 +61,7 @@ module Devise
           data: {
             action: "passkeys#create:prevent",
             controller: "passkeys",
-            passkeys_public_key_param: create_passkey_options,
+            passkeys_options_param: create_passkey_options,
             passkeys_error_messages_value: webauthn_error_messages.to_json
           }
         ) do |f|
@@ -79,7 +79,7 @@ module Devise
           data: {
             action: "passkeys#get:prevent",
             controller: "passkeys",
-            passkeys_public_key_param: webauthn_authentication_options,
+            passkeys_options_param: webauthn_authentication_options,
             passkeys_error_messages_value: webauthn_error_messages.to_json
           },
           class: form_classes

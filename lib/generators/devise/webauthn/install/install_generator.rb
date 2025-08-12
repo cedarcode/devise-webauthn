@@ -2,14 +2,12 @@
 
 require "rails/generators"
 require_relative "files_configurator"
-require_relative "javascript_setup"
 require_relative "devise_configurator"
 
 module Devise
   module Webauthn
     class InstallGenerator < Rails::Generators::Base
       include FilesConfigurator
-      include JavascriptSetup
       include DeviseConfigurator
 
       source_root File.expand_path("templates", __dir__)
@@ -22,7 +20,6 @@ module Devise
         say "Installing DeviseWebauthn configuration...", :green
 
         setup_configuration_files
-        setup_javascript_dependencies
         setup_devise_integration
         generate_models_and_migrations
 
