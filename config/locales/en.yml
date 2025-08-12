@@ -2,4 +2,4 @@ en:
   devise:
     failure:
       passkey_not_found: "Your passkey doesn't exist or is not valid."
-      verification_failed: "Passkey verification failed."
+      passkey_verification_failed: "Passkey verification failed."

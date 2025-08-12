@@ -15,7 +15,7 @@ module Devise
 
         verify_and_authenticate(webauthn_passkey, passkey)
       rescue WebAuthn::Error
-        fail!(:verification_failed)
+        fail!(:passkey_verification_failed)
       ensure
         session.delete(:authentication_challenge)
       end
