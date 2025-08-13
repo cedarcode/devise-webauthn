@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  mount Devise::Webauthn::Engine => "/devise-webauthn"
+  root "home#index"
 
   devise_for :users
 end

@@ -25,6 +25,8 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.1"
 
   spec.add_development_dependency "byebug"
+  spec.add_development_dependency "importmap-rails"
+  spec.add_development_dependency "puma"
   spec.add_development_dependency "rails", "~> 8.0"
   spec.add_development_dependency "rspec", "~> 3.13"
   spec.add_development_dependency "rspec-rails", "~> 6.1"

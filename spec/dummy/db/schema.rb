@@ -12,23 +12,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 20_240_101_000_000) do
-  create_table :users, force: true do |t|
-    t.string :email, null: false, default: ""
-    t.string :encrypted_password, null: false, default: ""
-    t.string :webauthn_id
-    t.timestamps null: false
-    t.index :webauthn_id, unique: true
-    t.index :email, unique: true
+ActiveRecord::Schema[8.0].define(version: 20_250_804_165_453) do
+  create_table "passkeys", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "external_id", null: false
+    t.string "public_key", null: false
+    t.string "name", null: false
+    t.integer "sign_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_passkeys_on_external_id", unique: true
+    t.index ["user_id"], name: "index_passkeys_on_user_id"
   end
 
-  create_table :passkeys, force: true do |t|
-    t.references :user, null: false
-    t.string :external_id, null: false
-    t.string :public_key, null: false
-    t.string :name, null: false
-    t.integer :sign_count, null: false, default: 0
-    t.timestamps null: false
-    t.index :external_id, unique: true
+  create_table "users", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "webauthn_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["webauthn_id"], name: "index_users_on_webauthn_id", unique: true
   end
+
+  create_table "webauthn_credentials", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "external_id"
+    t.string "public_key"
+    t.string "nickname"
+    t.bigint "sign_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_webauthn_credentials_on_external_id", unique: true
+    t.index ["user_id"], name: "index_webauthn_credentials_on_user_id"
+  end
+
+  add_foreign_key "webauthn_credentials", "users"
 end
