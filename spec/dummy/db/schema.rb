@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -12,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 20_250_804_165_453) do
+ActiveRecord::Schema[8.0].define(version: 2024_05_07_150026) do
   create_table "passkeys", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "external_id", null: false
@@ -34,18 +32,4 @@ ActiveRecord::Schema[8.0].define(version: 20_250_804_165_453) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["webauthn_id"], name: "index_users_on_webauthn_id", unique: true
   end
-
-  create_table "webauthn_credentials", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.string "external_id"
-    t.string "public_key"
-    t.string "nickname"
-    t.bigint "sign_count"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["external_id"], name: "index_webauthn_credentials_on_external_id", unique: true
-    t.index ["user_id"], name: "index_webauthn_credentials_on_user_id"
-  end
-
-  add_foreign_key "webauthn_credentials", "users"
 end

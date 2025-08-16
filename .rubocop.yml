@@ -23,3 +23,11 @@ RSpec/MultipleExpectations:
 
 RSpec/ExampleLength:
   Max: 20
+
+Style/NumericLiterals:
+  Exclude:
+    - 'spec/dummy/db/schema.rb'
+
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - 'spec/dummy/db/schema.rb'
