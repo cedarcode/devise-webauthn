@@ -1,2 +1,1 @@
-<%= link_to 'Sign out', webauthn_rails.session_path, data: { turbo_method: :delete } %>
-
+<%= link_to 'Sign out', destroy_user_session_path, data: { turbo_method: :delete } %>
