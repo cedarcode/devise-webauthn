@@ -6,5 +6,5 @@ WebAuthn.configure do |config|
   config.allowed_origins = ["http://localhost:3030"]
 
   # Relying Party name for display purposes
-  config.rp_name = "WebAuthn Rails Demo App"
+  config.rp_name = "Devise WebAuthn Demo App"
 end

@@ -13,5 +13,6 @@
 /spec/dummy/log/*
 /spec/dummy/tmp/*
 /spec/dummy/storage/*
+/spec/dummy/vendor
 
 .byebug_history
