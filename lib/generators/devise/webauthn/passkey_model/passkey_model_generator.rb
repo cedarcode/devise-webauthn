@@ -18,7 +18,7 @@ module Devise
           "external_id:string:uniq",
           "name:string",
           "public_key:text",
-          "sign_count:bigint",
+          "sign_count:integer{8}",
           "#{user_model_name}:references"
         ]
       end
