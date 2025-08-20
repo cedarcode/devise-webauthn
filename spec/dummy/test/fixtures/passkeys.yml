@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  external_id: MyString
+  name: MyString
+  public_key: MyText
+  sign_count: 1
+  user: one
+
+two:
+  external_id: MyString
+  name: MyString
+  public_key: MyText
+  sign_count: 1
+  user: two
