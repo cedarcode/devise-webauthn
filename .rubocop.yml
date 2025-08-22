@@ -5,6 +5,9 @@ plugins:
 AllCops:
   TargetRubyVersion: 3.1
   NewCops: enable
+  Exclude:
+    - "spec/dummy/**/*"
+    - "vendor/**/*"
 
 Style/Documentation:
   Enabled: false

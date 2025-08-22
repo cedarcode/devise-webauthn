@@ -24,10 +24,14 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
   spec.required_ruby_version = ">= 3.1"
 
+  spec.add_development_dependency "propshaft", "~> 1.2"
+  spec.add_development_dependency "puma", "~> 6.6"
+  spec.add_development_dependency "rails", "~> 8.0"
   spec.add_development_dependency "rspec", "~> 3.13"
   spec.add_development_dependency "rubocop", "~> 1.79"
   spec.add_development_dependency "rubocop-rails", "~> 2.32"
   spec.add_development_dependency "rubocop-rspec", "~> 3.6"
+  spec.add_development_dependency "sqlite3", "~> 2.7"
 
   spec.add_dependency "devise", "~> 4.9"
   spec.add_dependency "webauthn", "~> 3.0"
