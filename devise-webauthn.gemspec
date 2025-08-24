@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
   spec.required_ruby_version = ">= 3.1"
 
+  spec.add_development_dependency "importmap-rails"
   spec.add_development_dependency "propshaft", "~> 1.2"
   spec.add_development_dependency "puma", "~> 6.6"
   spec.add_development_dependency "rails", "~> 8.0"
