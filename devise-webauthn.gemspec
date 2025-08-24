@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "importmap-rails"
   spec.add_development_dependency "propshaft", "~> 1.2"
+  spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "puma", "~> 6.6"
   spec.add_development_dependency "rails", "~> 8.0"
   spec.add_development_dependency "rspec", "~> 3.13"
