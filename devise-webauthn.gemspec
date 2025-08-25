@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
   spec.required_ruby_version = ">= 3.1"
 
+  spec.add_development_dependency "capybara", "~> 3.40"
   spec.add_development_dependency "importmap-rails", "~> 2.2"
   spec.add_development_dependency "propshaft", "~> 1.2"
   spec.add_development_dependency "pry-byebug", "~> 3.11"
@@ -33,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop", "~> 1.79"
   spec.add_development_dependency "rubocop-rails", "~> 2.32"
   spec.add_development_dependency "rubocop-rspec", "~> 3.6"
+  spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "sqlite3", "~> 2.7"
   spec.add_development_dependency "stimulus-rails", "~> 1.3"
 

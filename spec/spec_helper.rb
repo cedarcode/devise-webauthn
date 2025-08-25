@@ -4,12 +4,15 @@ require "bundler/setup"
 require "devise/webauthn"
 require "rails/generators/test_case"
 require "support/generator_helper"
+require "support/passkeys_helper"
 
 require_relative "dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
 ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __dir__)
 
 require "rspec/rails"
+require "capybara/rspec"
+
 ENV["RAILS_ENV"] ||= "test"
 
 RSpec.configure do |config|
@@ -29,4 +32,5 @@ RSpec.configure do |config|
   config.include Rails::Generators::Testing::Assertions, type: :generator
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
+  config.include PasskeyHelper, type: :system
 end
