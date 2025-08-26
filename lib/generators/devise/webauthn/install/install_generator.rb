@@ -29,7 +29,7 @@ module Devise
         say "Error during passkey model generation: #{e.message}", :red
       end
 
-      def generate_webauthn_column
+      def generate_webauthn_id_column
         invoke "devise:webauthn:webauthn_id", [], resource_name: options[:resource_name]
       rescue StandardError => e
         say "Error during webauthn column generation: #{e.message}", :red
