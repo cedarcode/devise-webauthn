@@ -2,6 +2,7 @@
 
 require "bundler/setup"
 require "devise/webauthn"
+require "rails/generators/test_case"
 
 require_relative "dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
@@ -17,4 +18,7 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.include Rails::Generators::Testing::Behavior, type: :generator
+  config.include FileUtils, type: :generator
 end
