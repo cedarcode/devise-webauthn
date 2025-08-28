@@ -7,7 +7,7 @@ module Devise
     module EngineConfigurator
       def mount_passkeys_engine
         say "Adding passkeys engine mount...", :green
-        routes_file = "config/routes.rb"
+        routes_file = File.join(destination_root, "config/routes.rb")
 
         unless File.exist?(routes_file)
           say "Warning: config/routes.rb not found. Please add engine mount manually.", :yellow
