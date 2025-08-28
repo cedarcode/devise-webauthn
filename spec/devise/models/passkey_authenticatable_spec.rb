@@ -17,7 +17,7 @@ RSpec.describe Devise::Models::PasskeyAuthenticatable, type: :model do
   describe "associations" do
     it "has many passkeys" do
       user = User.create!(email: "user2@example.com", password: "password", password_confirmation: "password")
-      passkey = Passkey.create!(user: user, external_id: "ext", public_key: "pk", name: "My Passkey", sign_count: 1)
+      passkey = Passkey.create!(user: user, external_id: "ext", public_key: "pk", name: "My Passkey", sign_count: 0)
       expect(user.passkeys).to contain_exactly(passkey)
     end
   end
