@@ -10,10 +10,6 @@ module Devise
       private
 
       def setup_configuration_files
-        create_initializer
-      end
-
-      def create_initializer
         template "webauthn.rb", "config/initializers/webauthn.rb"
         say "Created initializer: config/initializers/webauthn.rb", :green
       end
