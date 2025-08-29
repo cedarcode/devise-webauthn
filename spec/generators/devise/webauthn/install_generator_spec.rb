@@ -13,7 +13,7 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
       add_config_directory
       add_routes
       allow(generator).to receive(:invoke)
-      generator.invoke_all
+      invoke generator
     end
 
     it "creates a weabauthn initializer" do
@@ -48,7 +48,7 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
       add_routes
       generator([destination_root], ["--resource_name=admin"])
       allow(generator).to receive(:invoke)
-      generator.invoke_all
+      invoke generator
     end
 
     it "invokes the passkey model generator with the custom resource name" do

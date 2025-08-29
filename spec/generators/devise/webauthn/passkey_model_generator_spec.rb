@@ -12,7 +12,7 @@ RSpec.describe Devise::Webauthn::PasskeyModelGenerator, type: :generator do
       prepare_destination
       create_passkey_model_file
       allow(generator).to receive(:invoke)
-      generator.invoke_all
+      invoke generator
     end
 
     it "invokes the active_record:model generator with correct arguments" do
@@ -37,7 +37,7 @@ RSpec.describe Devise::Webauthn::PasskeyModelGenerator, type: :generator do
       create_passkey_model_file
       generator([destination_root], ["--resource_name=admin"])
       allow(generator).to receive(:invoke)
-      generator.invoke_all
+      invoke generator
     end
 
     it "invokes the active_record:model generator with correct arguments" do

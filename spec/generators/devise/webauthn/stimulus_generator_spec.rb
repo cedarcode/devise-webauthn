@@ -9,7 +9,7 @@ RSpec.describe Devise::Webauthn::StimulusGenerator, type: :generator do
 
   before do
     prepare_destination
-    generator.invoke_all
+    invoke generator
   end
 
   it "copies the Stimulus controller to the correct location" do

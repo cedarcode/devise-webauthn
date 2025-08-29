@@ -11,7 +11,7 @@ RSpec.describe Devise::Webauthn::WebauthnIdGenerator, type: :generator do
     before do
       prepare_destination
       allow(generator).to receive(:invoke)
-      generator.invoke_all
+      invoke generator
     end
 
     it "invokes the active_record:migration generator with correct arguments" do
@@ -25,7 +25,7 @@ RSpec.describe Devise::Webauthn::WebauthnIdGenerator, type: :generator do
       prepare_destination
       generator([destination_root], ["--resource_name=admin"])
       allow(generator).to receive(:invoke)
-      generator.invoke_all
+      invoke generator
     end
 
     it "invokes the active_record:migration generator with correct arguments" do
