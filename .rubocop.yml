@@ -20,3 +20,15 @@ Metrics/MethodLength:
 
 Gemspec/DevelopmentDependencies:
   Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 3
+
+RSpec/ExampleLength:
+  Max: 20
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
