@@ -25,20 +25,14 @@ module Devise
 
       def generate_passkey_model
         invoke "devise:webauthn:passkey_model", [], resource_name: options[:resource_name]
-      rescue StandardError => e
-        say "Error during passkey model generation: #{e.message}", :red
       end
 
       def generate_webauthn_id_column
         invoke "devise:webauthn:webauthn_id", [], resource_name: options[:resource_name]
-      rescue StandardError => e
-        say "Error during webauthn column generation: #{e.message}", :red
       end
 
       def generate_stimulus_controller
         invoke "devise:webauthn:stimulus"
-      rescue StandardError => e
-        say "Error during stimulus controller generation: #{e.message}", :red
       end
 
       def final_message
