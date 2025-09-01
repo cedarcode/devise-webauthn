@@ -33,4 +33,15 @@ RSpec.configure do |config|
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
   config.include PasskeyHelper, type: :system
+
+  config.before(:each, type: :system) do
+    driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
+    Rails.application.reload_routes_unless_loaded
+
+    Capybara.app_host = "http://localhost:3030"
+    Capybara.server_host = "localhost"
+    Capybara.server_port = 3030
+  end
+
+  config.include Devise::Test::IntegrationHelpers, type: :system
 end
