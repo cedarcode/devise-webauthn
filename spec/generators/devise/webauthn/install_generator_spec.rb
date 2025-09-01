@@ -7,14 +7,16 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
   tests described_class
   destination File.expand_path("../../../tmp", __dir__)
 
+  before do
+    prepare_destination
+    add_config_directory
+    add_routes
+    allow(generator_instance).to receive(:invoke)
+    invoke generator_instance
+  end
+
   context "when using default resource name" do
-    before do
-      prepare_destination
-      add_config_directory
-      add_routes
-      allow(generator).to receive(:invoke)
-      invoke generator
-    end
+    let(:generator_instance) { generator }
 
     it "creates a weabauthn initializer" do
       assert_file "config/initializers/webauthn.rb"
@@ -41,14 +43,7 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
   end
 
   context "when using a custom resource name" do
-    before do
-      prepare_destination
-      add_config_directory
-      add_routes
-      generator([destination_root], ["--resource_name=admin"])
-      allow(generator).to receive(:invoke)
-      invoke generator
-    end
+    let(:generator_instance) { generator([destination_root], ["--resource_name=admin"]) }
 
     it "invokes the passkey model generator with the custom resource name" do
       expect(generator).to have_received(:invoke)
