@@ -6,11 +6,7 @@ WebAuthn.configure do |config|
   # Multiple origins can be used when needed. Using more than one will imply you MUST configure rp_id explicitely.
   # please see [our Advanced Configuration section](https://github.com/cedarcode/webauthn-ruby/blob/master/docs/advanced_configuration.md)
   # instead of adding multiple origins.
-  config.allowed_origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://0.0.0.0:3000"
-  ]
+  config.allowed_origins = [ "http://localhost:3030" ]
 
   # Relying Party name for display purposes
   config.rp_name = "Example Inc."
