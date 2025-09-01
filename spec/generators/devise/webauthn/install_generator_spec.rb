@@ -10,7 +10,6 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
   before do
     prepare_destination
     add_config_directory
-    add_routes
     allow(generator_instance).to receive(:invoke)
     invoke generator_instance
   end
@@ -20,10 +19,6 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
 
     it "creates a weabauthn initializer" do
       assert_file "config/initializers/webauthn.rb"
-    end
-
-    it "mounts the engine in routes.rb" do
-      assert_file "config/routes.rb", %r{mount Devise::Webauthn::Engine, at: "/devise-webauthn"}
     end
 
     it "invokes the passkey model generator" do
@@ -59,11 +54,4 @@ end
 
 def add_config_directory
   FileUtils.mkdir_p(File.join(destination_root, "config"))
-end
-
-def add_routes
-  File.write(File.join(destination_root, "config", "routes.rb"), <<~CONTENT)
-    Rails.application.routes.draw do
-    end
-  CONTENT
 end

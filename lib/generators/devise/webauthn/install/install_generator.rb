@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
 require "rails/generators"
-require_relative "engine_configurator"
 
 module Devise
   module Webauthn
     class InstallGenerator < Rails::Generators::Base
-      include EngineConfigurator
-
       source_root File.expand_path("templates", __dir__)
 
       desc "Install Devise::Webauthn configuration into your application"
@@ -19,8 +16,6 @@ module Devise
 
         template "webauthn.rb", "config/initializers/webauthn.rb"
         say "Created initializer: config/initializers/webauthn.rb", :green
-
-        mount_passkeys_engine
       end
 
       def generate_passkey_model
