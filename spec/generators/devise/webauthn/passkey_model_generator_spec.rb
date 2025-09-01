@@ -22,12 +22,8 @@ RSpec.describe Devise::Webauthn::PasskeyModelGenerator, type: :generator do
     end
 
     it "injects validations into the Passkey model" do
-      content = File.read(File.join(destination_root, "app/models/passkey.rb"))
-
-      expect(content).to include(
-        "validates :external_id, :public_key, :name, :sign_count, presence: true",
-        "validates :external_id, uniqueness: true"
-      )
+      assert_file "app/models/passkey.rb", /validates :external_id, :public_key, :name, :sign_count, presence: true/
+      assert_file "app/models/passkey.rb", /validates :external_id, uniqueness: true/
     end
   end
 

@@ -26,6 +26,7 @@ RSpec.configure do |config|
   end
 
   config.include Rails::Generators::Testing::Behavior, type: :generator
+  config.include Rails::Generators::Testing::Assertions, type: :generator
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
 end

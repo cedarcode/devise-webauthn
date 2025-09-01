@@ -17,12 +17,11 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
     end
 
     it "creates a weabauthn initializer" do
-      expect(File).to exist(File.join(destination_root, "config/initializers/webauthn.rb"))
+      assert_file "config/initializers/webauthn.rb"
     end
 
     it "mounts the engine in routes.rb" do
-      routes = File.read(File.join(destination_root, "config/routes.rb"))
-      expect(routes).to include('mount Devise::Webauthn::Engine, at: "/devise-webauthn"')
+      assert_file "config/routes.rb", %r{mount Devise::Webauthn::Engine, at: "/devise-webauthn"}
     end
 
     it "invokes the passkey model generator" do
