@@ -40,6 +40,12 @@ module Devise
       rescue StandardError => e
         say "Error during stimulus controller generation: #{e.message}", :red
       end
+
+      def final_message
+        say ""
+        say "Almost done! Now edit `config/initializers/webauthn.rb` and set the `allowed_origins` for your app.",
+            :yellow
+      end
     end
   end
 end
