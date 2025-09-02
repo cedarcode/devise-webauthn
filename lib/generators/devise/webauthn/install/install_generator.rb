@@ -31,8 +31,7 @@ module Devise
       end
 
       def final_message
-        say ""
-        say "Almost done! Now edit `config/initializers/webauthn.rb` and set the `allowed_origins` for your app.",
+        say "\nAlmost done! Now edit `config/initializers/webauthn.rb` and set the `allowed_origins` for your app.",
             :yellow
       end
     end
