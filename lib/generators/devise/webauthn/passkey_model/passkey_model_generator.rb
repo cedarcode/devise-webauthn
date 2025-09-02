@@ -7,7 +7,6 @@ module Devise
   module Webauthn
     class PasskeyModelGenerator < Rails::Generators::Base
       namespace "devise:webauthn:passkey_model"
-      source_root File.expand_path("templates", __dir__)
 
       desc "Generate a Passkey model with the required fields for WebAuthn"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"

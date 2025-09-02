@@ -7,7 +7,6 @@ module Devise
   module Webauthn
     class WebauthnIdGenerator < Rails::Generators::Base
       namespace "devise:webauthn:webauthn_id"
-      source_root File.expand_path("templates", __dir__)
 
       desc "Add webauthn_id field to User model"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
