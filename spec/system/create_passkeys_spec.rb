@@ -8,12 +8,10 @@ RSpec.describe "CreatePasskeys", type: :system do
     )
   end
 
-  before do
-    @authenticator = add_virtual_authenticator
-  end
+  let!(:authenticator) { add_virtual_authenticator }
 
   after do
-    @authenticator.remove! # rubocop:disable RSpec/InstanceVariable
+    authenticator.remove!
   end
 
   context "when user doesn't have passkeys" do
