@@ -7,7 +7,7 @@ module Devise
         raise ArgumentError, "Block is required for create_passkey_form" unless block_given?
 
         form_with(
-          url: devise_webauthn.passkeys_path,
+          url: user_passkeys_path,
           method: :post,
           local: true,
           class: form_classes,

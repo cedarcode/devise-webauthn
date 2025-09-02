@@ -10,11 +10,14 @@ module Devise
       end
 
       initializer "devise.webauthn.add_module" do
+        require "devise/webauthn/routes"
+
         Devise.add_module(
           :passkey_authenticatable,
           {
             model: "devise/models/passkey_authenticatable",
-            strategy: true
+            strategy: true,
+            route: { passkey_authentication: routes }
           }
         )
       end
