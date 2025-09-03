@@ -2,19 +2,21 @@
 
 module Devise
   module Webauthn
-    class PasskeysController < ApplicationController
+    class PasskeysController < DeviseController
       before_action :authenticate_user!
 
       def create
         passkey_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:passkey_public_key]))
 
         if verify_and_save_passkey(passkey_from_params)
-          redirect_back fallback_location:, notice: I18n.t("devise.webauthn.passkey_created")
+          set_flash_message! :notice, :passkey_created, scope: :"devise.webauthn"
         else
-          redirect_back fallback_location:, alert: I18n.t("devise.webauthn.passkey_creation_failed")
+          set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
         end
+        redirect_back fallback_location:
       rescue WebAuthn::Error
-        redirect_back fallback_location:, alert: I18n.t("devise.failure.passkey_verification_failed")
+        set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
+        redirect_back fallback_location:
       ensure
         session.delete(:webauthn_challenge)
       end
