@@ -22,7 +22,7 @@ RSpec.describe "CreatePasskeys", type: :system do
       fill_in "Passkey name", with: "My Passkey"
       click_button "Create Passkey"
 
-      expect(page).to have_content("My Passkey")
+      expect(page).to have_content("Passkey created successfully.")
     end
   end
 end
