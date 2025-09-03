@@ -9,7 +9,6 @@ module Devise
         form_with(
           url: user_passkeys_path,
           method: :post,
-          local: true,
           class: form_classes,
           data: {
             action: "passkeys#create:prevent",
