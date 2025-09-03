@@ -25,4 +25,20 @@ RSpec.describe "CreatePasskeys", type: :system do
       expect(page).to have_content("Passkey created successfully.")
     end
   end
+
+  context "when verification fails in the rp" do
+    before do
+      WebAuthn.configuration.allowed_origins = ["http://localhost:5000"]
+    end
+
+    it "fails to create a passkey" do
+      sign_in user
+      visit edit_user_registration_path(user)
+
+      fill_in "Passkey name", with: "My Passkey"
+      click_button "Create Passkey"
+
+      expect(page).to have_content("Passkey verification failed.")
+    end
+  end
 end
