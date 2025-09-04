@@ -25,7 +25,7 @@ module Devise
       private
 
       def passkey_param
-        params.dig(:user, :passkey_public_key)
+        params[:passkey_public_key]
       end
 
       def verify_passkeys(passkey_from_params, stored_passkey)
