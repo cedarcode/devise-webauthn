@@ -7,7 +7,7 @@ module Devise
         raise ArgumentError, "Block is required for create_passkey_form" unless block_given?
 
         form_with(
-          url: user_passkeys_path,
+          url: passkeys_path,
           method: :post,
           class: form_classes,
           data: {
@@ -42,6 +42,10 @@ module Devise
 
           options
         end
+      end
+
+      def passkeys_path
+        public_send("#{resource_name}_passkeys_path")
       end
     end
   end
