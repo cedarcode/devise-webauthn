@@ -28,7 +28,8 @@ RSpec.describe "CreatePasskeys", type: :system do
 
   context "when verification fails in the rp" do
     before do
-      WebAuthn.configuration.allowed_origins = ["http://localhost:5000"]
+      allow(WebAuthn.configuration.relying_party).to receive(:allowed_origins)
+        .and_return(["http://localhost:5000"])
     end
 
     it "fails to create a passkey" do
