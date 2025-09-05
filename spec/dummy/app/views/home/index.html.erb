@@ -1,3 +1,11 @@
-<div> Edit user: <%= link_to "Edit", edit_user_registration_path(current_user) %> </div>
+<% if current_user %>
+  <div>
+    Passkeys:
+
+    <% current_user.passkeys.each do |passkey| %>
+      <li><%= passkey.name %></li>
+    <% end %>
+  </div>
+<% end %>
 
 <div> Add Passkey: <%= link_to "Add Passkey", new_user_passkey_path %> </div>
