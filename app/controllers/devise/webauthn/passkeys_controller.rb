@@ -30,10 +30,10 @@ module Devise
         else
           set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
         end
-        redirect_back fallback_location:
+        redirect_to after_update_path
       rescue WebAuthn::Error
         set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
-        redirect_back fallback_location:
+        redirect_to after_update_path
       ensure
         session.delete(:webauthn_challenge)
       end
@@ -59,7 +59,11 @@ module Devise
         )
       end
 
-      def fallback_location = main_app.root_path
+      # The default url to be used after creating a passkey. You can overwrite
+      # this method in your own PasskeysController.
+      def after_update_path
+        public_send("new_#{resource_name}_passkey_path")
+      end
     end
   end
 end
