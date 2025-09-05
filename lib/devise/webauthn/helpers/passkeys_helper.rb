@@ -4,8 +4,6 @@ module Devise
   module Webauthn
     module PasskeysHelper
       def create_passkey_form(form_classes: nil, &block)
-        raise ArgumentError, "Block is required for create_passkey_form" unless block_given?
-
         form_with(
           url: passkeys_path,
           method: :post,
