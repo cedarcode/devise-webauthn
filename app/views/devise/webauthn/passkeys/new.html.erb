@@ -1,0 +1,13 @@
+<div>
+  Passkeys:
+
+  <% current_user.passkeys.each do |passkey| %>
+    <li><%= passkey.name %></li>
+  <% end %>
+</div>
+
+<%= create_passkey_form do |form| %>
+  <%= form.label :name, 'Passkey name' %>
+  <%= form.text_field :name, required: true %>
+  <%= form.submit 'Create Passkey' %>
+<% end %>

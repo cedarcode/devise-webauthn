@@ -20,7 +20,7 @@ RSpec.describe "CreatePasskeys", type: :system do
 
   context "when user doesn't have passkeys" do
     it "allows creating a passkey" do
-      visit edit_user_registration_path(user)
+      visit new_user_passkey_path
 
       fill_in "Passkey name", with: "My Passkey"
       click_button "Create Passkey"
@@ -36,7 +36,7 @@ RSpec.describe "CreatePasskeys", type: :system do
     end
 
     it "fails to create a passkey" do
-      visit edit_user_registration_path(user)
+      visit new_user_passkey_path
 
       fill_in "Passkey name", with: "My Passkey"
       click_button "Create Passkey"

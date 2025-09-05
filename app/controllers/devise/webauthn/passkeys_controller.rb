@@ -5,6 +5,23 @@ module Devise
     class PasskeysController < DeviseController
       before_action :authenticate_user!
 
+      def new
+        @create_passkey_options = WebAuthn::Credential.options_for_create(
+          user: {
+            id: current_user.webauthn_id,
+            name: current_user.email
+          },
+          exclude: current_user.passkeys.pluck(:external_id),
+          authenticator_selection: {
+            resident_key: "required",
+            user_verification: "required"
+          }
+        )
+
+        # Store challenge in session for later verification
+        session[:webauthn_challenge] = @create_passkey_options.challenge
+      end
+
       def create
         passkey_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:passkey_public_key]))
 

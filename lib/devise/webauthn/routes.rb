@@ -6,7 +6,7 @@ module ActionDispatch
       protected
 
       def devise_passkey_authentication(_mapping, _controllers)
-        resources :passkeys, only: %i[create], controller: "devise/webauthn/passkeys"
+        resources :passkeys, only: %i[new create], controller: "devise/webauthn/passkeys"
       end
     end
   end
