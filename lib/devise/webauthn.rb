@@ -12,5 +12,8 @@ require_relative "webauthn/routes"
 
 module Devise
   module Webauthn
+    module Test
+      autoload :AuthenticatorHelpers, "devise/webauthn/test/authenticator_helpers"
+    end
   end
 end

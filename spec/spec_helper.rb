@@ -4,7 +4,6 @@ require "bundler/setup"
 require "devise/webauthn"
 require "rails/generators/test_case"
 require "support/generator_helper"
-require "support/passkeys_helper"
 
 require_relative "dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
@@ -32,7 +31,6 @@ RSpec.configure do |config|
   config.include Rails::Generators::Testing::Assertions, type: :generator
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
-  config.include PasskeyHelper, type: :system
 
   config.before(:each, type: :system) do
     driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
@@ -43,4 +41,5 @@ RSpec.configure do |config|
   end
 
   config.include Devise::Test::IntegrationHelpers, type: :system
+  config.include Devise::Webauthn::Test::AuthenticatorHelpers, type: :system
 end
