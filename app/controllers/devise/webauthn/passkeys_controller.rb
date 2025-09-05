@@ -3,15 +3,15 @@
 module Devise
   module Webauthn
     class PasskeysController < DeviseController
-      before_action :authenticate_user!
+      before_action :authenticate_resource!
 
       def new
         @create_passkey_options = WebAuthn::Credential.options_for_create(
           user: {
-            id: current_user.webauthn_id,
-            name: current_user.email
+            id: resource.webauthn_id,
+            name: resource.email
           },
-          exclude: current_user.passkeys.pluck(:external_id),
+          exclude: resource.passkeys.pluck(:external_id),
           authenticator_selection: {
             resident_key: "required",
             user_verification: "required"
@@ -40,13 +40,18 @@ module Devise
 
       private
 
+      def authenticate_resource!
+        send(:"authenticate_#{resource_name}!", force: true)
+        self.resource = send(:"current_#{resource_name}")
+      end
+
       def verify_and_save_passkey(passkey_from_params)
         passkey_from_params.verify(
           session[:webauthn_challenge],
           user_verification: true
         )
 
-        current_user.passkeys.create(
+        resource.passkeys.create(
           external_id: passkey_from_params.id,
           name: params[:name],
           public_key: passkey_from_params.public_key,
