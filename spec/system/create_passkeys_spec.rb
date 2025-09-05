@@ -10,13 +10,16 @@ RSpec.describe "CreatePasskeys", type: :system do
 
   let!(:authenticator) { add_virtual_authenticator }
 
+  before do
+    sign_in user
+  end
+
   after do
     authenticator.remove!
   end
 
   context "when user doesn't have passkeys" do
     it "allows creating a passkey" do
-      sign_in user
       visit edit_user_registration_path(user)
 
       fill_in "Passkey name", with: "My Passkey"
@@ -33,7 +36,6 @@ RSpec.describe "CreatePasskeys", type: :system do
     end
 
     it "fails to create a passkey" do
-      sign_in user
       visit edit_user_registration_path(user)
 
       fill_in "Passkey name", with: "My Passkey"
