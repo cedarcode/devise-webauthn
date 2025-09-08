@@ -11,7 +11,7 @@ module Devise
           data: {
             action: "passkeys#create:prevent",
             controller: "passkeys",
-            passkeys_options_param: @create_passkey_options
+            passkeys_options_param: create_passkey_options
           }
         ) do |f|
           concat f.hidden_field(:passkey_public_key, data: { "passkeys-target": "hiddenPasskeyPublicKeyInput" })
@@ -20,6 +20,27 @@ module Devise
       end
 
       private
+
+      def create_passkey_options
+        @create_passkey_options ||= begin
+          options = WebAuthn::Credential.options_for_create(
+            user: {
+              id: resource.webauthn_id,
+              name: resource.email
+            },
+            exclude: resource.passkeys.pluck(:external_id),
+            authenticator_selection: {
+              resident_key: "required",
+              user_verification: "required"
+            }
+          )
+
+          # Store challenge in session for later verification
+          session[:webauthn_challenge] = options.challenge
+
+          options
+        end
+      end
 
       def passkeys_path
         main_app.public_send("#{resource_name}_passkeys_path")
