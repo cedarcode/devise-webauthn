@@ -3,7 +3,7 @@
 module Devise
   module Webauthn
     class PasskeysController < DeviseController
-      before_action :authenticate_resource!
+      before_action :authenticate_scope!
 
       def new; end
 
@@ -25,7 +25,7 @@ module Devise
 
       private
 
-      def authenticate_resource!
+      def authenticate_scope!
         send(:"authenticate_#{resource_name}!", force: true)
         self.resource = send(:"current_#{resource_name}")
       end
