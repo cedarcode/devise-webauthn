@@ -5,8 +5,8 @@ module ActionDispatch
     class Mapper
       protected
 
-      def devise_passkey_authentication(_mapping, _controllers)
-        resources :passkeys, only: %i[new create], controller: "devise/webauthn/passkeys"
+      def devise_passkey_authentication(_mapping, controllers)
+        resources :passkeys, only: %i[new create], controller: controllers[:passkeys]
       end
     end
   end
