@@ -14,9 +14,16 @@ module Devise
           :passkey_authenticatable,
           {
             model: "devise/models/passkey_authenticatable",
-            strategy: true
+            strategy: true,
+            route: { passkey_authentication: routes }
           }
         )
+      end
+
+      initializer "devise.webauthn.helpers" do
+        ActiveSupport.on_load(:action_view) do
+          include Devise::Webauthn::PasskeysHelper
+        end
       end
     end
   end

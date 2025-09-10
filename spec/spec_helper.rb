@@ -10,6 +10,8 @@ ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/mi
 ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __dir__)
 
 require "rspec/rails"
+require "capybara/rspec"
+
 ENV["RAILS_ENV"] ||= "test"
 
 RSpec.configure do |config|
@@ -29,4 +31,15 @@ RSpec.configure do |config|
   config.include Rails::Generators::Testing::Assertions, type: :generator
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
+
+  config.before(:each, type: :system) do
+    driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
+    Rails.application.reload_routes_unless_loaded
+
+    Capybara.server_host = "localhost"
+    WebAuthn.configuration.allowed_origins = ["http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"]
+  end
+
+  config.include Devise::Test::IntegrationHelpers, type: :system
+  config.include Devise::Webauthn::Test::AuthenticatorHelpers, type: :system
 end
