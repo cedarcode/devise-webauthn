@@ -11,7 +11,7 @@ module Devise
         passkey_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:passkey_public_key]))
 
         if verify_and_save_passkey(passkey_from_params)
-          set_flash_message! :notice, :passkey_created, scope: :"devise.webauthn"
+          set_flash_message! :notice, :passkey_created
         else
           set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
         end
