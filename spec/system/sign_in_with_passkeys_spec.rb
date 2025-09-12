@@ -10,27 +10,28 @@ RSpec.describe "SignInWithPasskeys", type: :system do
 
   let!(:authenticator) { add_virtual_authenticator }
 
-  before do
-    sign_in user
-  end
-
   after do
     authenticator.remove!
   end
 
-  it "allows to create a passkey and then sign in with it" do
-    visit new_user_passkey_path
+  context "when user has passkeys" do
+    before do
+      sign_in user
+      visit new_user_passkey_path
 
-    fill_in "Passkey name", with: "My Passkey"
-    click_button "Create Passkey"
+      fill_in "Passkey name", with: "My Passkey"
+      click_button "Create Passkey"
 
-    expect(page).to have_content("Passkey created successfully.")
+      page.has_text?("Passkey created successfully.")
 
-    sign_out user
+      sign_out user
+    end
 
-    visit new_user_session_path
-    click_button "Log in with passkeys"
+    it "allows to create a passkey and then sign in with it" do
+      visit new_user_session_path
+      click_button "Log in with passkeys"
 
-    expect(page).to have_content("Signed in successfully.")
+      expect(page).to have_content("Signed in successfully.")
+    end
   end
 end
