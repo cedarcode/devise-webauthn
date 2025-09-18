@@ -17,6 +17,7 @@ RSpec.describe Devise::Webauthn::ViewsGenerator, type: :generator do
 
     it "copies the views to the correct location" do
       assert_file "app/views/devise/sessions/new.html.erb"
+      assert_file "app/views/devise/passkeys/new.html.erb"
     end
   end
 
@@ -25,6 +26,7 @@ RSpec.describe Devise::Webauthn::ViewsGenerator, type: :generator do
 
     it "copies the views to the correct location" do
       assert_file "app/views/admins/sessions/new.html.erb"
+      assert_file "app/views/admins/passkeys/new.html.erb"
     end
   end
 end

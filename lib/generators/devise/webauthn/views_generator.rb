@@ -13,6 +13,7 @@ module Devise
                        desc: "The scope to copy views to"
 
       def copy_views
+        view_directory :passkeys
         view_directory :sessions
       end
 
