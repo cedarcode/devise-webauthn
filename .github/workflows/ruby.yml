@@ -20,6 +20,13 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+          - 3.4
+          - 3.3
+          - 3.2
 
     steps:
     - name: Check out repository code
@@ -28,6 +35,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
+        ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
 
     - name: Run tests
