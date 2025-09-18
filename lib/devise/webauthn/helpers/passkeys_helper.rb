@@ -19,6 +19,22 @@ module Devise
         end
       end
 
+      def login_with_passkey_button(text = nil, button_classes: nil, form_classes: nil, &block)
+        form_with(
+          url: resource_session_path,
+          method: :post,
+          data: {
+            action: "passkeys#get:prevent",
+            controller: "passkeys",
+            passkeys_options_param: webauthn_authentication_options
+          },
+          class: form_classes
+        ) do |f|
+          concat f.hidden_field(:passkey_public_key, data: { "passkeys-target": "hiddenPasskeyPublicKeyInput" })
+          concat f.button(text, type: "submit", class: button_classes, &block)
+        end
+      end
+
       private
 
       def create_passkey_options
@@ -40,6 +56,23 @@ module Devise
 
           options
         end
+      end
+
+      def webauthn_authentication_options
+        @webauthn_authentication_options ||= begin
+          options = WebAuthn::Credential.options_for_get(
+            user_verification: "required"
+          )
+
+          # Store challenge in session for later verification
+          session[:authentication_challenge] = options.challenge
+
+          options
+        end
+      end
+
+      def resource_session_path
+        session_path(resource_name)
       end
 
       def passkeys_path
