@@ -12,9 +12,18 @@ module Devise
       argument :scope, required: false, default: nil,
                        desc: "The scope to copy views to"
 
+      class_option :views, aliases: "-v", type: :array,
+                           desc: "Select specific view directories to generate (sessions, passkeys)"
+
       def copy_views
-        view_directory :passkeys
-        view_directory :sessions
+        if options[:views]
+          options[:views].each do |directory|
+            view_directory directory.to_sym
+          end
+        else
+          view_directory :passkeys
+          view_directory :sessions
+        end
       end
 
       private
