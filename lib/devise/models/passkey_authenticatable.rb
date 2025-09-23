@@ -8,7 +8,7 @@ module Devise
       extend ActiveSupport::Concern
 
       included do
-        has_many :passkeys, dependent: :destroy
+        has_many :passkeys, dependent: :destroy, class_name: "WebauthnCredential"
 
         validates :webauthn_id, uniqueness: true, allow_blank: true
 

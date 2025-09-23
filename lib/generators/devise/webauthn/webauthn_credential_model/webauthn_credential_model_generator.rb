@@ -5,15 +5,15 @@ require "rails/generators/active_record"
 
 module Devise
   module Webauthn
-    class PasskeyModelGenerator < Rails::Generators::Base
-      namespace "devise:webauthn:passkey_model"
+    class WebauthnCredentialModelGenerator < Rails::Generators::Base
+      namespace "devise:webauthn:webauthn_credential_model"
 
-      desc "Generate a Passkey model with the required fields for WebAuthn"
+      desc "Generate a WebauthnCredential model with the required fields for WebAuthn"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
 
       def generate_model
         invoke "active_record:model", [
-          "passkey",
+          "webauthn_credential",
           "external_id:string:uniq",
           "name:string",
           "public_key:text",
@@ -22,8 +22,8 @@ module Devise
         ]
       end
 
-      def inject_passkey_content
-        inject_into_file("app/models/passkey.rb", before: /^end\s*$/) do
+      def inject_webauthn_credential_content
+        inject_into_file("app/models/webauthn_credential.rb", before: /^end\s*$/) do
           <<~RUBY.indent(2)
             validates :external_id, :public_key, :name, :sign_count, presence: true
             validates :external_id, uniqueness: true
@@ -33,7 +33,7 @@ module Devise
 
       def show_instructions
         say <<~MSG
-          Passkey model has been generated! Next steps:
+          WebauthnCredential model has been generated! Next steps:
 
           1. Run the migration:
              rails db:migrate

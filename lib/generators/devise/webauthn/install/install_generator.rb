@@ -18,8 +18,8 @@ module Devise
         say "Created initializer: config/initializers/webauthn.rb", :green
       end
 
-      def generate_passkey_model
-        invoke "devise:webauthn:passkey_model", [], resource_name: options[:resource_name]
+      def generate_webauthn_credential_model
+        invoke "devise:webauthn:webauthn_credential_model", [], resource_name: options[:resource_name]
       end
 
       def generate_webauthn_id_column

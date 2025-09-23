@@ -1,6 +1,6 @@
-class CreatePasskeys < ActiveRecord::Migration[8.0]
+class CreateWebauthnCredentials < ActiveRecord::Migration[8.0]
   def change
-    create_table :passkeys do |t|
+    create_table :webauthn_credentials do |t|
       t.string :external_id
       t.string :name
       t.text :public_key
@@ -9,6 +9,6 @@ class CreatePasskeys < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :passkeys, :external_id, unique: true
+    add_index :webauthn_credentials, :external_id, unique: true
   end
 end
