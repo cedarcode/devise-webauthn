@@ -13,6 +13,6 @@ RSpec.describe Devise::Webauthn::StimulusGenerator, type: :generator do
   end
 
   it "copies the Stimulus controller to the correct location" do
-    assert_file "app/javascript/controllers/passkeys_controller.js"
+    assert_file "app/javascript/controllers/webauthn_credentials_controller.js"
   end
 end

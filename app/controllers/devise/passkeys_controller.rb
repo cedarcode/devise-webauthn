@@ -7,7 +7,7 @@ module Devise
     def new; end
 
     def create
-      passkey_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:passkey_public_key]))
+      passkey_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
 
       if verify_and_save_passkey(passkey_from_params)
         set_flash_message! :notice, :passkey_created

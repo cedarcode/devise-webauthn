@@ -9,12 +9,13 @@ module Devise
           method: :post,
           class: form_classes,
           data: {
-            action: "passkeys#create:prevent",
-            controller: "passkeys",
-            passkeys_options_param: create_passkey_options
+            action: "webauthn-credentials#create:prevent",
+            controller: "webauthn-credentials",
+            webauthn_credentials_options_param: create_passkey_options
           }
         ) do |f|
-          concat f.hidden_field(:passkey_public_key, data: { "passkeys-target": "hiddenPasskeyPublicKeyInput" })
+          concat f.hidden_field(:public_key_credential,
+                                data: { "webauthn-credentials-target": "credentialHiddenInput" })
           concat capture(f, &block)
         end
       end
@@ -24,13 +25,14 @@ module Devise
           url: resource_session_path,
           method: :post,
           data: {
-            action: "passkeys#get:prevent",
-            controller: "passkeys",
-            passkeys_options_param: webauthn_authentication_options
+            action: "webauthn-credentials#get:prevent",
+            controller: "webauthn-credentials",
+            webauthn_credentials_options_param: webauthn_authentication_options
           },
           class: form_classes
         ) do |f|
-          concat f.hidden_field(:passkey_public_key, data: { "passkeys-target": "hiddenPasskeyPublicKeyInput" })
+          concat f.hidden_field(:public_key_credential,
+                                data: { "webauthn-credentials-target": "credentialHiddenInput" })
           concat f.button(text, type: "submit", class: button_classes, &block)
         end
       end
