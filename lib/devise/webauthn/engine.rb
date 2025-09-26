@@ -22,7 +22,7 @@ module Devise
 
       initializer "devise.webauthn.helpers" do
         ActiveSupport.on_load(:action_view) do
-          include Devise::Webauthn::PasskeysHelper
+          include Devise::Webauthn::CredentialsHelper
         end
       end
     end

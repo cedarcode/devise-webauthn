@@ -21,9 +21,9 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
       assert_file "config/initializers/webauthn.rb"
     end
 
-    it "invokes the passkey model generator" do
+    it "invokes the webauthn credential model generator" do
       expect(generator).to have_received(:invoke)
-        .with("devise:webauthn:passkey_model", [], resource_name: "user")
+        .with("devise:webauthn:webauthn_credential_model", [], resource_name: "user")
     end
 
     it "invokes the webauthn_id column generator" do
@@ -40,9 +40,9 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
   context "when using a custom resource name" do
     let(:generator_instance) { generator([destination_root], ["--resource_name=admin"]) }
 
-    it "invokes the passkey model generator with the custom resource name" do
+    it "invokes the webauthn credential model generator with the custom resource name" do
       expect(generator).to have_received(:invoke)
-        .with("devise:webauthn:passkey_model", [], resource_name: "admin")
+        .with("devise:webauthn:webauthn_credential_model", [], resource_name: "admin")
     end
 
     it "invokes the webauthn_id column generator with the custom resource name" do

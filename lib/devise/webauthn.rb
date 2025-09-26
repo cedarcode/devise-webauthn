@@ -7,7 +7,7 @@ require_relative "webauthn/version"
 require_relative "webauthn/engine"
 require_relative "models/passkey_authenticatable"
 require_relative "strategies/passkey_authenticatable"
-require_relative "webauthn/helpers/passkeys_helper"
+require_relative "webauthn/helpers/credentials_helper"
 require_relative "webauthn/routes"
 
 module Devise
