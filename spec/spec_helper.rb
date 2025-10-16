@@ -34,7 +34,6 @@ RSpec.configure do |config|
 
   config.before(:each, type: :system) do
     driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
-    Rails.application.reload_routes_unless_loaded
 
     Capybara.server_host = "localhost"
     WebAuthn.configuration.allowed_origins = ["http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"]
