@@ -41,5 +41,6 @@ RSpec.configure do |config|
   end
 
   config.include Devise::Test::IntegrationHelpers, type: :system
+  config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Webauthn::Test::AuthenticatorHelpers, type: :system
 end
