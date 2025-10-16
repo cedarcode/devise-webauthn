@@ -33,6 +33,8 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v5
 
+    - run: rm Gemfile.lock
+
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
