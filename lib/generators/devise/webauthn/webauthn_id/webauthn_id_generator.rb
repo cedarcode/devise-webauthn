@@ -6,6 +6,7 @@ require "rails/generators/active_record"
 module Devise
   module Webauthn
     class WebauthnIdGenerator < Rails::Generators::Base
+      hide!
       namespace "devise:webauthn:webauthn_id"
 
       desc "Add webauthn_id field to User model"

@@ -5,6 +5,7 @@ require "rails/generators"
 module Devise
   module Webauthn
     class StimulusGenerator < Rails::Generators::Base
+      hide!
       source_root File.expand_path("templates", __dir__)
 
       desc "Copy DeviseWebauthn Stimulus controller to your application"

@@ -6,6 +6,7 @@ require "rails/generators/active_record"
 module Devise
   module Webauthn
     class WebauthnCredentialModelGenerator < Rails::Generators::Base
+      hide!
       namespace "devise:webauthn:webauthn_credential_model"
 
       desc "Generate a WebauthnCredential model with the required fields for WebAuthn"
