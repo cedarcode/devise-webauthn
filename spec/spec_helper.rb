@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+ENV["RAILS_ENV"] ||= "test"
+
 require "bundler/setup"
 require "devise/webauthn"
 require "rails/generators/test_case"
@@ -11,8 +13,6 @@ ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __d
 
 require "rspec/rails"
 require "capybara/rspec"
-
-ENV["RAILS_ENV"] ||= "test"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
