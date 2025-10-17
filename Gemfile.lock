@@ -337,7 +337,7 @@ DEPENDENCIES
   devise-webauthn!
   importmap-rails (~> 2.0)
   propshaft (~> 1.2)
-  pry-byebug (~> 3.11)
+  pry-byebug (~> 3.10)
   puma (~> 6.6)
   rails (~> 7.1)
   rspec-rails (~> 7.1)

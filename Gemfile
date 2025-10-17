@@ -10,7 +10,7 @@ gemspec
 gem "capybara", "~> 3.39"
 gem "importmap-rails", "~> 2.0"
 gem "propshaft", "~> 1.2"
-gem "pry-byebug", "~> 3.11"
+gem "pry-byebug", "~> 3.10"
 gem "puma", "~> 6.6"
 gem "rails", "~> 7.1"
 gem "rspec-rails", "~> 7.1"
