@@ -19,3 +19,11 @@
 
 # rspec failure tracking
 .rspec_status
+
+# combustion files
+/spec/internal/db/*.sqlite
+/spec/internal/db/*.sqlite-*
+/spec/internal/log/*.log
+/spec/internal/storage/
+/spec/internal/tmp/
+/spec/internal/.byebug_history
