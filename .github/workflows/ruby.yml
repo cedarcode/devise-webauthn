@@ -40,5 +40,4 @@ jobs:
 
     - name: Run tests
       run: |
-        bundle exec rails db:create db:schema:load
         bundle exec rspec
