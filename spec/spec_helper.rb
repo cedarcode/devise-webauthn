@@ -7,9 +7,9 @@ require "devise/webauthn"
 require "rails/generators/test_case"
 require "support/generator_helper"
 
-require_relative "dummy/config/environment"
-ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
-ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __dir__)
+Bundler.require :default, :development
+
+Combustion.initialize! :all
 
 require "rspec/rails"
 require "capybara/rspec"
