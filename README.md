@@ -1,8 +1,7 @@
 # Devise::Webauthn
+[![Gem Version](https://badge.fury.io/rb/devise-webauthn.svg)](https://badge.fury.io/rb/devise-webauthn)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/devise/webauthn`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Devise::Webauthn is a [Devise](https://github.com/heartcombo/devise) extension that adds [WebAuthn](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/) support to your Rails application, allowing users to authenticate with [passkeys](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/#passkey).
 
 ## Installation
 
@@ -22,17 +21,104 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+First, ensure you have Devise set up in your Rails application. For a full guide on setting up Devise, refer to the [Devise documentation](https://github.com/heartcombo/devise?tab=readme-ov-file#getting-started).
+Then, follow these steps to integrate Devise::Webauthn:
+1. **Run Devise::Webauthn Generator:**
+   Run the generator to set up necessary configurations, migrations, and Stimulus controller:
+   ```bash
+   rails generate devise:webauthn:install
+   rails db:migrate
+   ```
+
+   You can optionally specify a different resource name (defaults to "user"):
+   ```bash
+   rails generate devise:webauthn:install --resource-name=RESOURCE_NAME
+   ```
+
+   The generator will:
+    - Create the WebAuthn initializer (`config/initializers/webauthn.rb`)
+    - Generate the `WebauthnCredential` model and migration
+    - Add `webauthn_id` field to your devise model (e.g., `User`)
+    - Set up JavaScript dependencies (importmap or package manager)
+    - Install the Stimulus controller
+
+2. **Update Your Devise Model:**
+   Add `:passkey_authenticatable` to your Devise model (e.g., `User`):
+   ```ruby
+   class User < ApplicationRecord
+     devise :database_authenticatable, :registerable,
+            :recoverable, :rememberable, :validatable, :passkey_authenticatable
+   end
+   ```
+3. **Configure WebAuthn Settings:**
+   Update the generated initializer file `config/initializers/webauthn.rb` with your application's specific settings, such as `rp_name`, and `allowed_origins`. For example:
+   ```ruby
+    WebAuthn.configure do |config|
+      # This value needs to match `window.location.origin` evaluated by
+      # the User Agent during registration and authentication ceremonies.
+      config.allowed_origins = ["https://yourapp.com"]
+
+      # Relying Party name for display purposes
+      config.rp_name = "Your App Name"
+    end
+    ```
+
+## How It Works
+
+### Adding Passkeys
+Signed-in users can add passkeys by visiting `/users/passkeys/new`.
+
+### Sign In with Passkeys
+When a user visits `/users/sign_in` they can choose to authenticate using a passkey. The authentication flow is handled by `PasskeysAuthenticatable` strategy.
+
+The WebAuthn passkey sign-in flow works as follows:
+1. User clicks "Sign in with Passkey", starting a WebAuthn authentication ceremony.
+2. Browser shows available passkeys.
+3. User selects a passkey and verifies with their [authenticator](https://www.w3.org/TR/webauthn-3/#webauthn-authenticator).
+4. The server verifies the response and signs in the user.
+
+## Customization
+
+### Customizing Views
+Similar to [views customization on Devise](https://github.com/heartcombo/devise?tab=readme-ov-file#configuring-views), to customize the views, you can copy the view files from the gem into your application. Run the following command:
+```bash
+rails generate devise:webauthn:views
+```
+
+If you want to customize only specific views, you can copy them individually. For example, to copy only the passkeys views:
+```bash
+rails generate devise:webauthn:views -v passkeys
+```
+
+You can also use the helper methods provided by Devise::Webauthn in your views:
+
+To add a button for logging in with passkeys:
+```erb
+<%= login_with_passkey_button("Log in with passkeys") %>
+```
+
+To add a passkeys creation form:
+```erb
+<%= create_passkey_form do |form| %>
+  <%= form.label :name, 'Passkey name' %>
+  <%= form.text_field :name, required: true %>
+  <%= form.submit 'Create Passkey' %>
+<% end %>
+```
+
+### Customizing Controllers
+TODO
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rspec` to run the tests.
+To run the linter, use `bundle exec rubocop`.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Before submitting a pull request, ensure that tests and linter pass.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/devise-webauthn.
+Bug reports and pull requests are welcome on GitHub at https://github.com/cedarcode/devise-webauthn.
 
 ## License
 
