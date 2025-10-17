@@ -335,7 +335,7 @@ PLATFORMS
 DEPENDENCIES
   capybara (~> 3.39)
   devise-webauthn!
-  importmap-rails (~> 2.2)
+  importmap-rails (~> 2.0)
   propshaft (~> 1.2)
   pry-byebug (~> 3.11)
   puma (~> 6.6)

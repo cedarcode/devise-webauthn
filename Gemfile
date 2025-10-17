@@ -8,7 +8,7 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 gemspec
 
 gem "capybara", "~> 3.39"
-gem "importmap-rails", "~> 2.2"
+gem "importmap-rails", "~> 2.0"
 gem "propshaft", "~> 1.2"
 gem "pry-byebug", "~> 3.11"
 gem "puma", "~> 6.6"
