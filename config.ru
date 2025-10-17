@@ -5,5 +5,7 @@ require "bundler"
 
 Bundler.require :default, :development
 
-Combustion.initialize! :all
+Combustion.initialize! :all do
+  config.load_defaults Rails.version.to_f
+end
 run Combustion::Application

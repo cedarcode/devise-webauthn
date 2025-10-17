@@ -9,7 +9,9 @@ require "support/generator_helper"
 
 Bundler.require :default, :development
 
-Combustion.initialize! :all
+Combustion.initialize! :all do
+  config.load_defaults Rails.version.to_f
+end
 
 require "rspec/rails"
 require "capybara/rspec"
