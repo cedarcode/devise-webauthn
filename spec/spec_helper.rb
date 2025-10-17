@@ -9,7 +9,7 @@ require "support/generator_helper"
 
 Bundler.require :default, :development
 
-Combustion.initialize! :all do
+Combustion.initialize! :active_model, :active_record, :action_controller, :action_view do
   config.load_defaults Rails.version.to_f
 end
 
