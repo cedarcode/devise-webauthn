@@ -9,7 +9,7 @@ require "support/generator_helper"
 
 Bundler.require :default, :development
 
-Combustion.initialize! :active_model, :active_record, :action_controller, :action_view, :active_job do
+Combustion.initialize! :active_model, :active_record, :action_controller, :action_view do
   config.load_defaults Rails.version.to_f
 end
 
@@ -33,6 +33,7 @@ RSpec.configure do |config|
   config.include Rails::Generators::Testing::Assertions, type: :generator
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
+  config.include ActiveSupport::Testing::Assertions, type: :request
 
   config.before(:each, type: :system) do
     driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
