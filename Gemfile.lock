@@ -333,7 +333,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  capybara (~> 3.40)
+  capybara (~> 3.39)
   devise-webauthn!
   importmap-rails (~> 2.2)
   propshaft (~> 1.2)
