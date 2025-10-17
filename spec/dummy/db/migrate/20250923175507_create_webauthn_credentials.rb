@@ -1,4 +1,4 @@
-class CreateWebauthnCredentials < ActiveRecord::Migration[7.2]
+class CreateWebauthnCredentials < ActiveRecord::Migration[7.1]
   def change
     create_table :webauthn_credentials do |t|
       t.string :external_id
