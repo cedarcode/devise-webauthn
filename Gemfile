@@ -20,3 +20,5 @@ gem "rubocop-rspec", "~> 3.6"
 gem "selenium-webdriver"
 gem "sqlite3", "~> 1.7"
 gem "stimulus-rails", "~> 1.3"
+
+gem "rack", "~> 2.2" if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.0.0")
