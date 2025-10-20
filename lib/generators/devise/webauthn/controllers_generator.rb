@@ -20,6 +20,10 @@ module Devise
                    "app/controllers/#{scope}/#{name}_controller.rb"
         end
       end
+
+      def show_readme
+        readme "README" if behavior == :invoke
+      end
     end
   end
 end
