@@ -13,7 +13,7 @@ gem 'devise-webauthn'
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -27,7 +27,6 @@ Then, follow these steps to integrate Devise::Webauthn:
    Run the generator to set up necessary configurations, migrations, and Stimulus controller:
    ```bash
    rails generate devise:webauthn:install
-   rails db:migrate
    ```
 
    You can optionally specify a different resource name (defaults to "user"):
@@ -42,7 +41,13 @@ Then, follow these steps to integrate Devise::Webauthn:
     - Set up JavaScript dependencies (importmap or package manager)
     - Install the Stimulus controller
 
-2. **Update Your Devise Model:**
+2. **Run Migrations:**
+   After running the generator, execute the migrations to update your database schema:
+   ```bash
+   rails db:migrate
+   ```
+
+3. **Update Your Devise Model:**
    Add `:passkey_authenticatable` to your Devise model (e.g., `User`):
    ```ruby
    class User < ApplicationRecord
@@ -50,7 +55,8 @@ Then, follow these steps to integrate Devise::Webauthn:
             :recoverable, :rememberable, :validatable, :passkey_authenticatable
    end
    ```
-3. **Configure WebAuthn Settings:**
+
+4. **Configure WebAuthn Settings:**
    Update the generated initializer file `config/initializers/webauthn.rb` with your application's specific settings, such as `rp_name`, and `allowed_origins`. For example:
    ```ruby
     WebAuthn.configure do |config|
@@ -90,7 +96,8 @@ If you want to customize only specific views, you can copy them individually. Fo
 rails generate devise:webauthn:views -v passkeys
 ```
 
-You can also use the helper methods provided by Devise::Webauthn in your views:
+### Helper methods
+Devise::Webauthn provides helpers that can be used in your views:
 
 To add a button for logging in with passkeys:
 ```erb
