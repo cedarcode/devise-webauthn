@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module <%= @scope_prefix %>PasskeysController < DeviseController
+class <%= @scope_prefix %>PasskeysController < DeviseController
   # GET /resource/passkeys/new
   # def new
   #   super
