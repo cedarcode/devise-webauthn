@@ -6,8 +6,7 @@ require "bundler/setup"
 require "devise/webauthn"
 require "rails/generators/test_case"
 require "support/generator_helper"
-
-Bundler.require :default, :development
+require "combustion"
 
 Combustion.initialize! :active_model, :active_record, :action_controller, :action_view do
   config.load_defaults Rails.version.to_f
