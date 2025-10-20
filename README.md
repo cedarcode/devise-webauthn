@@ -114,7 +114,22 @@ To add a passkeys creation form:
 ```
 
 ### Customizing Controllers
-TODO
+Similar to [controllers customization on Devise](https://github.com/heartcombo/devise?tab=readme-ov-file#configuring-controllers), you can customize the Devise::Webauthn controllers.
+
+1. Create your custom controllers using the generator which requires a scope:
+```bash
+rails generate devise:webauthn:controllers [scope]
+```
+
+2. Tell the router to use your custom controllers. For example, if your scope is `users`:
+```ruby
+devise_for :users, controllers: {
+  passkeys: 'users/passkeys'
+}
+```
+
+3. Change or extend the generated controllers as needed.
+
 
 ## Development
 
