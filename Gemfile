@@ -7,6 +7,7 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 # Specify your gem's dependencies in devise-webauthn.gemspec
 gemspec
 
+gem "appraisal", "~> 2.5"
 gem "capybara", "~> 3.40"
 gem "combustion", "~> 1.3"
 gem "importmap-rails", "~> 2.2"
