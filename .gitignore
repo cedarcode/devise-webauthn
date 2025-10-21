@@ -21,3 +21,5 @@
 /spec/internal/storage/
 /spec/internal/tmp/
 /spec/internal/.byebug_history
+
+/gemfiles/*.gemfile.lock
