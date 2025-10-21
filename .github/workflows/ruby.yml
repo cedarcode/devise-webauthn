@@ -43,6 +43,9 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
 
+    - run: "gem list psych"
+    - run: "gem --version"
+
     - name: Run tests
       run: |
         bundle exec rails db:create db:schema:load
