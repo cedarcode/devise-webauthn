@@ -8,6 +8,7 @@ AllCops:
   Exclude:
     - "spec/internal/**/*"
     - "vendor/**/*"
+    - "gemfiles/**/*"
 
 Style/Documentation:
   Enabled: false
