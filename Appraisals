@@ -14,4 +14,10 @@ end
 
 appraise "rails-7_1" do
   gem "rails", "~> 7.1"
+
+  gem "capybara", "~> 3.39"
+  gem "importmap-rails", "~> 2.0"
+  gem "pry-byebug", "~> 3.10"
+  gem "rspec-rails", "~> 7.1"
+  gem "sqlite3", "~> 1.7"
 end
