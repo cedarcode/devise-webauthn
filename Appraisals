@@ -18,6 +18,7 @@ appraise "rails-7_1" do
   gem "capybara", "~> 3.39"
   gem "importmap-rails", "~> 2.0"
   gem "pry-byebug", "~> 3.10"
+  gem "psych", "~> 4.0"
   gem "rack", "~> 2.2"
   gem "rspec-rails", "~> 7.1"
   gem "sqlite3", "~> 1.7"
