@@ -103,16 +103,16 @@ rails generate devise:webauthn:views -v passkeys
 ```
 
 ### Helper methods
-Devise::Webauthn provides helpers that can be used in your views:
+Devise::Webauthn provides helpers that can be used in your views. For example, for a resource named `user`, you can use the following helpers:
 
 To add a button for logging in with passkeys:
 ```erb
-<%= login_with_passkey_button("Log in with passkeys") %>
+<%= login_with_passkey_button("Log in with passkeys", session_path: user_session_path) %>
 ```
 
 To add a passkeys creation form:
 ```erb
-<%= create_passkey_form do |form| %>
+<%= create_passkey_form(resource: current_user, passkeys_path: user_passkeys_path) do |form| %>
   <%= form.label :name, 'Passkey name' %>
   <%= form.text_field :name, required: true %>
   <%= form.submit 'Create Passkey' %>
