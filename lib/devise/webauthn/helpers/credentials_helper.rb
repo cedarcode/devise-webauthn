@@ -3,15 +3,15 @@
 module Devise
   module Webauthn
     module CredentialsHelper
-      def create_passkey_form(form_classes: nil, &block)
+      def create_passkey_form(resource:, passkeys_path:, form_classes: nil, &block)
         form_with(
-          url: passkeys_path(resource_name),
+          url: passkeys_path,
           method: :post,
           class: form_classes,
           data: {
             action: "webauthn-credentials#create:prevent",
             controller: "webauthn-credentials",
-            webauthn_credentials_options_param: create_passkey_options
+            webauthn_credentials_options_param: create_passkey_options(resource)
           }
         ) do |f|
           concat f.hidden_field(:public_key_credential,
@@ -20,9 +20,9 @@ module Devise
         end
       end
 
-      def login_with_passkey_button(text = nil, button_classes: nil, form_classes: nil, &block)
+      def login_with_passkey_button(text = nil, session_path:, button_classes: nil, form_classes: nil, &block)
         form_with(
-          url: resource_session_path,
+          url: session_path,
           method: :post,
           data: {
             action: "webauthn-credentials#get:prevent",
@@ -39,7 +39,7 @@ module Devise
 
       private
 
-      def create_passkey_options
+      def create_passkey_options(resource)
         @create_passkey_options ||= begin
           options = WebAuthn::Credential.options_for_create(
             user: {
@@ -71,10 +71,6 @@ module Devise
 
           options
         end
-      end
-
-      def resource_session_path
-        session_path(resource_name)
       end
     end
   end
