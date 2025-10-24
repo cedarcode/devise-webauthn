@@ -3,6 +3,13 @@
 
 Devise::Webauthn is a [Devise](https://github.com/heartcombo/devise) extension that adds [WebAuthn](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/) support to your Rails application, allowing users to authenticate with [passkeys](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/#passkey).
 
+## Requirements
+
+- **Ruby**: 2.7+
+- **Stimulus Rails**: This gem requires [stimulus-rails](https://github.com/hotwired/stimulus-rails) to be installed and configured in your application.
+> **Note:** Stimulus Rails is needed for the generated code to work out of the box.  
+> If you prefer not to have this dependency, you’ll need to manually implement the JavaScript logic for WebAuthn interactions.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -38,7 +45,6 @@ Then, follow these steps to integrate Devise::Webauthn:
     - Create the WebAuthn initializer (`config/initializers/webauthn.rb`)
     - Generate the `WebauthnCredential` model and migration
     - Add `webauthn_id` field to your devise model (e.g., `User`)
-    - Set up JavaScript dependencies (importmap or package manager)
     - Install the Stimulus controller
 
 2. **Run Migrations:**
