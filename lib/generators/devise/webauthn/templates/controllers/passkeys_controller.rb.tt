@@ -11,6 +11,11 @@ class <%= @scope_prefix %>PasskeysController < Devise::PasskeysController
   #   super
   # end
 
+  # DELETE /resource/passkeys/:id
+  # def destroy
+  #  super
+  # end
+
   # private
 
   # Verifies the passkey coming in the params and saves it to the database.
