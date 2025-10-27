@@ -86,4 +86,35 @@ RSpec.describe Devise::PasskeysController, type: :request do
       end
     end
   end
+
+  describe "DELETE #destroy" do
+    context "when user is authenticated" do
+      let!(:passkey) do
+        user.passkeys.create!(
+          external_id: "external-id",
+          name: "My Passkey",
+          public_key: "public-key",
+          sign_count: 0
+        )
+      end
+
+      before do
+        sign_in user, scope: :user
+      end
+
+      it "deletes the passkey and redirects" do
+        assert_difference("user.passkeys.count", -1) do
+          delete user_passkey_path(passkey)
+          expect(response).to redirect_to(new_user_passkey_path)
+        end
+      end
+    end
+
+    context "when user is not authenticated" do
+      it "redirects to the sign-in page" do
+        delete user_passkey_path(1)
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
 end

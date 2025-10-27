@@ -22,6 +22,11 @@ module Devise
       session.delete(:webauthn_challenge)
     end
 
+    def destroy
+      resource.passkeys.destroy(params[:id])
+      redirect_to after_update_path
+    end
+
     private
 
     def authenticate_scope!
