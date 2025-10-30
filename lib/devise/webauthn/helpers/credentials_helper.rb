@@ -5,7 +5,7 @@ module Devise
     module CredentialsHelper
       def create_passkey_form(form_classes: nil, &block)
         form_with(
-          url: passkeys_path,
+          url: passkeys_path(resource_name),
           method: :post,
           class: form_classes,
           data: {
@@ -75,10 +75,6 @@ module Devise
 
       def resource_session_path
         session_path(resource_name)
-      end
-
-      def passkeys_path
-        main_app.public_send("#{resource_name}_passkeys_path")
       end
     end
   end

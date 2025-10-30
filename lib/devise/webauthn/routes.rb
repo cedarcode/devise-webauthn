@@ -5,7 +5,7 @@ module ActionDispatch
     class Mapper
       protected
 
-      def devise_passkey_authentication(_mapping, controllers)
+      def devise_passkeys(_mapping, controllers)
         resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys]
       end
     end

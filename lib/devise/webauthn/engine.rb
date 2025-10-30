@@ -15,7 +15,7 @@ module Devise
           {
             model: "devise/models/passkey_authenticatable",
             strategy: true,
-            route: { passkey_authentication: routes }
+            route: { passkeys: [nil, :new, :create, :destroy] }
           }
         )
       end
