@@ -51,7 +51,7 @@ module Devise
     # The default url to be used after creating a passkey. You can overwrite
     # this method in your own PasskeysController.
     def after_update_path
-      public_send("new_#{resource_name}_passkey_path")
+      new_passkey_path(resource_name)
     end
   end
 end
