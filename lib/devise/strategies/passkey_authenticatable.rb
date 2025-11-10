@@ -41,3 +41,5 @@ module Devise
     end
   end
 end
+
+Warden::Strategies.add(:passkey_authenticatable, Devise::Strategies::PasskeyAuthenticatable)
