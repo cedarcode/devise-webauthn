@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "active_support/concern"
+require "devise/strategies/passkey_authenticatable"
 
 module Devise
   module Models
