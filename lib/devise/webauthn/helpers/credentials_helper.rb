@@ -3,9 +3,9 @@
 module Devise
   module Webauthn
     module CredentialsHelper
-      def create_passkey_form(resource:, passkeys_path:, form_classes: nil, &block)
+      def create_passkey_form(resource:, form_classes: nil, &block)
         form_with(
-          url: passkeys_path,
+          url: passkeys_path(resource),
           method: :post,
           class: form_classes,
           data: {
