@@ -33,12 +33,12 @@ Then, follow these steps to integrate Devise::Webauthn:
 1. **Run Devise::Webauthn Generator:**
    Run the generator to set up necessary configurations, migrations, and Stimulus controller:
    ```bash
-   rails generate devise:webauthn:install
+   $ bin/rails generate devise:webauthn:install
    ```
 
    You can optionally specify a different resource name (defaults to "user"):
    ```bash
-   rails generate devise:webauthn:install --resource-name=RESOURCE_NAME
+   $ bin/rails generate devise:webauthn:install --resource-name=RESOURCE_NAME
    ```
 
    The generator will:
@@ -50,7 +50,7 @@ Then, follow these steps to integrate Devise::Webauthn:
 2. **Run Migrations:**
    After running the generator, execute the migrations to update your database schema:
    ```bash
-   rails db:migrate
+   $ bin/rails db:migrate
    ```
 
 3. **Update Your Devise Model:**
@@ -94,12 +94,12 @@ The WebAuthn passkey sign-in flow works as follows:
 ### Customizing Views
 Similar to [views customization on Devise](https://github.com/heartcombo/devise?tab=readme-ov-file#configuring-views), to customize the views, you can copy the view files from the gem into your application. Run the following command:
 ```bash
-rails generate devise:webauthn:views
+$ bin/rails generate devise:webauthn:views
 ```
 
 If you want to customize only specific views, you can copy them individually. For example, to copy only the passkeys views:
 ```bash
-rails generate devise:webauthn:views -v passkeys
+$ bin/rails generate devise:webauthn:views -v passkeys
 ```
 
 ### Helper methods
@@ -124,7 +124,7 @@ Similar to [controllers customization on Devise](https://github.com/heartcombo/d
 
 1. Create your custom controllers using the generator which requires a scope:
 ```bash
-rails generate devise:webauthn:controllers [scope]
+$ bin/rails generate devise:webauthn:controllers [scope]
 ```
 
 2. Tell the router to use your custom controllers. For example, if your scope is `users`:
