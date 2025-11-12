@@ -5,10 +5,6 @@ module Devise
     class Engine < ::Rails::Engine
       isolate_namespace Devise::Webauthn
 
-      initializer "devise.webauthn.setup" do
-        Warden::Strategies.add(:passkey_authenticatable, Devise::Strategies::PasskeyAuthenticatable)
-      end
-
       initializer "devise.webauthn.add_module" do
         Devise.add_module(
           :passkey_authenticatable,
