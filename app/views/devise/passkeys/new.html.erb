@@ -1,4 +1,4 @@
-<%= create_passkey_form(resource: resource) do |form| %>
+<%= passkey_creation_form_for(resource) do |form| %>
   <%= form.label :name, 'Passkey name' %>
   <%= form.text_field :name, required: true %>
   <%= form.submit 'Create Passkey' %>

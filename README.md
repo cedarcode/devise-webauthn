@@ -112,7 +112,7 @@ To add a button for logging in with passkeys:
 
 To add a passkeys creation form:
 ```erb
-<%= create_passkey_form(resource: current_user) do |form| %>
+<%= passkey_creation_form_for(current_user) do |form| %>
   <%= form.label :name, 'Passkey name' %>
   <%= form.text_field :name, required: true %>
   <%= form.submit 'Create Passkey' %>
