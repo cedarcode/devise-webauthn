@@ -7,6 +7,7 @@ require_relative "webauthn/version"
 require_relative "webauthn/engine"
 require_relative "webauthn/helpers/credentials_helper"
 require_relative "webauthn/routes"
+require_relative "webauthn/url_helpers"
 
 module Devise
   module Webauthn
