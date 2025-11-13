@@ -6,7 +6,15 @@ module ActionDispatch
       protected
 
       def devise_passkey_authentication(_mapping, controllers)
-        resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys]
+        resources :passkeys,
+                  only: %i[new create destroy],
+                  controller: controllers[:passkeys]
+      end
+
+      def devise_second_factor_authentication(_mapping, controllers)
+        resource :second_factor_authentication,
+                 only: %i[new create],
+                 controller: controllers[:second_factor_authentication]
       end
     end
   end
