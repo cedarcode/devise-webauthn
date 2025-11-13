@@ -15,6 +15,8 @@ module Devise
 
         verify_passkeys(passkey_from_params, stored_passkey)
 
+        session[:second_factor_authenticated] = true
+
         success!(stored_passkey.user)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)

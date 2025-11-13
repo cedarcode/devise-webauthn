@@ -2,15 +2,22 @@
 
 module Devise
   class SecondFactorAuthenticationController < DeviseController
+    before_action :set_resource
+
     def new
-      byebug
       get_options = WebAuthn::Credential.options_for_get(
-        allow: current_user.webauthn_credentials.pluck(:external_id),
+        allow: @resource.passkeys.pluck(:external_id),
         user_verification: "discouraged"
       )
-      session[:current_authentication][:challenge] = get_options.challenge
+      session[:'2fa_authentication_challenge'] = get_options.challenge
 
       @options = get_options
+    end
+
+    private
+
+    def set_resource
+      @resource = resource_class.find(session['pre_2fa_user_id'])
     end
   end
 end
