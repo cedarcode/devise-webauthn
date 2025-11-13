@@ -3,6 +3,7 @@
 module Devise
   class SecondFactorAuthenticationController < DeviseController
     def new
+      byebug
       get_options = WebAuthn::Credential.options_for_get(
         allow: current_user.webauthn_credentials.pluck(:external_id),
         user_verification: "discouraged"
