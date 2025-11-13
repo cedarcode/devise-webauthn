@@ -19,7 +19,8 @@ module Devise
           "name:string",
           "public_key:text",
           "sign_count:integer{8}",
-          "#{user_model_name}:references"
+          "#{user_model_name}:references",
+          "authentication_factor:integer{1}"
         ]
       end
 
