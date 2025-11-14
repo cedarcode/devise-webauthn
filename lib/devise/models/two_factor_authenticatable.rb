@@ -16,7 +16,7 @@ module Devise
       end
 
       def second_factor_enabled?
-        true
+        webauthn_credentials.any?
       end
     end
   end
