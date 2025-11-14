@@ -5,7 +5,7 @@ class TwoFactorRequiredFailureApp < Devise::FailureApp
     if warden_message == :two_factor_required
       # new_second_factor_authentication_url(scope: scope)
       # store_resource(scope, resource)
-      session[:pre_2fa_user_id] = resource.id
+      session[:current_authentication_resource_id] = resource.id
       send(:"new_#{scope}_second_factor_authentication_path")
     else
       super

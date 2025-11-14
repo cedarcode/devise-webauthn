@@ -17,7 +17,7 @@ module Devise
     private
 
     def set_resource
-      @resource = resource_class.find(session['pre_2fa_user_id'])
+      @resource = resource_class.find(session[:current_authentication_resource_id])
     end
   end
 end

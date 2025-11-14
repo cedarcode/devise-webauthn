@@ -2,11 +2,11 @@
 
 require "devise/two_factor_required_failure_app"
 
-Warden::Manager.after_authentication do |user, auth, opts|
-  if user.second_factor_enabled? && !auth.env["rack.session"][:second_factor_authenticated]
-    auth.env["rack.session"][:pre_2fa_user_id] = user.id
+Warden::Manager.after_authentication do |resource, auth, opts|
+  if resource.second_factor_enabled? && !auth.env["rack.session"][:second_factor_authenticated]
+    auth.env["rack.session"][:current_authentication_resource_id] = resource.id
     auth.logout
-    throw(:warden, scope: opts[:scope], resource: user, message: :two_factor_required)
+    throw(:warden, scope: opts[:scope], resource: resource, message: :two_factor_required)
   end
 end
 
