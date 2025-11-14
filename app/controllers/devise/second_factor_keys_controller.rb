@@ -4,7 +4,26 @@ module Devise
   class SecondFactorKeysController < DeviseController
     before_action :authenticate_scope!
 
-    def new; end
+    def new
+      @options ||= begin
+        options = WebAuthn::Credential.options_for_create(
+          user: {
+            id: resource.webauthn_id,
+            name: resource.email
+          },
+          exclude: resource.webauthn_credentials.pluck(:external_id),
+          authenticator_selection: {
+            resident_key: "discouraged",
+            user_verification: "discouraged"
+          }
+        )
+
+        # Store challenge in session for later verification
+        session[:webauthn_challenge] = options.challenge
+
+        options
+      end
+    end
 
     def create
       secuirity_key_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))

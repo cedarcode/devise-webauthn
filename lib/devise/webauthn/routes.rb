@@ -15,6 +15,10 @@ module ActionDispatch
         resource :second_factor_authentication,
                  only: %i[new create],
                  controller: controllers[:second_factor_authentication]
+
+        resources :second_factor_keys,
+                 only: %i[new create destroy],
+                 controller: controllers[:second_factor_keys]
       end
     end
   end
