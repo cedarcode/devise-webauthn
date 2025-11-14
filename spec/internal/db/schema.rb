@@ -11,8 +11,10 @@ ActiveRecord::Schema.define do
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.datetime "updated_at", null: false
+    t.string "webauthn_id"
     t.index ["email"], name: "index_admins_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
+    t.index ["webauthn_id"], name: "index_admins_on_webauthn_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
