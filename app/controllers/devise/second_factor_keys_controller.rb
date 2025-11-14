@@ -42,7 +42,7 @@ module Devise
     end
 
     def destroy
-      resource.second_factor_keys.destroy(params[:id])
+      resource.second_factor_webauthn_credentials.destroy(params[:id])
       redirect_to after_update_path
     end
 
@@ -58,7 +58,7 @@ module Devise
         session[:webauthn_challenge]
       )
 
-      resource.second_factor_keys.create(
+      resource.second_factor_webauthn_credentials.create(
         external_id: security_key_from_params.id,
         name: params[:name],
         public_key: security_key_from_params.public_key,
