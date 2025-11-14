@@ -1,21 +1,17 @@
 # frozen_string_literal: true
 
 require "active_support/concern"
+require "devise/models/webauthn_credential_authenticatable"
 require "devise/strategies/passkey_authenticatable"
 
 module Devise
   module Models
     module PasskeyAuthenticatable
       extend ActiveSupport::Concern
+      include WebauthnCredentialAuthenticatable
 
       included do
-        has_many :passkeys, dependent: :destroy, class_name: "WebauthnCredential"
-
-        validates :webauthn_id, uniqueness: true, allow_blank: true
-
-        after_initialize do
-          self.webauthn_id ||= WebAuthn.generate_user_id
-        end
+        has_many :passkeys, -> { passkey }, class_name: "WebauthnCredential"
       end
     end
   end
