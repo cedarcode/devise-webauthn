@@ -4,7 +4,7 @@ module Devise
   module Strategies
     class TwoFactorAuthenticatable < Warden::Strategies::Base
       def valid?
-        passkey_param.present? && session[:'2fa_authentication_challenge'].present?
+        passkey_param.present? && session[:two_factor_authentication_challenge].present?
       end
 
       def authenticate!
@@ -19,9 +19,9 @@ module Devise
 
         success!(stored_passkey.user)
       rescue WebAuthn::Error
-        fail!(:'2fa_authentication_challenge')
+        fail!(:two_factor_authentication_challenge)
       ensure
-        session.delete(:'2fa_authentication_challenge')
+        session.delete(:two_factor_authentication_challenge)
       end
 
       private
@@ -32,7 +32,7 @@ module Devise
 
       def verify_credential(passkey_from_params, stored_passkey)
         passkey_from_params.verify(
-          session[:'2fa_authentication_challenge'],
+          session[:two_factor_authentication_challenge],
           public_key: stored_passkey.public_key,
           sign_count: stored_passkey.sign_count,
         )

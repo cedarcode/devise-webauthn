@@ -9,7 +9,7 @@ module Devise
         allow: @resource.passkeys.pluck(:external_id),
         user_verification: "discouraged"
       )
-      session[:'2fa_authentication_challenge'] = get_options.challenge
+      session[:two_factor_authentication_challenge] = get_options.challenge
 
       @options = get_options
     end
