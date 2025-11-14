@@ -26,9 +26,9 @@ module Devise
     end
 
     def create
-      secuirity_key_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
+      security_key_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
 
-      if verify_and_save_security_key(secuirity_key_from_params)
+      if verify_and_save_security_key(security_key_from_params)
         set_flash_message! :notice, :secuirty_key_created
       else
         set_flash_message! :alert, :secuirty_key_verification_failed, scope: :"devise.failure"
@@ -53,16 +53,16 @@ module Devise
       self.resource = send(:"current_#{resource_name}")
     end
 
-    def verify_and_save_second_factor_key(secuirity_key_from_params)
-      secuirty_key_from_params.verify(
+    def verify_and_save_security_key(security_key_from_params)
+      security_key_from_params.verify(
         session[:webauthn_challenge]
       )
 
       resource.second_factor_keys.create(
-        external_id: secuirity_key_from_params.id,
+        external_id: security_key_from_params.id,
         name: params[:name],
-        public_key: secuirity_key_from_params.public_key,
-        sign_count: secuirity_key_from_params.sign_count
+        public_key: security_key_from_params.public_key,
+        sign_count: security_key_from_params.sign_count
       )
     end
 
