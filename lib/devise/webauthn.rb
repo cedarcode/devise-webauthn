@@ -9,6 +9,8 @@ require_relative "webauthn/helpers/credentials_helper"
 require_relative "webauthn/routes"
 require_relative "webauthn/url_helpers"
 
+require_relative "failure_app_extension"
+
 module Devise
   module Webauthn
     module Test
