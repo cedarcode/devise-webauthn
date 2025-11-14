@@ -6,7 +6,7 @@ module Devise
 
     def new
       get_options = WebAuthn::Credential.options_for_get(
-        allow: @resource.passkeys.pluck(:external_id),
+        allow: @resource.webauthn_credentials.pluck(:external_id),
         user_verification: "discouraged"
       )
       session[:two_factor_authentication_challenge] = get_options.challenge
