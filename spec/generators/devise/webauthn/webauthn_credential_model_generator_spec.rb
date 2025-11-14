@@ -14,30 +14,19 @@ RSpec.describe Devise::Webauthn::WebauthnCredentialModelGenerator, type: :genera
     invoke generator_instance
   end
 
-  context "when using default resource name" do
-    let(:generator_instance) { generator }
+  let(:generator_instance) { generator }
 
-    it "invokes the active_record:model generator with correct arguments" do
-      expect(generator).to have_received(:invoke).with("active_record:model",
-                                                       ["webauthn_credential", "external_id:string:uniq", "name:string",
-                                                        "public_key:text", "sign_count:integer{8}", "user:references"])
-    end
-
-    it "injects validations into the Passkey model" do
-      assert_file "app/models/webauthn_credential.rb",
-                  /validates :external_id, :public_key, :name, :sign_count, presence: true/
-      assert_file "app/models/webauthn_credential.rb", /validates :external_id, uniqueness: true/
-    end
+  it "invokes the active_record:model generator with correct arguments" do
+    expect(generator).to have_received(:invoke).with("active_record:model",
+                                                     ["webauthn_credential", "external_id:string:uniq", "name:string",
+                                                      "public_key:text", "sign_count:integer{8}",
+                                                      "resource:belongs_to{polymorphic}"])
   end
 
-  context "when using a custom resource name" do
-    let(:generator_instance) { generator([destination_root], ["--resource_name=admin"]) }
-
-    it "invokes the active_record:model generator with correct arguments" do
-      expect(generator).to have_received(:invoke).with("active_record:model",
-                                                       ["webauthn_credential", "external_id:string:uniq", "name:string",
-                                                        "public_key:text", "sign_count:integer{8}", "admin:references"])
-    end
+  it "injects validations into the Passkey model" do
+    assert_file "app/models/webauthn_credential.rb",
+                /validates :external_id, :public_key, :name, :sign_count, presence: true/
+    assert_file "app/models/webauthn_credential.rb", /validates :external_id, uniqueness: true/
   end
 end
 

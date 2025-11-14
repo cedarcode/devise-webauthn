@@ -15,7 +15,7 @@ module Devise
 
         verify_passkeys(passkey_from_params, stored_passkey)
 
-        success!(stored_passkey.user)
+        success!(stored_passkey.resource)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)
       ensure

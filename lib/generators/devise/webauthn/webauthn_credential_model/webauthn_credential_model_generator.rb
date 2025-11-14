@@ -10,7 +10,6 @@ module Devise
       namespace "devise:webauthn:webauthn_credential_model"
 
       desc "Generate a WebauthnCredential model with the required fields for WebAuthn"
-      class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
 
       def generate_model
         invoke "active_record:model", [
@@ -19,7 +18,7 @@ module Devise
           "name:string",
           "public_key:text",
           "sign_count:integer{8}",
-          "#{user_model_name}:references"
+          "resource:belongs_to{polymorphic}"
         ]
       end
 
@@ -42,12 +41,6 @@ module Devise
           2. Make sure your User model includes :passkey_authenticatable in the devise line:
              devise :database_authenticatable, :passkey_authenticatable, ...
         MSG
-      end
-
-      private
-
-      def user_model_name
-        options[:resource_name].underscore
       end
     end
   end
