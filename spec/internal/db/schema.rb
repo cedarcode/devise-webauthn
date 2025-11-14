@@ -34,12 +34,11 @@ ActiveRecord::Schema.define do
     t.string "name"
     t.text "public_key"
     t.integer "sign_count", limit: 8
-    t.integer "user_id", null: false
+    t.integer "resource_id", null: false
+    t.string "resource_type", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_webauthn_credentials_on_external_id", unique: true
-    t.index ["user_id"], name: "index_webauthn_credentials_on_user_id"
+    t.index ["resource_type", "resource_id"], name: "index_webauthn_credentials_on_resource"
   end
-
-  add_foreign_key "webauthn_credentials", "users"
 end
