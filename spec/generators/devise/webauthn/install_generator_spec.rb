@@ -23,7 +23,7 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
 
     it "invokes the webauthn credential model generator" do
       expect(generator).to have_received(:invoke)
-        .with("devise:webauthn:webauthn_credential_model")
+        .with("devise:webauthn:webauthn_credential_model", [], resource_name: "user")
     end
 
     it "invokes the webauthn_id column generator" do
@@ -39,6 +39,11 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
 
   context "when using a custom resource name" do
     let(:generator_instance) { generator([destination_root], ["--resource_name=admin"]) }
+
+    it "invokes the webauthn credential model generator with the custom resource name" do
+      expect(generator).to have_received(:invoke)
+        .with("devise:webauthn:webauthn_credential_model", [], resource_name: "admin")
+    end
 
     it "invokes the webauthn_id column generator with the custom resource name" do
       expect(generator).to have_received(:invoke)

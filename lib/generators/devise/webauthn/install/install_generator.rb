@@ -19,7 +19,7 @@ module Devise
       end
 
       def generate_webauthn_credential_model
-        invoke "devise:webauthn:webauthn_credential_model"
+        invoke "devise:webauthn:webauthn_credential_model", [], resource_name: options[:resource_name]
       end
 
       def generate_webauthn_id_column
