@@ -41,7 +41,7 @@ RSpec.configure do |config|
     WebAuthn.configuration.allowed_origins = ["http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"]
 
     # TODO: Remove when Devise fixes https://github.com/heartcombo/devise/issues/5705
-    Rails.application.reload_routes_unless_loaded
+    Rails.application.reload_routes_unless_loaded if Rails::VERSION::MAJOR >= 8
   end
 
   config.include Devise::Test::IntegrationHelpers, type: :system
