@@ -19,6 +19,7 @@ module Devise
           :two_factor_authenticatable,
           {
             model: "devise/models/two_factor_authenticatable",
+            route: { second_factor_authentication: [] }
           }
         )
       end

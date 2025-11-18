@@ -3,6 +3,8 @@ en:
     passkeys:
       passkey_created: "Passkey created successfully."
       passkey_creation_failed: "Passkey creation failed."
+    second_factor_keys:
+      security_key_created: "Security Key created successfully."
     failure:
       passkey_not_found: "Your passkey doesn't exist or is not valid."
       passkey_verification_failed: "Passkey verification failed."
