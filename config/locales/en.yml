@@ -9,5 +9,6 @@ en:
       passkey_not_found: "Your passkey doesn't exist or is not valid."
       passkey_verification_failed: "Passkey verification failed."
       sign_in_not_initiated: "Sign in was not initiated."
+      two_factor_required: "Two-factor authentication is required to sign in."
       security_key_not_found: "Your WebAuthn credential doesn't exist or is not valid."
       security_key_verification_failed: "Webauthn credential verification failed."
