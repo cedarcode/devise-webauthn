@@ -1,5 +1,5 @@
 <%= form_with(
-  url: public_send("#{resource_name}_second_factor_keys_path"),
+  url: second_factor_keys_path(resource),
   method: :post,
   data: {
     action: "webauthn-credentials#create:prevent",

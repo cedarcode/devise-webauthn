@@ -65,7 +65,7 @@ module Devise
     # The default url to be used after creating a second factor key. You can overwrite
     # this method in your own SecondFactorKeysController.
     def after_update_path
-      public_send("new_#{resource_name}_second_factor_key_path")
+      new_second_factor_key_path(resource_name)
     end
   end
 end
