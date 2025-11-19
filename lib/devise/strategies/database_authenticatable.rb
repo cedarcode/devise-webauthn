@@ -13,6 +13,8 @@ module Devise
         if validate(resource){ hashed = true; resource.valid_password?(password) }
           if resource.second_factor_enabled?
             session[:current_authentication_resource_id] = resource.id
+            request.flash[:alert] = two_factor_required_message
+            request.commit_flash
             redirect!(two_factor_authentication_path, {}, message: two_factor_required_message)
           else
             remember_me(resource)
