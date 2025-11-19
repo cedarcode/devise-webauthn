@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Devise
-  class SecondFactorKeysController < DeviseController
+  class SecondFactorWebauthnCredentialsController < DeviseController
     before_action :authenticate_scope!
 
     def new
@@ -63,9 +63,9 @@ module Devise
     end
 
     # The default url to be used after creating a second factor key. You can overwrite
-    # this method in your own SecondFactorKeysController.
+    # this method in your own SecondFactorWebauthnCredentialsController.
     def after_update_path
-      new_second_factor_key_path(resource_name)
+      new_second_factor_webauthn_credential_path(resource_name)
     end
   end
 end

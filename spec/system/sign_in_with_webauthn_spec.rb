@@ -53,7 +53,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
   describe "sign in with security keys as second factor" do
     before do
       sign_in user
-      visit new_user_second_factor_key_path
+      visit new_user_second_factor_webauthn_credential_path
 
       fill_in "Security Key name", with: "My Security Key"
       click_button "Create Security Key"
