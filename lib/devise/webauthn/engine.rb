@@ -20,7 +20,7 @@ module Devise
           {
             model: "devise/models/two_factor_authenticatable",
             strategy: true,
-            route: { second_factor_authentication: [] }
+            route: { two_factor_authentication: [] }
           }
         )
       end

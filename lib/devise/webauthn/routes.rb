@@ -9,10 +9,10 @@ module ActionDispatch
         resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys]
       end
 
-      def devise_second_factor_authentication(_mapping, controllers)
-        resource :second_factor_authentication,
+      def devise_two_factor_authentication(_mapping, controllers)
+        resource :two_factor_authentication,
                  only: %i[new create],
-                 controller: controllers[:second_factor_authentication]
+                 controller: controllers[:two_factor_authentications]
 
         resources :second_factor_webauthn_credentials,
                   only: %i[new create destroy],

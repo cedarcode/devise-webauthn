@@ -24,7 +24,7 @@ module Devise
       {
         passkeys: [nil],
         passkey: [nil, :new],
-        second_factor_authentication: [nil, :new],
+        two_factor_authentication: [nil, :new],
         second_factor_webauthn_credentials: [nil],
         second_factor_webauthn_credential: [nil, :new]
       }.each do |route, actions|

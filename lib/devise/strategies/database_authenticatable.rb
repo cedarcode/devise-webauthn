@@ -35,7 +35,7 @@ module Devise
       private
 
       def two_factor_authentication_path
-        Rails.application.routes.url_helpers.send(:"new_#{scope}_second_factor_authentication_path")
+        Rails.application.routes.url_helpers.send(:"new_#{scope}_two_factor_authentication_path")
       end
 
       def two_factor_required_message

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Devise
-  class SecondFactorAuthenticationController < DeviseController
+  class TwoFactorAuthenticationsController < DeviseController
     prepend_before_action :require_no_authentication
     append_before_action :ensure_sign_in_initiated
     append_before_action :set_resource
