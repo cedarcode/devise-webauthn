@@ -1,8 +1,8 @@
-class User < ApplicationRecord
+class Admin < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable, :passkey_authenticatable,
-         :recoverable, :rememberable, :validatable
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable, :passkey_authenticatable
 
   # Override this association in order to use `resource_id`
   # as the foreign key in WebauthnCredential.

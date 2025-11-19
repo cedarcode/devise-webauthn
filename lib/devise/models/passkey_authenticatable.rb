@@ -17,6 +17,12 @@ module Devise
           self.webauthn_id ||= WebAuthn.generate_user_id
         end
       end
+
+      module ClassMethods
+        def find_for_passkey_authentication(passkey)
+          passkey.send(name.underscore)
+        end
+      end
     end
   end
 end
