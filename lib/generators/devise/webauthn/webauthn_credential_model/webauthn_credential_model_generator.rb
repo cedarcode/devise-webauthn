@@ -19,7 +19,8 @@ module Devise
           "name:string",
           "public_key:text",
           "sign_count:integer{8}",
-          "#{user_model_name}:references"
+          "#{user_model_name}:references",
+          "authentication_factor:integer{1}"
         ]
       end
 
@@ -28,6 +29,10 @@ module Devise
           <<~RUBY.indent(2)
             validates :external_id, :public_key, :name, :sign_count, presence: true
             validates :external_id, uniqueness: true
+
+            enum :authentication_factor, { first_factor: 0, second_factor: 1 }
+
+            scope :passkey, -> { first_factor }
           RUBY
         end
       end

@@ -21,6 +21,7 @@ RSpec.describe Devise::Models::PasskeyAuthenticatable, type: :model do
                                            external_id: "ext",
                                            public_key: "pk",
                                            name: "My Passkey",
+                                           authentication_factor: :first_factor,
                                            sign_count: 0)
       expect(user.passkeys).to contain_exactly(passkey)
     end
