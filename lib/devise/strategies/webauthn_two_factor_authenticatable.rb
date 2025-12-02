@@ -11,7 +11,7 @@ module Devise
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
         stored_credential = WebauthnCredential.find_by(external_id: credential_from_params.id)
 
-        return fail!(:security_key_not_found) if stored_credential.blank?
+        return fail!(:webauthn_credential_not_found) if stored_credential.blank?
 
         verify_credential(credential_from_params, stored_credential)
 
@@ -19,7 +19,7 @@ module Devise
 
         session.delete(:current_authentication_resource_id)
       rescue WebAuthn::Error
-        fail!(:security_key_verification_failed)
+        fail!(:webauthn_credential_verification_failed)
       ensure
         session.delete(:two_factor_authentication_challenge)
       end

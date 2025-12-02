@@ -27,11 +27,11 @@ module Devise
       if verify_and_save_security_key(security_key_from_params)
         set_flash_message! :notice, :security_key_created
       else
-        set_flash_message! :alert, :security_key_verification_failed, scope: :"devise.failure"
+        set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       end
       redirect_to after_update_path
     rescue WebAuthn::Error
-      set_flash_message! :alert, :security_key_verification_failed, scope: :"devise.failure"
+      set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_update_path
     ensure
       session.delete(:webauthn_challenge)
