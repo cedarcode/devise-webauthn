@@ -2,7 +2,7 @@
 
 module Devise
   module Strategies
-    class PasskeyAuthenticatable < Warden::Strategies::Base
+    class PasskeyAuthenticatable < Devise::Strategies::Base
       def valid?
         passkey_param.present? && session[:authentication_challenge].present?
       end
@@ -15,7 +15,8 @@ module Devise
 
         verify_passkeys(passkey_from_params, stored_passkey)
 
-        success!(stored_passkey.user)
+        resource = mapping.to.find_for_passkey_authentication(stored_passkey)
+        success!(resource)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)
       ensure
