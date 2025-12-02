@@ -2,7 +2,7 @@
 
 RSpec.describe "CreatePasskeys", type: :system do
   let(:user) do
-    User.create!(
+    Account.create!(
       email: "testuser1@gmail.com",
       password: "password123"
     )
@@ -20,7 +20,7 @@ RSpec.describe "CreatePasskeys", type: :system do
 
   context "when user doesn't have passkeys" do
     it "allows creating a passkey" do
-      visit new_user_passkey_path
+      visit new_account_passkey_path
 
       fill_in "Passkey name", with: "My Passkey"
       click_button "Create Passkey"
@@ -36,7 +36,7 @@ RSpec.describe "CreatePasskeys", type: :system do
     end
 
     it "fails to create a passkey" do
-      visit new_user_passkey_path
+      visit new_account_passkey_path
 
       fill_in "Passkey name", with: "My Passkey"
       click_button "Create Passkey"

@@ -2,7 +2,7 @@
 
 RSpec.describe "SignInWithPasskeys", type: :system do
   let(:user) do
-    User.create!(
+    Account.create!(
       email: "testuser1@gmail.com",
       password: "password123"
     )
@@ -17,7 +17,7 @@ RSpec.describe "SignInWithPasskeys", type: :system do
   context "when user has passkeys" do
     before do
       sign_in user
-      visit new_user_passkey_path
+      visit new_account_passkey_path
 
       fill_in "Passkey name", with: "My Passkey"
       click_button "Create Passkey"
@@ -28,7 +28,7 @@ RSpec.describe "SignInWithPasskeys", type: :system do
     end
 
     it "allows to create a passkey and then sign in with it" do
-      visit new_user_session_path
+      visit new_account_session_path
       click_button "Log in with passkeys"
 
       expect(page).to have_content("Signed in successfully.")

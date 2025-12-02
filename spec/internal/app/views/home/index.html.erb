@@ -1,11 +1,11 @@
-<% if current_user %>
+<% if current_account %>
   <div>
     Passkeys:
 
-    <% current_user.passkeys.each do |passkey| %>
+    <% current_account.passkeys.each do |passkey| %>
       <li><%= passkey.name %></li>
     <% end %>
   </div>
 <% end %>
 
-<div> Add Passkey: <%= link_to "Add Passkey", new_user_passkey_path %> </div>
+<div> Add Passkey: <%= link_to "Add Passkey", new_account_passkey_path %> </div>
