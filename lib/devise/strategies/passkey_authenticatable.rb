@@ -15,7 +15,7 @@ module Devise
 
         verify_passkeys(passkey_from_params, stored_passkey)
 
-        resource = mapping.to.find_for_passkey_authentication(stored_passkey)
+        resource = stored_passkey.public_send(resource_name)
         success!(resource)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)
@@ -38,6 +38,10 @@ module Devise
         )
 
         stored_passkey.update!(sign_count: passkey_from_params.sign_count)
+      end
+
+      def resource_name
+        mapping.to.name.underscore
       end
     end
   end
