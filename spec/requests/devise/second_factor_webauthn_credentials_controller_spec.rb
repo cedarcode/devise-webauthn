@@ -4,15 +4,15 @@ require "spec_helper"
 require "webauthn/fake_client"
 
 RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request do
-  let(:user) { User.create!(email: "test@example.com", password: "password123") }
+  let(:user) { Account.create!(email: "test@example.com", password: "password123") }
   let(:client) { WebAuthn::FakeClient.new(WebAuthn.configuration.allowed_origins.first) }
 
   describe "GET #new" do
     context "when user is not authenticated" do
       it "redirects to the sign-in page" do
-        get new_user_second_factor_webauthn_credential_path
+        get new_account_second_factor_webauthn_credential_path
 
-        expect(response).to redirect_to(new_user_session_path)
+        expect(response).to redirect_to(new_account_session_path)
       end
     end
 
@@ -22,7 +22,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
 
       it "renders the new template" do
-        get new_user_second_factor_webauthn_credential_path
+        get new_account_second_factor_webauthn_credential_path
 
         expect(response).to have_http_status(:ok)
       end
@@ -32,16 +32,16 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
   describe "POST #create" do
     context "when user is not authenticated" do
       it "redirects to the sign-in page" do
-        post user_second_factor_webauthn_credentials_path
+        post account_second_factor_webauthn_credentials_path
 
-        expect(response).to redirect_to(new_user_session_path)
+        expect(response).to redirect_to(new_account_session_path)
       end
     end
 
     context "when user is authenticated" do
       before do
         sign_in user
-        get new_user_second_factor_webauthn_credential_path # To set the challenge in session
+        get new_account_second_factor_webauthn_credential_path # To set the challenge in session
       end
 
       context "with valid parameters" do
@@ -54,13 +54,13 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         it "creates a new security key and redirects" do
           assert_difference("user.second_factor_webauthn_credentials.count", 1) do
-            post user_second_factor_webauthn_credentials_path, params: {
+            post account_second_factor_webauthn_credentials_path, params: {
               public_key_credential: credential.to_json,
               name: "My Security Key"
             }
           end
 
-          expect(response).to redirect_to(new_user_second_factor_webauthn_credential_path)
+          expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
           expect(flash[:notice]).to eq "Security Key created successfully."
           expect(session[:webauthn_challenge]).to be_nil
         end
@@ -76,13 +76,13 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         it "does not create a new security key and redirects" do
           assert_difference("user.second_factor_webauthn_credentials.count", 0) do
-            post user_second_factor_webauthn_credentials_path, params: {
+            post account_second_factor_webauthn_credentials_path, params: {
               public_key_credential: invalid_credential.to_json,
               name: "My Security Key"
             }
           end
 
-          expect(response).to redirect_to(new_user_second_factor_webauthn_credential_path)
+          expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
           expect(flash[:alert]).to eq "Webauthn credential verification failed."
           expect(session[:webauthn_challenge]).to be_nil
         end
@@ -93,9 +93,9 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
   describe "DELETE #destroy" do
     context "when user is not authenticated" do
       it "redirects to the sign-in page" do
-        delete user_second_factor_webauthn_credential_path(1)
+        delete account_second_factor_webauthn_credential_path(1)
 
-        expect(response).to redirect_to(new_user_session_path)
+        expect(response).to redirect_to(new_account_session_path)
       end
     end
 
@@ -110,13 +110,13 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
 
       before do
-        sign_in user, scope: :user
+        sign_in user, scope: :account
       end
 
       it "deletes the security key and redirects" do
         assert_difference("user.second_factor_webauthn_credentials.count", -1) do
-          delete user_second_factor_webauthn_credential_path(security_key)
-          expect(response).to redirect_to(new_user_second_factor_webauthn_credential_path)
+          delete account_second_factor_webauthn_credential_path(security_key)
+          expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
         end
       end
     end

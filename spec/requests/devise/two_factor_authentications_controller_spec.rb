@@ -3,16 +3,16 @@
 require "spec_helper"
 
 RSpec.describe Devise::TwoFactorAuthenticationsController, type: :request do
-  let(:user) { User.create!(email: "test@example.com", password: "password123") }
+  let(:user) { Account.create!(email: "test@example.com", password: "password123") }
 
   describe "GET #new" do
     context "when user is authenticated" do
       before do
-        sign_in user, scope: :user
+        sign_in user, scope: :account
       end
 
       it "redirects to root path" do
-        get new_user_two_factor_authentication_path
+        get new_account_two_factor_authentication_path
 
         expect(response).to redirect_to(root_path)
       end
@@ -21,9 +21,9 @@ RSpec.describe Devise::TwoFactorAuthenticationsController, type: :request do
     context "when user is not authenticated" do
       context "when user has not initiated sign in" do
         it "redirects to the sign-in page" do
-          get new_user_two_factor_authentication_path
+          get new_account_two_factor_authentication_path
 
-          expect(response).to redirect_to(new_user_session_path)
+          expect(response).to redirect_to(new_account_session_path)
           expect(flash[:alert]).to eq "Sign in was not initiated."
         end
       end
@@ -37,8 +37,8 @@ RSpec.describe Devise::TwoFactorAuthenticationsController, type: :request do
             sign_count: 0
           )
 
-          post user_session_path, params: {
-            user: {
+          post account_session_path, params: {
+            account: {
               email: user.email,
               password: "password123"
             }
@@ -46,7 +46,7 @@ RSpec.describe Devise::TwoFactorAuthenticationsController, type: :request do
         end
 
         it "renders the new template" do
-          get new_user_two_factor_authentication_path
+          get new_account_two_factor_authentication_path
 
           expect(response).to have_http_status(:ok)
         end
