@@ -16,6 +16,8 @@ module Devise
         verify_credential(credential_from_params, stored_credential)
 
         success!(stored_credential.user)
+
+        session.delete(:current_authentication_resource_id)
       rescue WebAuthn::Error
         fail!(:security_key_verification_failed)
       ensure
