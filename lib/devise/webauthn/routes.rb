@@ -11,7 +11,7 @@ module ActionDispatch
 
       def devise_two_factor_authentication(_mapping, controllers)
         resource :two_factor_authentication,
-                 only: %i[new create],
+                 only: %i[new],
                  controller: controllers[:two_factor_authentications]
 
         resources :second_factor_webauthn_credentials,
