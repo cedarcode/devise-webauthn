@@ -2,11 +2,11 @@
 
 require "active_support/concern"
 require "devise/models/webauthn_credential_authenticatable"
-require "devise/strategies/two_factor_authenticatable"
+require "devise/strategies/webauthn_two_factor_authenticatable"
 
 module Devise
   module Models
-    module TwoFactorAuthenticatable
+    module WebauthnTwoFactorAuthenticatable
       extend ActiveSupport::Concern
       include WebauthnCredentialAuthenticatable
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Devise::Models::TwoFactorAuthenticatable, type: :model do
+RSpec.describe Devise::Models::WebauthnTwoFactorAuthenticatable, type: :model do
   describe "webauthn_id initialization" do
     it "generates a webauthn_id on initialize" do
       user = User.new(email: "user@example.com", password: "password", password_confirmation: "password")

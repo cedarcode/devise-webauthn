@@ -16,9 +16,9 @@ module Devise
         )
 
         Devise.add_module(
-          :two_factor_authenticatable,
+          :webauthn_two_factor_authenticatable,
           {
-            model: "devise/models/two_factor_authenticatable",
+            model: "devise/models/webauthn_two_factor_authenticatable",
             strategy: true,
             route: { two_factor_authentication: [] }
           }

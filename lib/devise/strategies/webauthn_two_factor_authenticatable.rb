@@ -2,7 +2,7 @@
 
 module Devise
   module Strategies
-    class TwoFactorAuthenticatable < Warden::Strategies::Base
+    class WebauthnTwoFactorAuthenticatable < Warden::Strategies::Base
       def valid?
         credential_param.present? && session[:two_factor_authentication_challenge].present?
       end
@@ -41,4 +41,4 @@ module Devise
   end
 end
 
-Warden::Strategies.add(:two_factor_authenticatable, Devise::Strategies::TwoFactorAuthenticatable)
+Warden::Strategies.add(:webauthn_two_factor_authenticatable, Devise::Strategies::WebauthnTwoFactorAuthenticatable)
