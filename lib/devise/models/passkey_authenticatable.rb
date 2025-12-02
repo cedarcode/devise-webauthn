@@ -20,7 +20,7 @@ module Devise
 
       module ClassMethods
         def find_for_passkey_authentication(passkey)
-          passkey.send(name.underscore)
+          passkey.public_send(name.underscore)
         end
       end
     end
