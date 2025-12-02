@@ -9,7 +9,7 @@ module Devise
 
       def authenticate!
         passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
-        stored_passkey = WebauthnCredential.find_by(external_id: passkey_from_params.id)
+        stored_passkey = WebauthnCredential.passkey.find_by(external_id: passkey_from_params.id)
 
         return fail!(:passkey_not_found) if stored_passkey.blank?
 
