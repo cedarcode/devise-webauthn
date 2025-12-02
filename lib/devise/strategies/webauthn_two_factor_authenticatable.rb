@@ -2,7 +2,7 @@
 
 module Devise
   module Strategies
-    class WebauthnTwoFactorAuthenticatable < Warden::Strategies::Base
+    class WebauthnTwoFactorAuthenticatable < Devise::Strategies::Base
       def valid?
         credential_param.present? && session[:two_factor_authentication_challenge].present?
       end
@@ -15,7 +15,8 @@ module Devise
 
         verify_credential(credential_from_params, stored_credential)
 
-        success!(stored_credential.user)
+        resource = stored_credential.public_send(resource_name)
+        success!(resource)
 
         session.delete(:current_authentication_resource_id)
       rescue WebAuthn::Error
@@ -38,6 +39,10 @@ module Devise
         )
 
         stored_credential.update!(sign_count: credential_from_params.sign_count)
+      end
+
+      def resource_name
+        mapping.to.name.underscore
       end
     end
   end
