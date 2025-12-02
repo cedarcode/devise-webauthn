@@ -1,19 +1,19 @@
-<% if current_user %>
+<% if current_account %>
   <div>
     Passkeys:
 
-    <% current_user.passkeys.each do |passkey| %>
+    <% current_account.passkeys.each do |passkey| %>
       <li><%= passkey.name %></li>
     <% end %>
   </div>
   <div>
     Security keys:
 
-    <% current_user.second_factor_webauthn_credentials.each do |second_factor_webauthn_credential| %>
+    <% current_account.second_factor_webauthn_credentials.each do |second_factor_webauthn_credential| %>
       <li><%= second_factor_webauthn_credential.name %></li>
     <% end %>
   </div>
 <% end %>
 
-<div> Add Passkey: <%= link_to "Add Passkey", new_user_passkey_path %> </div>
-<div> Add Security Key: <%= link_to "Security Key", new_user_second_factor_webauthn_credential_path %> </div>
+<div> Add Passkey: <%= link_to "Add Passkey", new_account_passkey_path %> </div>
+<div> Add Security Key: <%= link_to "Security Key", new_account_second_factor_webauthn_credential_path %> </div>

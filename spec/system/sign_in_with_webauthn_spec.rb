@@ -2,7 +2,7 @@
 
 RSpec.describe "SignInWithWebauthn", type: :system do
   let(:user) do
-    User.create!(
+    Account.create!(
       email: "testuser1@gmail.com",
       password: "$3cretp@ssword123"
     )
@@ -17,7 +17,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
   describe "sign in using passkeys" do
     before do
       sign_in user
-      visit new_user_passkey_path
+      visit new_account_passkey_path
 
       fill_in "Passkey name", with: "My Passkey"
       click_button "Create Passkey"
@@ -28,14 +28,14 @@ RSpec.describe "SignInWithWebauthn", type: :system do
     end
 
     it "allows to create a passkey and then sign in with it" do
-      visit new_user_session_path
+      visit new_account_session_path
       click_button "Log in with passkeys"
 
       expect(page).to have_content("Signed in successfully.")
     end
 
     it "can use them as second factor authentication" do
-      visit new_user_session_path
+      visit new_account_session_path
 
       fill_in "Email", with: user.email
       fill_in "Password", with: "$3cretp@ssword123"
@@ -53,7 +53,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
   describe "sign in with security keys as second factor" do
     before do
       sign_in user
-      visit new_user_second_factor_webauthn_credential_path
+      visit new_account_second_factor_webauthn_credential_path
 
       fill_in "Security Key name", with: "My Security Key"
       click_button "Create Security Key"
@@ -64,7 +64,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
     end
 
     it "can use them as second factor authentication" do
-      visit new_user_session_path
+      visit new_account_session_path
 
       fill_in "Email", with: user.email
       fill_in "Password", with: "$3cretp@ssword123"

@@ -2,7 +2,7 @@
 
 RSpec.describe "Manage webauthn credentials", type: :system do
   let(:user) do
-    User.create!(
+    Account.create!(
       email: "testuser1@gmail.com",
       password: "password123"
     )
@@ -21,7 +21,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
   describe "manages paskeys" do
     context "when user doesn't have passkeys" do
       it "allows creating a passkey" do
-        visit new_user_passkey_path
+        visit new_account_passkey_path
 
         fill_in "Passkey name", with: "My Passkey"
         click_button "Create Passkey"
@@ -37,7 +37,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
       end
 
       it "fails to create a passkey" do
-        visit new_user_passkey_path
+        visit new_account_passkey_path
 
         fill_in "Passkey name", with: "My Passkey"
         click_button "Create Passkey"
@@ -50,7 +50,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
   describe "manages security keys" do
     context "when user doesn't have security keys" do
       it "allows creating a security key" do
-        visit new_user_second_factor_webauthn_credential_path
+        visit new_account_second_factor_webauthn_credential_path
 
         fill_in "Security Key name", with: "My Security Key"
         click_button "Create Security Key"
@@ -66,7 +66,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
       end
 
       it "fails to create a security key" do
-        visit new_user_second_factor_webauthn_credential_path
+        visit new_account_second_factor_webauthn_credential_path
 
         fill_in "Security Key name", with: "My Security Key"
         click_button "Create Security Key"
