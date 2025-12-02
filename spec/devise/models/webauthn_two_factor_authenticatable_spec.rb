@@ -9,7 +9,7 @@ RSpec.describe Devise::Models::WebauthnTwoFactorAuthenticatable, type: :model do
 
     it "keeps existing webauthn_id" do
       user = Account.new(email: "user@example.com", password: "password", password_confirmation: "password",
-                      webauthn_id: "custom")
+                         webauthn_id: "custom")
       expect(user.webauthn_id).to eq("custom")
     end
   end
