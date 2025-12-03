@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    devise-webauthn (0.1.1)
+    devise-webauthn (0.1.2)
       devise (~> 4.9)
       webauthn (~> 3.0)
 
