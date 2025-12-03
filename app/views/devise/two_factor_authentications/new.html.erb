@@ -1,12 +1,1 @@
-<%= form_with(
-  url: two_factor_authentication_path(resource_name),
-  method: :post,
-  data: {
-    action: "webauthn-credentials#get:prevent",
-    controller: "webauthn-credentials",
-    webauthn_credentials_options_param: @options
-  },
-) do |f| %>
-  <%= f.hidden_field(:public_key_credential, data: { "webauthn-credentials-target": "credentialHiddenInput" }) %>
-  <%= f.button('Use security key', type: "submit") %>
-<% end %>
+<%= login_with_security_key_button('Use security key', resource: @resource) %>

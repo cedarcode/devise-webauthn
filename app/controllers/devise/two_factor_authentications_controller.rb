@@ -6,13 +6,7 @@ module Devise
     prepend_before_action :ensure_sign_in_initiated
     prepend_before_action :require_no_authentication
 
-    def new
-      @options = WebAuthn::Credential.options_for_get(
-        allow: @resource.webauthn_credentials.pluck(:external_id),
-        user_verification: "discouraged"
-      )
-      session[:two_factor_authentication_challenge] = @options.challenge
-    end
+    def new; end
 
     def create
       self.resource = warden.authenticate!(auth_options)
