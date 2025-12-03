@@ -3,6 +3,12 @@ en:
     passkeys:
       passkey_created: "Passkey created successfully."
       passkey_creation_failed: "Passkey creation failed."
+    second_factor_webauthn_credentials:
+      security_key_created: "Security Key created successfully."
     failure:
       passkey_not_found: "Your passkey doesn't exist or is not valid."
       passkey_verification_failed: "Passkey verification failed."
+      sign_in_not_initiated: "Sign in was not initiated."
+      two_factor_required: "Two-factor authentication is required to sign in."
+      webauthn_credential_not_found: "Your WebAuthn credential doesn't exist or is not valid."
+      webauthn_credential_verification_failed: "Webauthn credential verification failed."

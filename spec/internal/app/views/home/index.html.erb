@@ -6,6 +6,14 @@
       <li><%= passkey.name %></li>
     <% end %>
   </div>
+  <div>
+    Security keys:
+
+    <% current_account.second_factor_webauthn_credentials.each do |second_factor_webauthn_credential| %>
+      <li><%= second_factor_webauthn_credential.name %></li>
+    <% end %>
+  </div>
 <% end %>
 
 <div> Add Passkey: <%= link_to "Add Passkey", new_account_passkey_path %> </div>
+<div> Add Security Key: <%= link_to "Security Key", new_account_second_factor_webauthn_credential_path %> </div>

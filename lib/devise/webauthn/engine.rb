@@ -14,6 +14,15 @@ module Devise
             route: { passkey_authentication: [] }
           }
         )
+
+        Devise.add_module(
+          :webauthn_two_factor_authenticatable,
+          {
+            model: "devise/models/webauthn_two_factor_authenticatable",
+            strategy: true,
+            route: { two_factor_authentication: [] }
+          }
+        )
       end
 
       initializer "devise.webauthn.helpers" do

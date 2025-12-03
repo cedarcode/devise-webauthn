@@ -9,6 +9,7 @@ AllCops:
     - "spec/internal/**/*"
     - "vendor/**/*"
     - "gemfiles/**/*"
+    - "lib/devise/strategies/database_authenticatable.rb"
 
 Style/Documentation:
   Enabled: false
