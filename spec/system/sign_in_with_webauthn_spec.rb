@@ -77,5 +77,28 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
       expect(page).to have_content("Signed in successfully.")
     end
+
+    context "when something fails" do
+      before do
+        allow(WebAuthn.configuration.relying_party).to receive(:allowed_origins)
+          .and_return(["http://localhost:5000"])
+      end
+
+      it "redirects to new two factor authentication page" do
+        visit new_account_session_path
+
+        fill_in "Email", with: user.email
+        fill_in "Password", with: "$3cretp@ssword123"
+
+        click_button "Log in"
+
+        expect(page).to have_content("Two-factor authentication is required to sign in.")
+
+        click_button "Use security key"
+
+        expect(page).to have_content("Webauthn credential verification failed.")
+        expect(page).to have_button("Use security key")
+      end
+    end
   end
 end
