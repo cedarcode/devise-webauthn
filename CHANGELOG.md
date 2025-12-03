@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [v0.2.0](https://github.com/cedarcode/devise-webauthn/compare/v0.1.2...v0.2.0/) - 2025-12-03
+
 - Add new `webauthn_two_factor_authenticatable` module for enabling 2FA using WebAuthn credentials.
 
 ## [v0.1.2](https://github.com/cedarcode/devise-webauthn/compare/v0.1.1...v0.1.2/) - 2025-12-03
