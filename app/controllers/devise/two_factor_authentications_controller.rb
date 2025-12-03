@@ -4,7 +4,7 @@ module Devise
   class TwoFactorAuthenticationsController < DeviseController
     prepend_before_action :require_no_authentication
     append_before_action :ensure_sign_in_initiated
-    append_before_action :set_resource
+    append_before_action :set_resource, only: :new
 
     def new
       @options = WebAuthn::Credential.options_for_get(
@@ -12,6 +12,20 @@ module Devise
         user_verification: "discouraged"
       )
       session[:two_factor_authentication_challenge] = @options.challenge
+    end
+
+    def create
+      self.resource = warden.authenticate!(auth_options)
+      set_flash_message! :notice, :signed_in
+      sign_in(resource_name, resource)
+      yield resource if block_given?
+      respond_with resource, location: after_sign_in_path_for(resource)
+    end
+
+    protected
+
+    def auth_options
+      { scope: resource_name, recall: "#{controller_path}#new", locale: I18n.locale }
     end
 
     private

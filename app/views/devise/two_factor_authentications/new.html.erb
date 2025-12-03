@@ -1,5 +1,5 @@
 <%= form_with(
-  url: session_path(resource_name),
+  url: two_factor_authentication_path(resource_name),
   method: :post,
   data: {
     action: "webauthn-credentials#get:prevent",
