@@ -2,9 +2,9 @@
 
 module Devise
   class TwoFactorAuthenticationsController < DeviseController
+    prepend_before_action :set_resource, only: :new
+    prepend_before_action :ensure_sign_in_initiated
     prepend_before_action :require_no_authentication
-    append_before_action :ensure_sign_in_initiated
-    append_before_action :set_resource, only: :new
 
     def new
       @options = WebAuthn::Credential.options_for_get(
