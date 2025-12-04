@@ -32,6 +32,7 @@ jobs:
           - 2.7
         gemfile:
           - rails_edge
+          - rails_8_1
           - rails_8_0
           - rails_7_2
           - rails_7_1
@@ -40,10 +41,14 @@ jobs:
           - ruby: 3.1
             gemfile: rails_edge
           - ruby: 3.1
+            gemfile: rails_8_1
+          - ruby: 3.1
             gemfile: rails_8_0
 
           - ruby: 3.0
             gemfile: rails_edge
+          - ruby: 3.0
+            gemfile: rails_8_1
           - ruby: 3.0
             gemfile: rails_8_0
           - ruby: 3.0
@@ -51,6 +56,8 @@ jobs:
 
           - ruby: 2.7
             gemfile: rails_edge
+          - ruby: 2.7
+            gemfile: rails_8_1
           - ruby: 2.7
             gemfile: rails_8_0
           - ruby: 2.7
