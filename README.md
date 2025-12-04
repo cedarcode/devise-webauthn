@@ -1,7 +1,7 @@
 # Devise::Webauthn
 [![Gem Version](https://badge.fury.io/rb/devise-webauthn.svg)](https://badge.fury.io/rb/devise-webauthn)
 
-Devise::Webauthn is a [Devise](https://github.com/heartcombo/devise) extension that adds [WebAuthn](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/) support to your Rails application, allowing users to authenticate with [passkeys](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/#passkey).
+Devise::Webauthn is a [Devise](https://github.com/heartcombo/devise) extension that adds [WebAuthn](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/) support to your Rails application, allowing users to authenticate with [passkeys](https://www.w3.org/TR/2025/WD-webauthn-3-20250127/#passkey) and use [security keys](https://www.w3.org/TR/webauthn-3/#server-side-credential) for two factor authentication.
 
 ## Requirements
 
@@ -54,11 +54,12 @@ Then, follow these steps to integrate Devise::Webauthn:
    ```
 
 3. **Update Your Devise Model:**
-   Add `:passkey_authenticatable` to your Devise model (e.g., `User`):
+   Add `:passkey_authenticatable` to your Devise model (e.g., `User`) for passkeys authentication and `:webauthn_two_factor_authenticatable` for WebAuthn-based 2FA if desired. For example:
    ```ruby
    class User < ApplicationRecord
      devise :database_authenticatable, :registerable,
-            :recoverable, :rememberable, :validatable, :passkey_authenticatable
+            :recoverable, :rememberable, :validatable,
+            :passkey_authenticatable, :webauthn_two_factor_authenticatable
    end
    ```
 
@@ -77,10 +78,12 @@ Then, follow these steps to integrate Devise::Webauthn:
 
 ## How It Works
 
-### Adding Passkeys
+### Passkey authentication
+
+#### Adding Passkeys
 Signed-in users can add passkeys by visiting `/users/passkeys/new`.
 
-### Sign In with Passkeys
+#### Sign In with Passkeys
 When a user visits `/users/sign_in` they can choose to authenticate using a passkey. The authentication flow is handled by `PasskeysAuthenticatable` strategy.
 
 The WebAuthn passkey sign-in flow works as follows:
@@ -88,6 +91,22 @@ The WebAuthn passkey sign-in flow works as follows:
 2. Browser shows available passkeys.
 3. User selects a passkey and verifies with their [authenticator](https://www.w3.org/TR/webauthn-3/#webauthn-authenticator).
 4. The server verifies the response and signs in the user.
+
+### Two-Factor Authentication (2FA) with WebAuthn
+
+#### Adding Security Keys for 2FA
+Signed-in users can add security keys by visiting `/users/second_factor_webauthn_credentials/new`.
+
+#### 2FA Sign In with Security Keys
+When a user that has 2FA enabled (i.e., has registered passkeys or security keys) visits `/users/sign_in`, after entering their primary credentials (e.g., email and password), they will be prompted to complete the second factor authentication using WebAuthn. The authentication flow is handled by `WebauthnTwoFactorAuthenticatable` strategy.
+
+The two factor authentication flow with WebAuthn works as follows:
+1. User enters their primary credentials (e.g., email and password) and submits the form.
+2. If the user has 2FA enabled, they are redirected to a second factor authentication page.
+3. User clicks "Use security key", starting a WebAuthn authentication ceremony.
+4. Browser shows available credentials (which can be both passkeys and security keys).
+5. User selects a credential and verifies with their [authenticator](https://www.w3.org/TR/webauthn-3/#webauthn-authenticator).
+6. The server verifies the response and signs in the user.
 
 ## Customization
 
