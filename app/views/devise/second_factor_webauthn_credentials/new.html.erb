@@ -1,14 +1,4 @@
-<%= form_with(
-  url: second_factor_webauthn_credentials_path(resource),
-  method: :post,
-  data: {
-    action: "webauthn-credentials#create:prevent",
-    controller: "webauthn-credentials",
-    webauthn_credentials_options_param: @options,
-  }
-) do |form| %>
-  <%= form.hidden_field(:public_key_credential,
-                        data: { "webauthn-credentials-target": "credentialHiddenInput" }) %>
+<%= security_key_creation_form_for(resource) do |form| %>
   <%= form.label :name, 'Security Key name' %>
   <%= form.text_field :name, required: true %>
   <%= form.submit 'Create Security Key' %>
