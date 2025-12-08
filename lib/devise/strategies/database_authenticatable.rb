@@ -11,7 +11,7 @@ module Devise
         hashed = false
 
         if validate(resource){ hashed = true; resource.valid_password?(password) }
-          if resource.second_factor_enabled?
+          if second_factor_enabled?(resource)
             session[:current_authentication_resource_id] = resource.id
             request.flash[:notice] = two_factor_required_message
             request.commit_flash
@@ -40,6 +40,10 @@ module Devise
 
       def two_factor_required_message
         I18n.t(:"#{scope}.two_factor_required", resource_name: scope, scope: "devise.failure", default: :two_factor_required)
+      end
+
+      def second_factor_enabled?(resource)
+        resource.respond_to?(:second_factor_enabled?) && resource.second_factor_enabled?
       end
     end
   end
