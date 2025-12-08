@@ -57,7 +57,7 @@ module Devise
 
       def login_with_security_key_button(text = nil, resource:, button_classes: nil, form_classes: nil, &block)
         form_with(
-          url: two_factor_authentication_path(resource_name),
+          url: two_factor_authentication_path(resource),
           method: :post,
           data: {
             action: "webauthn-credentials#get:prevent",
