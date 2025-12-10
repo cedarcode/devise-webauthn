@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [v0.2.1](https://github.com/cedarcode/devise-webauthn/compare/v0.2.0...v0.2.1/) - 2025-12-10
+
 - Add form helpers for security key registration and 2FA authentication.
 - Fix incorrect call to `resource_name` instead of using passed `resource` param in `login_with_security_key_button` helper.
 - Fix `NoMethodError` when calling `second_factor_enabled?` on resources without 2FA.
