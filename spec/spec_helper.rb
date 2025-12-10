@@ -6,10 +6,11 @@ require "bundler/setup"
 require "devise/webauthn"
 require "rails/generators/test_case"
 require "support/generator_helper"
+require "combustion"
 
-require_relative "dummy/config/environment"
-ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
-ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __dir__)
+Combustion.initialize! :active_model, :active_record, :action_controller, :action_view do
+  config.load_defaults Rails.version.to_f
+end
 
 require "rspec/rails"
 require "capybara/rspec"
@@ -31,13 +32,16 @@ RSpec.configure do |config|
   config.include Rails::Generators::Testing::Assertions, type: :generator
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
+  config.include ActiveSupport::Testing::Assertions, type: :request
 
   config.before(:each, type: :system) do
     driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
-    Rails.application.reload_routes_unless_loaded
 
     Capybara.server_host = "localhost"
     WebAuthn.configuration.allowed_origins = ["http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"]
+
+    # TODO: Remove when Devise fixes https://github.com/heartcombo/devise/issues/5705
+    Rails.application.reload_routes_unless_loaded if Rails::VERSION::MAJOR >= 8
   end
 
   config.include Devise::Test::IntegrationHelpers, type: :system

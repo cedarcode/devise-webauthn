@@ -9,13 +9,17 @@
 /log/*.log
 
 /spec/tmp/
-/spec/dummy/db/*.sqlite3
-/spec/dummy/db/*.sqlite3-*
-/spec/dummy/log/*.log
-/spec/dummy/storage/
-/spec/dummy/tmp/
-/spec/dummy/.byebug_history
 .byebug_history
 
 # rspec failure tracking
 .rspec_status
+
+# combustion files
+/spec/internal/db/*.sqlite
+/spec/internal/db/*.sqlite-*
+/spec/internal/log/*.log
+/spec/internal/storage/
+/spec/internal/tmp/
+/spec/internal/.byebug_history
+
+/gemfiles/*.gemfile.lock

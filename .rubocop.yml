@@ -3,12 +3,14 @@ plugins:
   - rubocop-rails
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 2.7
   NewCops: enable
   Exclude:
-    - "spec/dummy/**/*"
+    - "spec/internal/**/*"
     - "spec/tmp/**/*"
     - "vendor/**/*"
+    - "gemfiles/**/*"
+    - "lib/devise/strategies/database_authenticatable.rb"
 
 Style/Documentation:
   Enabled: false

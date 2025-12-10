@@ -5,17 +5,22 @@ module Devise
     class Engine < ::Rails::Engine
       isolate_namespace Devise::Webauthn
 
-      initializer "devise.webauthn.setup" do
-        Warden::Strategies.add(:passkey_authenticatable, Devise::Strategies::PasskeyAuthenticatable)
-      end
-
       initializer "devise.webauthn.add_module" do
         Devise.add_module(
           :passkey_authenticatable,
           {
             model: "devise/models/passkey_authenticatable",
             strategy: true,
-            route: { passkey_authentication: routes }
+            route: { passkey_authentication: [] }
+          }
+        )
+
+        Devise.add_module(
+          :webauthn_two_factor_authenticatable,
+          {
+            model: "devise/models/webauthn_two_factor_authenticatable",
+            strategy: true,
+            route: { two_factor_authentication: [] }
           }
         )
       end
@@ -24,6 +29,10 @@ module Devise
         ActiveSupport.on_load(:action_view) do
           include Devise::Webauthn::CredentialsHelper
         end
+      end
+
+      initializer "devise.webauthn.url_helpers" do
+        Devise.include_helpers(Devise::Webauthn)
       end
     end
   end

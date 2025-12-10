@@ -1,0 +1,31 @@
+# frozen_string_literal: true
+
+class <%= @scope_prefix %>PasskeysController < Devise::PasskeysController
+  # GET /resource/passkeys/new
+  # def new
+  #   super
+  # end
+
+  # POST /resource/passkeys
+  # def create
+  #   super
+  # end
+
+  # DELETE /resource/passkeys/:id
+  # def destroy
+  #  super
+  # end
+
+  # private
+
+  # Verifies the passkey coming in the params and saves it to the database.
+  # def verify_and_save_passkey(passkey_from_params)
+  #   super
+  # end
+
+  # The default url to be used after creating a passkey. You can overwrite
+  # this method in your own PasskeysController.
+  # def after_update_path
+  #   super
+  # end
+end

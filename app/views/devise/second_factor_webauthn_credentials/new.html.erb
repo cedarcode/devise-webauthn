@@ -1,0 +1,5 @@
+<%= security_key_creation_form_for(resource) do |form| %>
+  <%= form.label :name, 'Security Key name' %>
+  <%= form.text_field :name, required: true %>
+  <%= form.submit 'Create Security Key' %>
+<% end %>

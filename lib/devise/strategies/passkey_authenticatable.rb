@@ -2,20 +2,21 @@
 
 module Devise
   module Strategies
-    class PasskeyAuthenticatable < Warden::Strategies::Base
+    class PasskeyAuthenticatable < Devise::Strategies::Base
       def valid?
         passkey_param.present? && session[:authentication_challenge].present?
       end
 
       def authenticate!
         passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
-        stored_passkey = WebauthnCredential.find_by(external_id: passkey_from_params.id)
+        stored_passkey = WebauthnCredential.passkey.find_by(external_id: passkey_from_params.id)
 
         return fail!(:passkey_not_found) if stored_passkey.blank?
 
         verify_passkeys(passkey_from_params, stored_passkey)
 
-        success!(stored_passkey.user)
+        resource = stored_passkey.public_send(resource_name)
+        success!(resource)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)
       ensure
@@ -38,6 +39,12 @@ module Devise
 
         stored_passkey.update!(sign_count: passkey_from_params.sign_count)
       end
+
+      def resource_name
+        mapping.to.name.underscore
+      end
     end
   end
 end
+
+Warden::Strategies.add(:passkey_authenticatable, Devise::Strategies::PasskeyAuthenticatable)
