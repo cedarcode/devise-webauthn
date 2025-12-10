@@ -79,7 +79,7 @@ module Devise
           options = WebAuthn::Credential.options_for_create(
             user: {
               id: resource.webauthn_id,
-              name: resource.email
+              name: resource_human_palatable_identifier
             },
             exclude: resource.passkeys.pluck(:external_id),
             authenticator_selection: {
@@ -113,7 +113,7 @@ module Devise
           options = WebAuthn::Credential.options_for_create(
             user: {
               id: resource.webauthn_id,
-              name: resource.email
+              name: resource_human_palatable_identifier
             },
             exclude: resource.webauthn_credentials.pluck(:external_id),
             authenticator_selection: {
@@ -141,6 +141,13 @@ module Devise
 
           options
         end
+      end
+
+      def resource_human_palatable_identifier
+        authentication_keys = resource.class.authentication_keys
+        authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
+
+        authentication_keys.filter_map { |authentication_key| resource.public_send(authentication_key) }.first
       end
     end
   end
