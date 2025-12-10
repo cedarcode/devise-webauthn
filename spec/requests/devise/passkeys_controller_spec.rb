@@ -31,7 +31,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
     context "when user is authenticated" do
       before do
         sign_in user, scope: :account
-        get new_account_passkey_path # To set the challenge in session
+        get options_for_create_account_passkeys_path # To set the challenge in session
       end
 
       context "with valid parameters" do
