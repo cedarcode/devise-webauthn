@@ -24,7 +24,7 @@ module Devise
         invoke "active_record:model", ["webauthn_credential"], migration: false
       end
 
-      # TODO: Remove this in favor of strandard model generation with
+      # TODO: Remove this in favor of strandard model generator with
       # not null modifier (`!`) once we drop support for Rails < 8.
       def generate_migration
         migration_template "webauthn_credential_migration.rb.erb", "db/migrate/create_webauthn_credentials.rb"
