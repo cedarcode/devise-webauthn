@@ -8,6 +8,7 @@ module ActionDispatch
       def devise_passkey_authentication(_mapping, controllers)
         resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys] do
           get :options_for_get, on: :collection
+          get :options_for_create, on: :collection
         end
       end
 
@@ -20,6 +21,7 @@ module ActionDispatch
           only: %i[new create destroy],
           controller: controllers[:second_factor_webauthn_credentials] do
             get :options_for_get, on: :collection
+            get :options_for_create, on: :collection
           end
       end
     end
