@@ -21,25 +21,13 @@ module Devise
       end
 
       def generate_model
-        if Rails.version.to_f >= 8.0
-          invoke "active_record:model", [
-            "webauthn_credential",
-            "external_id:string!:uniq",
-            "name:string!",
-            "public_key:text!",
-            "sign_count:integer{8}!",
-            "#{user_model_name}:references",
-            "authentication_factor:integer{1}!"
-          ]
-        else
-          invoke "active_record:model", ["webauthn_credential"], migration: false
-        end
+        invoke "active_record:model", ["webauthn_credential"], migration: false
       end
 
-      if Rails.version.to_f < 8.0
-        def generate_migration
-          migration_template "webauthn_credential_migration.rb.erb", "db/migrate/create_webauthn_credentials.rb"
-        end
+      # TODO: Remove this in favor of strandard model generation with
+      # not null modifier (`!`) once we drop support for Rails < 8.
+      def generate_migration
+        migration_template "webauthn_credential_migration.rb.erb", "db/migrate/create_webauthn_credentials.rb"
       end
 
       def inject_webauthn_credential_content
