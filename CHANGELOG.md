@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Generate webauthn credentials table with not null constraints in attributes that must be present.
+
 ## [v0.2.1](https://github.com/cedarcode/devise-webauthn/compare/v0.2.0...v0.2.1/) - 2025-12-10
 
 - Add form helpers for security key registration and 2FA authentication.
