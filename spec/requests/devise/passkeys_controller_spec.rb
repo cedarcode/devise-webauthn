@@ -118,4 +118,62 @@ RSpec.describe Devise::PasskeysController, type: :request do
       end
     end
   end
+
+  # rubocop:disable RSpec/MultipleExpectations
+  describe "GET #options_for_get" do
+    it "returns authentication options and stores the challenge in the session" do
+      get options_for_get_account_passkeys_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("application/json")
+
+      body = response.parsed_body
+      expect(body).to include("challenge")
+      expect(session[:authentication_challenge]).to be_present
+    end
+  end
+
+  describe "GET #options_for_create" do
+    context "when user is authenticated" do
+      before do
+        sign_in user, scope: :account
+      end
+
+      it "returns passkey creation options and stores the challenge in the session" do
+        get options_for_create_account_passkeys_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq("application/json")
+
+        body = response.parsed_body
+        expect(body).to include("challenge")
+        expect(body.dig("user", "name")).to eq(user.email)
+        expect(session[:webauthn_challenge]).to be_present
+      end
+
+      it "includes existing passkeys in the excludeCredentials list" do
+        user.passkeys.create!(
+          external_id: "existing-external-id",
+          name: "Existing Passkey",
+          public_key: "public-key",
+          sign_count: 0
+        )
+
+        get options_for_create_account_passkeys_path
+
+        body = response.parsed_body
+        exclude_credentials = body["excludeCredentials"] || []
+
+        expect(exclude_credentials.size).to eq(user.passkeys.count)
+      end
+    end
+
+    context "when user is not authenticated" do
+      it "redirects to the sign-in page" do
+        get options_for_create_account_passkeys_path
+        expect(response).to redirect_to(new_account_session_path)
+      end
+    end
+  end
+  # rubocop:enable RSpec/MultipleExpectations
 end
