@@ -18,12 +18,12 @@ ActiveRecord::Schema.define do
   end
 
   create_table "webauthn_credentials", force: :cascade do |t|
-    t.string "external_id"
-    t.string "name"
-    t.text "public_key"
-    t.integer "sign_count", limit: 8
+    t.string "external_id", null: false
+    t.string "name", null: false
+    t.text "public_key", null: false
+    t.integer "sign_count", limit: 8, null: false
     t.integer "account_id", null: false
-    t.integer "authentication_factor", limit: 1
+    t.integer "authentication_factor", limit: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_webauthn_credentials_on_external_id", unique: true
