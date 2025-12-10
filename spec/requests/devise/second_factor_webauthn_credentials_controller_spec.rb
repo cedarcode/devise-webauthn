@@ -41,7 +41,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
     context "when user is authenticated" do
       before do
         sign_in user
-        get new_account_second_factor_webauthn_credential_path # To set the challenge in session
+        get options_for_create_account_second_factor_webauthn_credentials_path # To set the challenge in session
       end
 
       context "with valid parameters" do
