@@ -6,22 +6,40 @@ require "rails/generators/active_record"
 module Devise
   module Webauthn
     class WebauthnCredentialModelGenerator < Rails::Generators::Base
+      include Rails::Generators::Migration
+
       hide!
       namespace "devise:webauthn:webauthn_credential_model"
+
+      source_root File.expand_path("templates", __dir__)
 
       desc "Generate a WebauthnCredential model with the required fields for WebAuthn"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
 
+      def self.next_migration_number(dirname)
+        ActiveRecord::Generators::Base.next_migration_number(dirname)
+      end
+
       def generate_model
-        invoke "active_record:model", [
-          "webauthn_credential",
-          "external_id:string:uniq",
-          "name:string",
-          "public_key:text",
-          "sign_count:integer{8}",
-          "#{user_model_name}:references",
-          "authentication_factor:integer{1}"
-        ]
+        if Rails.version.to_f >= 8.0
+          invoke "active_record:model", [
+            "webauthn_credential",
+            "external_id:string!:uniq",
+            "name:string!",
+            "public_key:text!",
+            "sign_count:integer{8}!",
+            "#{user_model_name}:references",
+            "authentication_factor:integer{1}!"
+          ]
+        else
+          invoke "active_record:model", ["webauthn_credential"], migration: false
+        end
+      end
+
+      if Rails.version.to_f < 8.0
+        def generate_migration
+          migration_template "webauthn_credential_migration.rb.erb", "db/migrate/create_webauthn_credentials.rb"
+        end
       end
 
       def inject_webauthn_credential_content
