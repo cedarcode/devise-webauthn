@@ -2,7 +2,6 @@ en:
   devise:
     passkeys:
       passkey_created: "Passkey created successfully."
-      passkey_creation_failed: "Passkey creation failed."
     second_factor_webauthn_credentials:
       security_key_created: "Security Key created successfully."
     failure:
