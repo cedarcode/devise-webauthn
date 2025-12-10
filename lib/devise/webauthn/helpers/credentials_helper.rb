@@ -56,57 +56,6 @@ module Devise
           end
         end
       end
-
-      private
-
-      def create_passkey_options(resource)
-        @create_passkey_options ||= begin
-          options = WebAuthn::Credential.options_for_create(
-            user: {
-              id: resource.webauthn_id,
-              name: resource_human_palatable_identifier
-            },
-            exclude: resource.passkeys.pluck(:external_id),
-            authenticator_selection: {
-              resident_key: "required",
-              user_verification: "required"
-            }
-          )
-
-          # Store challenge in session for later verification
-          session[:webauthn_challenge] = options.challenge
-
-          options
-        end
-      end
-
-      def create_security_key_options(resource)
-        @create_security_key_options ||= begin
-          options = WebAuthn::Credential.options_for_create(
-            user: {
-              id: resource.webauthn_id,
-              name: resource_human_palatable_identifier
-            },
-            exclude: resource.webauthn_credentials.pluck(:external_id),
-            authenticator_selection: {
-              resident_key: "discouraged",
-              user_verification: "discouraged"
-            }
-          )
-
-          # Store challenge in session for later verification
-          session[:webauthn_challenge] = options.challenge
-
-          options
-        end
-      end
-
-      def resource_human_palatable_identifier
-        authentication_keys = resource.class.authentication_keys
-        authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
-
-        authentication_keys.filter_map { |authentication_key| resource.public_send(authentication_key) }.first
-      end
     end
   end
 end

@@ -2,7 +2,7 @@
 
 module Devise
   class PasskeysController < DeviseController
-    before_action :authenticate_scope!
+    before_action :authenticate_scope!, only: %i[new create destroy options_for_create]
 
     def new; end
 
@@ -44,6 +44,26 @@ module Devise
       render json: passkey_authentication_options
     end
 
+    def options_for_create
+      create_passkey_options =
+        WebAuthn::Credential.options_for_create(
+          user: {
+            id: resource.webauthn_id,
+            name: resource_human_palatable_identifier
+          },
+          exclude: resource.passkeys.pluck(:external_id),
+          authenticator_selection: {
+            resident_key: "required",
+            user_verification: "required"
+          }
+        )
+
+      # Store challenge in session for later verification
+      session[:webauthn_challenge] = create_passkey_options.challenge
+
+      render json: create_passkey_options
+    end
+
     private
 
     def authenticate_scope!
@@ -69,6 +89,13 @@ module Devise
     # this method in your own PasskeysController.
     def after_update_path
       new_passkey_path(resource_name)
+    end
+
+    def resource_human_palatable_identifier
+      authentication_keys = resource.class.authentication_keys
+      authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
+
+      authentication_keys.filter_map { |authentication_key| resource.public_send(authentication_key) }.first
     end
   end
 end
