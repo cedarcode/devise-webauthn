@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ModuleLength
 module Devise
   module Webauthn
     module CredentialsHelper
@@ -74,4 +73,3 @@ module Devise
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength
