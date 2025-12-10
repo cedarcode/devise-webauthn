@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+class <%= @scope_prefix %>TwoFactorAuthenticationsController < Devise::Devise::TwoFactorAuthenticationsController
+  # GET /resource/two_factor_authentication/new
+  # def new
+  #   super
+  # end
+
+  # POST /resource/two_factor_authentication
+  # def create
+  #   super
+  # end
+end
