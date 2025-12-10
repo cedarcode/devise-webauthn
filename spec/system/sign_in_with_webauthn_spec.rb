@@ -16,15 +16,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
   describe "sign in using passkeys" do
     before do
-      sign_in user
-      visit new_account_passkey_path
-
-      fill_in "Passkey name", with: "My Passkey"
-      click_button "Create Passkey"
-
-      page.has_text?("Passkey created successfully.")
-
-      sign_out user
+      add_passkey_to_authenticator(authenticator, user)
     end
 
     it "allows to create a passkey and then sign in with it" do
@@ -52,15 +44,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
   describe "sign in with security keys as second factor" do
     before do
-      sign_in user
-      visit new_account_second_factor_webauthn_credential_path
-
-      fill_in "Security Key name", with: "My Security Key"
-      click_button "Create Security Key"
-
-      page.has_text?("Security Key created successfully.")
-
-      sign_out user
+      add_security_key_to_authenticator(authenticator, user)
     end
 
     it "can use them as second factor authentication" do
