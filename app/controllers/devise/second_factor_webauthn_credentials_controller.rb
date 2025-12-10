@@ -3,6 +3,7 @@
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
     before_action :authenticate_scope!
+    before_action :set_resource, only: :options_for_get
 
     def new; end
 
@@ -40,6 +41,19 @@ module Devise
       end
 
       redirect_to after_destroy_path
+    end
+
+    def options_for_get
+      security_key_authentication_options =
+        WebAuthn::Credential.options_for_get(
+          allow: @resource.webauthn_credentials.pluck(:external_id),
+          user_verification: "discouraged"
+        )
+
+      # Store challenge in session for later verification
+      session[:two_factor_authentication_challenge] = security_key_authentication_options.challenge
+
+      render json: security_key_authentication_options
     end
 
     private

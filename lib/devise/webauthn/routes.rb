@@ -6,7 +6,9 @@ module ActionDispatch
       protected
 
       def devise_passkey_authentication(_mapping, controllers)
-        resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys]
+        resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys] do
+          get :options_for_get, on: :collection
+        end
       end
 
       def devise_two_factor_authentication(_mapping, controllers)
@@ -16,7 +18,9 @@ module ActionDispatch
 
         resources :second_factor_webauthn_credentials,
                   only: %i[new create update destroy],
-                  controller: controllers[:second_factor_webauthn_credentials]
+                  controller: controllers[:second_factor_webauthn_credentials] do
+                    get :options_for_get, on: :collection
+                  end
       end
     end
   end

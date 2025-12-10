@@ -32,6 +32,18 @@ module Devise
       redirect_to after_update_path
     end
 
+    def options_for_get
+      passkey_authentication_options =
+        WebAuthn::Credential.options_for_get(
+          user_verification: "required"
+        )
+
+      # Store challenge in session for later verification
+      session[:authentication_challenge] = passkey_authentication_options.challenge
+
+      render json: passkey_authentication_options
+    end
+
     private
 
     def authenticate_scope!

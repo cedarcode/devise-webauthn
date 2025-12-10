@@ -80,19 +80,6 @@ module Devise
         end
       end
 
-      def passkey_authentication_options
-        @passkey_authentication_options ||= begin
-          options = WebAuthn::Credential.options_for_get(
-            user_verification: "required"
-          )
-
-          # Store challenge in session for later verification
-          session[:authentication_challenge] = options.challenge
-
-          options
-        end
-      end
-
       def create_security_key_options(resource)
         @create_security_key_options ||= begin
           options = WebAuthn::Credential.options_for_create(
@@ -109,20 +96,6 @@ module Devise
 
           # Store challenge in session for later verification
           session[:webauthn_challenge] = options.challenge
-
-          options
-        end
-      end
-
-      def security_key_authentication_options(resource)
-        @security_key_authentication_options ||= begin
-          options = WebAuthn::Credential.options_for_get(
-            allow: resource.webauthn_credentials.pluck(:external_id),
-            user_verification: "discouraged"
-          )
-
-          # Store challenge in session for later verification
-          session[:two_factor_authentication_challenge] = options.challenge
 
           options
         end
