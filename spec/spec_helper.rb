@@ -33,6 +33,7 @@ RSpec.configure do |config|
   config.include FileUtils, type: :generator
   config.include GeneratorHelper, type: :generator
   config.include ActiveSupport::Testing::Assertions, type: :request
+  config.include ActiveSupport::Testing::Assertions, type: :generator
 
   config.before(:each, type: :system) do
     driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
