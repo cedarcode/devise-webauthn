@@ -22,7 +22,9 @@ module Devise
           end
         else
           view_directory :passkeys
+          view_directory :second_factor_webauthn_credentials
           view_directory :sessions
+          view_directory :two_factor_authentications
         end
       end
 
