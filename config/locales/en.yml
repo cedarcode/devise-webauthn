@@ -2,11 +2,15 @@ en:
   devise:
     passkeys:
       passkey_created: "Passkey created successfully."
+      passkey_deleted: "Passkey deleted successfully."
     second_factor_webauthn_credentials:
       security_key_created: "Security Key created successfully."
+      security_key_deleted: "Security Key deleted successfully."
     failure:
       passkey_not_found: "Your passkey doesn't exist or is not valid."
       passkey_verification_failed: "Passkey verification failed."
+      passkey_deletion_failed: "Passkey deletion failed."
+      security_key_deletion_failed: "Security Key deletion failed."
       sign_in_not_initiated: "Sign in was not initiated."
       two_factor_required: "Two-factor authentication is required to sign in."
       webauthn_credential_not_found: "Your WebAuthn credential doesn't exist or is not valid."
