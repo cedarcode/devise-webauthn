@@ -19,9 +19,16 @@ RSpec.describe Devise::Webauthn::WebauthnCredentialModelGenerator, type: :genera
 
     it "invokes the active_record:model generator with correct arguments" do
       expect(generator).to have_received(:invoke).with("active_record:model",
-                                                       ["webauthn_credential", "external_id:string:uniq", "name:string",
-                                                        "public_key:text", "sign_count:integer{8}", "user:references",
-                                                        "authentication_factor:integer{1}"])
+                                                       ["webauthn_credential"],
+                                                       migration: false)
+    end
+
+    it "create migration for creating webauthn credentials" do
+      assert_migration "db/migrate/create_webauthn_credentials.rb" do |migration|
+        assert_instance_method :change, migration do |method_body|
+          assert_match(/t\.references :user, null: false, foreign_key: true/, method_body)
+        end
+      end
     end
 
     it "injects validations into the Passkey model" do
@@ -36,9 +43,16 @@ RSpec.describe Devise::Webauthn::WebauthnCredentialModelGenerator, type: :genera
 
     it "invokes the active_record:model generator with correct arguments" do
       expect(generator).to have_received(:invoke).with("active_record:model",
-                                                       ["webauthn_credential", "external_id:string:uniq", "name:string",
-                                                        "public_key:text", "sign_count:integer{8}", "admin:references",
-                                                        "authentication_factor:integer{1}"])
+                                                       ["webauthn_credential"],
+                                                       migration: false)
+    end
+
+    it "create migration for creating webauthn credentials with correct association" do
+      assert_migration "db/migrate/create_webauthn_credentials.rb" do |migration|
+        assert_instance_method :change, migration do |method_body|
+          assert_match(/t\.references :admin, null: false, foreign_key: true/, method_body)
+        end
+      end
     end
   end
 end
