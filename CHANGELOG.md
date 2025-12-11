@@ -4,6 +4,7 @@
 
 - Generate webauthn credentials table with not null constraints in attributes that must be present.
 - Update controllers and views generators to generate 2FA-related controllers and views.
+- Add flash messages when removing credentials.
 
 ## [v0.2.1](https://github.com/cedarcode/devise-webauthn/compare/v0.2.0...v0.2.1/) - 2025-12-10
 
