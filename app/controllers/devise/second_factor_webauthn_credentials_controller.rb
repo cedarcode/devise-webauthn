@@ -26,7 +26,7 @@ module Devise
       if resource.second_factor_webauthn_credentials.destroy(params[:id])
         set_flash_message! :notice, :security_key_deleted
       else
-        set_flash_message! :alert, :webauthn_credential_deletion_failed, scope: :"devise.failure"
+        set_flash_message! :alert, :security_key_deletion_failed, scope: :"devise.failure"
       end
 
       redirect_to after_update_path
