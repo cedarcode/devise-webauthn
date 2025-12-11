@@ -165,7 +165,8 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         external_id: "second-factor-id",
         name: "Second Factor Key",
         public_key: "pk",
-        sign_count: 0
+        sign_count: 0,
+        authentication_factor: :second_factor
       )
 
       # rubocop:disable RSpec/AnyInstance
@@ -219,7 +220,8 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
           external_id: "existing-id",
           name: "Existing Key",
           public_key: "pk",
-          sign_count: 0
+          sign_count: 0,
+          authentication_factor: :first_factor
         )
 
         get options_for_create_account_second_factor_webauthn_credentials_path
