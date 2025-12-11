@@ -105,6 +105,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
       it "deletes the passkey and redirects" do
         assert_difference("user.passkeys.count", -1) do
           delete account_passkey_path(passkey)
+          expect(flash[:notice]).to eq I18n.t("devise.passkeys.passkey_deleted")
           expect(response).to redirect_to(new_account_passkey_path)
         end
       end
