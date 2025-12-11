@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [v0.2.2](https://github.com/cedarcode/devise-webauthn/compare/v0.2.1...v0.2.2/) - 2025-12-11
+
 - Generate webauthn credentials table with not null constraints in attributes that must be present.
 - Update controllers and views generators to generate 2FA-related controllers and views.
 
