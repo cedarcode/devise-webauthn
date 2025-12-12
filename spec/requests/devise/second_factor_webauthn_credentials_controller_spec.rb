@@ -116,6 +116,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       it "deletes the security key and redirects" do
         assert_difference("user.second_factor_webauthn_credentials.count", -1) do
           delete account_second_factor_webauthn_credential_path(security_key)
+          expect(flash[:notice]).to eq I18n.t("devise.second_factor_webauthn_credentials.security_key_deleted")
           expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
         end
       end

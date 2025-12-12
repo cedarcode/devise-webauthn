@@ -23,7 +23,12 @@ module Devise
     end
 
     def destroy
-      resource.passkeys.destroy(params[:id])
+      if resource.passkeys.destroy(params[:id])
+        set_flash_message! :notice, :passkey_deleted
+      else
+        set_flash_message! :alert, :passkey_deletion_failed, scope: :"devise.failure"
+      end
+
       redirect_to after_update_path
     end
 

@@ -5,7 +5,11 @@ require "rails/generators"
 module Devise
   module Webauthn
     class ControllersGenerator < Rails::Generators::Base
-      CONTROLLERS = %w[passkeys].freeze
+      CONTROLLERS = %w[
+        passkeys
+        second_factor_webauthn_credentials
+        two_factor_authentications
+      ].freeze
 
       desc "Create inherited Devise::Webauthn controllers in your app/controllers folder."
 
