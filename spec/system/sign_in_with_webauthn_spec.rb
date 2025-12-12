@@ -21,9 +21,11 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
     it "allows to create a passkey and then sign in with it" do
       visit new_account_session_path
-      click_button "Log in with passkeys"
 
-      expect(page).to have_content("Signed in successfully.")
+      button = find_button("Log in with passkeys")
+      page.execute_script("arguments[0].click()", button)
+
+      assert_selector "div", text: "Signed in successfully."
     end
 
     it "can use them as second factor authentication" do
@@ -32,13 +34,15 @@ RSpec.describe "SignInWithWebauthn", type: :system do
       fill_in "Email", with: user.email
       fill_in "Password", with: "$3cretp@ssword123"
 
-      click_button "Log in"
+      button = find_button("Log in")
+      page.execute_script("arguments[0].click()", button)
 
-      expect(page).to have_content("Two-factor authentication is required to sign in.")
+      assert_selector "div", text: "Two-factor authentication is required to sign in."
 
-      click_button "Use security key"
+      button = find_button("Use security key")
+      page.execute_script("arguments[0].click()", button)
 
-      expect(page).to have_content("Signed in successfully.")
+      assert_selector "div", text: "Signed in successfully."
     end
   end
 
@@ -53,13 +57,15 @@ RSpec.describe "SignInWithWebauthn", type: :system do
       fill_in "Email", with: user.email
       fill_in "Password", with: "$3cretp@ssword123"
 
-      click_button "Log in"
+      button = find_button("Log in")
+      page.execute_script("arguments[0].click()", button)
 
-      expect(page).to have_content("Two-factor authentication is required to sign in.")
+      assert_selector "div", text: "Two-factor authentication is required to sign in."
 
-      click_button "Use security key"
+      button = find_button("Use security key")
+      page.execute_script("arguments[0].click()", button)
 
-      expect(page).to have_content("Signed in successfully.")
+      assert_selector "div", text: "Signed in successfully."
     end
 
     context "when something fails" do
@@ -74,13 +80,15 @@ RSpec.describe "SignInWithWebauthn", type: :system do
         fill_in "Email", with: user.email
         fill_in "Password", with: "$3cretp@ssword123"
 
-        click_button "Log in"
+        button = find_button("Log in")
+        page.execute_script("arguments[0].click()", button)
 
-        expect(page).to have_content("Two-factor authentication is required to sign in.")
+        assert_selector "div", text: "Two-factor authentication is required to sign in."
 
-        click_button "Use security key"
+        button = find_button("Use security key")
+        page.execute_script("arguments[0].click()", button)
 
-        expect(page).to have_content("Webauthn credential verification failed.")
+        assert_selector "div", text: "Webauthn credential verification failed."
         expect(page).to have_button("Use security key")
       end
     end

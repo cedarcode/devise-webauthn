@@ -24,7 +24,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_passkey_path
 
         fill_in "Passkey name", with: "My Passkey"
-        click_button "Create Passkey"
+        find_button("Create Passkey").click
 
         expect(page).to have_content("Passkey created successfully.")
       end
@@ -40,7 +40,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_passkey_path
 
         fill_in "Passkey name", with: "My Passkey"
-        click_button "Create Passkey"
+        find_button("Create Passkey").click
 
         expect(page).to have_content("Passkey verification failed.")
       end
@@ -53,7 +53,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_second_factor_webauthn_credential_path
 
         fill_in "Security Key name", with: "My Security Key"
-        click_button "Create Security Key"
+        find_button("Create Security Key").click
 
         expect(page).to have_content("Security Key created successfully.")
       end
@@ -69,7 +69,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_second_factor_webauthn_credential_path
 
         fill_in "Security Key name", with: "My Security Key"
-        click_button "Create Security Key"
+        find_button("Create Security Key").click
 
         expect(page).to have_content("Webauthn credential verification failed.")
       end
