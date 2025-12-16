@@ -1,5 +1,9 @@
 <%= security_key_creation_form_for(resource) do |form| %>
   <%= form.label :name, 'Security Key name' %>
   <%= form.text_field :name, required: true %>
-  <%= form.submit 'Create Security Key' %>
+  <%= form.button(
+    'Create Security Key',
+    type: "button",
+    data: { action: "webauthn-credentials#create:prevent", webauthn_credentials_options_url_param: options_for_create_second_factor_webauthn_credentials_path(resource) },
+  ) %>
 <% end %>

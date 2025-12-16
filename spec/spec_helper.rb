@@ -39,6 +39,7 @@ RSpec.configure do |config|
     driven_by :selenium, using: ENV["HEADLESS"] == "false" ? :chrome : :headless_chrome
 
     Capybara.server_host = "localhost"
+    Capybara.default_max_wait_time = 10
     WebAuthn.configuration.allowed_origins = ["http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"]
 
     # TODO: Remove when Devise fixes https://github.com/heartcombo/devise/issues/5705

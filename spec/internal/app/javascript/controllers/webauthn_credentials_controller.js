@@ -7,12 +7,15 @@ export default class extends Controller {
     try {
       const response = await fetch(optionsUrl);
 
-      const credentialOptions = PublicKeyCredential.parseCreationOptionsFromJSON(await response.json());
+      const parsedResponse = await response.json();
+      const credentialOptions = PublicKeyCredential.parseCreationOptionsFromJSON(parsedResponse);
       const credential = await navigator.credentials.create({ publicKey: credentialOptions });
 
       this.credentialHiddenInputTarget.value = JSON.stringify(credential);
 
-      this.element.submit();
+      setTimeout(() => {
+        this.element.requestSubmit()
+      }, 0)
     } catch (error) {
       alert(error.message || error);
     }
@@ -27,7 +30,9 @@ export default class extends Controller {
 
       this.credentialHiddenInputTarget.value = JSON.stringify(credential);
 
-      this.element.submit();
+      setTimeout(() => {
+        this.element.requestSubmit()
+      }, 0)
     } catch (error) {
       alert(error.message || error);
     }

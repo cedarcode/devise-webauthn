@@ -9,9 +9,7 @@ module Devise
           method: :post,
           class: form_classes,
           data: {
-            action: "webauthn-credentials#create:prevent",
             controller: "webauthn-credentials",
-            webauthn_credentials_options_url_param: options_for_create_passkeys_path(resource)
           }
         ) do |f|
           concat f.hidden_field(:public_key_credential,
@@ -25,15 +23,18 @@ module Devise
           url: session_path,
           method: :post,
           data: {
-            action: "webauthn-credentials#get:prevent",
             controller: "webauthn-credentials",
-            webauthn_credentials_options_url_param: options_for_get_passkeys_path(resource)
           },
           class: form_classes
         ) do |f|
           concat f.hidden_field(:public_key_credential,
                                 data: { "webauthn-credentials-target": "credentialHiddenInput" })
-          concat f.button(text, type: "submit", class: button_classes, &block)
+          concat f.button(text,
+                          type: "button",
+                          class: button_classes,
+                          data: { action: "webauthn-credentials#get",
+                                  webauthn_credentials_options_url_param: options_for_get_passkeys_path(resource) },
+                          &block)
         end
       end
 
@@ -43,9 +44,7 @@ module Devise
           method: :post,
           class: form_classes,
           data: {
-            action: "webauthn-credentials#create:prevent",
             controller: "webauthn-credentials",
-            webauthn_credentials_options_url_param: options_for_create_second_factor_webauthn_credentials_path(resource)
           }
         ) do |f|
           concat f.hidden_field(:public_key_credential,
@@ -59,15 +58,18 @@ module Devise
           url: two_factor_authentication_path(resource),
           method: :post,
           data: {
-            action: "webauthn-credentials#get:prevent",
             controller: "webauthn-credentials",
-            webauthn_credentials_options_url_param: options_for_get_second_factor_webauthn_credentials_path(resource)
           },
           class: form_classes
         ) do |f|
           concat f.hidden_field(:public_key_credential,
                                 data: { "webauthn-credentials-target": "credentialHiddenInput" })
-          concat f.button(text, type: "submit", class: button_classes, &block)
+          concat f.button(text,
+                          type: "button",
+                          class: button_classes,
+                          data: { action: "webauthn-credentials#get",
+                                  webauthn_credentials_options_url_param: options_for_get_second_factor_webauthn_credentials_path(resource) },
+                          &block)
         end
       end
     end
