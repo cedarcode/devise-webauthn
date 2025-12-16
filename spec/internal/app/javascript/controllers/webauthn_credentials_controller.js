@@ -13,9 +13,7 @@ export default class extends Controller {
 
       this.credentialHiddenInputTarget.value = JSON.stringify(credential);
 
-      setTimeout(() => {
-        this.element.requestSubmit()
-      }, 0)
+      queueMicrotask(() => this.element.requestSubmit());
     } catch (error) {
       alert(error.message || error);
     }
@@ -30,9 +28,7 @@ export default class extends Controller {
 
       this.credentialHiddenInputTarget.value = JSON.stringify(credential);
 
-      setTimeout(() => {
-        this.element.requestSubmit()
-      }, 0)
+      queueMicrotask(() => this.element.requestSubmit());
     } catch (error) {
       alert(error.message || error);
     }
