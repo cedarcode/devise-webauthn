@@ -22,6 +22,16 @@ module Devise
       session.delete(:webauthn_challenge)
     end
 
+    def update
+      if resource.second_factor_webauthn_credentials.find(params[:id]).update(authentication_factor: 0)
+        set_flash_message! :notice, :security_key_promoted
+      else
+        set_flash_message! :alert, :security_key_promotion_failed, scope: :"devise.failure"
+      end
+
+      redirect_to after_update_path
+    end
+
     def destroy
       if resource.second_factor_webauthn_credentials.destroy(params[:id])
         set_flash_message! :notice, :security_key_deleted
