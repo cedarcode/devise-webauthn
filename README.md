@@ -75,6 +75,8 @@ Then, follow these steps to integrate Devise::Webauthn:
       config.rp_name = "Your App Name"
     end
     ```
+> [!TIP]
+> You can find a working example on how to use this gem for passwordless and two factor authentication in [`devise-webauthn-rails-demo`](https://github.com/cedarcode/devise-webauthn-demo-app).
 
 ## How It Works
 
