@@ -12,9 +12,22 @@ export class WebauthnCreateElement extends HTMLElement {
 
         this.closest('form').submit();
       } catch (error) {
-        alert(error.message || error);
+        this.handleError(error);
       }
     });
+  }
+
+  handleError(error) {
+    const event = new CustomEvent('webauthn:prompt:error', {
+      detail: { error, action: 'create' },
+      bubbles: true,
+      cancelable: true
+    });
+
+    // If no listener prevents default, show alert
+    if (this.dispatchEvent(event)) {
+      alert(error.message || error);
+    }
   }
 }
 
@@ -32,9 +45,22 @@ export class WebauthnGetElement extends HTMLElement {
 
         this.closest('form').submit();
       } catch (error) {
-        alert(error.message || error);
+        this.handleError(error);
       }
     });
+  }
+
+  handleError(error) {
+    const event = new CustomEvent('webauthn:prompt:error', {
+      detail: { error, action: 'get' },
+      bubbles: true,
+      cancelable: true
+    });
+
+    // If no listener prevents default, show alert
+    if (this.dispatchEvent(event)) {
+      alert(error.message || error);
+    }
   }
 }
 
