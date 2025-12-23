@@ -34,6 +34,12 @@ module Devise
       initializer "devise.webauthn.url_helpers" do
         Devise.include_helpers(Devise::Webauthn)
       end
+
+      initializer "devise.webauthn.assets" do
+        if ::Rails.application.config.respond_to?(:assets)
+          ::Rails.application.config.assets.precompile += %w[webauthn.js]
+        end
+      end
     end
   end
 end
