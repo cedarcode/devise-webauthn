@@ -1,3 +1,27 @@
+export class WebauthnCreateElement extends HTMLElement {
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {
+    this.closest('form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      try {
+        const options = JSON.parse(this.getAttribute('create-options'));
+        const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(options);
+        const credential = await navigator.credentials.create({ publicKey });
+
+        this.querySelector('.js-webauthn-response').value = JSON.stringify(credential);
+
+        this.closest('form').submit();
+      } catch (error) {
+        alert(error.message || error);
+      }
+    });
+  }
+}
+
 export class WebauthnGetElement extends HTMLElement {
   constructor() {
     super();
@@ -22,4 +46,5 @@ export class WebauthnGetElement extends HTMLElement {
   }
 }
 
+customElements.define('webauthn-create', WebauthnCreateElement);
 customElements.define('webauthn-get', WebauthnGetElement);
