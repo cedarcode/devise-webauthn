@@ -12,17 +12,17 @@ module Devise
           page.driver.browser.add_virtual_authenticator(options)
         end
 
-        def add_passkey_to_authenticator(authenticator, resource)
-          add_credential_to_authenticator(authenticator, resource, passkey: true)
+        def add_passkey_to_authenticator(authenticator, resource, name: "My Passkey")
+          add_credential_to_authenticator(authenticator, resource, passkey: true, name: name)
         end
 
-        def add_security_key_to_authenticator(authenticator, resource)
-          add_credential_to_authenticator(authenticator, resource, passkey: false)
+        def add_security_key_to_authenticator(authenticator, resource, name: "My Security Key")
+          add_credential_to_authenticator(authenticator, resource, passkey: false, name: name)
         end
 
         # rubocop:disable Metrics/AbcSize
         # rubocop:disable Metrics/MethodLength
-        def add_credential_to_authenticator(authenticator, resource, passkey:)
+        def add_credential_to_authenticator(authenticator, resource, passkey:, name: "My Credential")
           credential_id = SecureRandom.random_bytes(16)
           encoded_credential_id = Base64.urlsafe_encode64(credential_id)
           key = OpenSSL::PKey.generate_key("ED25519")
@@ -44,7 +44,7 @@ module Devise
           authenticator.add_credential(credential_json)
 
           resource.webauthn_credentials.create!(
-            name: "My Credential",
+            name: name,
             external_id: Base64.urlsafe_encode64(credential_id, padding: false),
             public_key: encoded_cose_public_key,
             sign_count: 0,

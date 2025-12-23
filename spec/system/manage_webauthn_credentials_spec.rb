@@ -74,5 +74,50 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         expect(page).to have_content("Webauthn credential verification failed.")
       end
     end
+
+    # rubocop:disable RSpec/MultipleExpectations
+    context "when user has existing security keys" do
+      before do
+        add_security_key_to_authenticator(authenticator, user, name: "Existing Key")
+      end
+
+      it "allows upgrading security key to passkey" do
+        visit root_path
+
+        within passkeys_section do
+          expect(page).not_to have_content("Existing Key")
+        end
+
+        within security_keys_section do
+          expect(page).to have_content("Existing Key")
+          click_button "Upgrade to Passkey"
+        end
+
+        expect(page).to have_content("Security Key promoted to passkey successfully.")
+
+        # Need to revisit the page because we're redirecting to the new security key page
+        visit root_path
+
+        within passkeys_section do
+          expect(page).to have_content("Existing Key")
+        end
+
+        within security_keys_section do
+          expect(page).not_to have_content("Existing Key")
+          expect(page).not_to have_button("Upgrade to Passkey")
+        end
+      end
+    end
+  end
+  # rubocop:enable RSpec/MultipleExpectations
+
+  private
+
+  def security_keys_section
+    find("div", text: "Security keys:")
+  end
+
+  def passkeys_section
+    find("div", text: "Passkeys:")
   end
 end
