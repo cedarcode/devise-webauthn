@@ -11,6 +11,7 @@
 
     <% current_account.second_factor_webauthn_credentials.each do |second_factor_webauthn_credential| %>
       <li><%= second_factor_webauthn_credential.name %></li>
+      <%= button_to "Upgrade to Passkey", account_second_factor_webauthn_credential_path(second_factor_webauthn_credential), method: :patch %>
     <% end %>
   </div>
 <% end %>
