@@ -95,9 +95,6 @@ RSpec.describe "Manage webauthn credentials", type: :system do
 
         expect(page).to have_content("Security Key promoted to passkey successfully.")
 
-        # Need to revisit the page because we're redirecting to the new security key page
-        visit root_path
-
         within passkeys_section do
           expect(page).to have_content("Existing Key")
         end

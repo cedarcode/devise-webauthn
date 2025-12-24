@@ -14,10 +14,10 @@ module Devise
       else
         set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       end
-      redirect_to after_update_path
+      redirect_to after_create_path
     rescue WebAuthn::Error
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
-      redirect_to after_update_path
+      redirect_to after_create_path
     ensure
       session.delete(:webauthn_challenge)
     end
@@ -39,7 +39,7 @@ module Devise
         set_flash_message! :alert, :security_key_deletion_failed, scope: :"devise.failure"
       end
 
-      redirect_to after_update_path
+      redirect_to after_destroy_path
     end
 
     private
@@ -64,7 +64,19 @@ module Devise
 
     # The default url to be used after creating a second factor key. You can overwrite
     # this method in your own SecondFactorWebauthnCredentialsController.
+    def after_create_path
+      new_second_factor_webauthn_credential_path(resource_name)
+    end
+
+    # The default url to be used after creating a second factor key. You can overwrite
+    # this method in your own SecondFactorWebauthnCredentialsController.
     def after_update_path
+      request.referer || new_second_factor_webauthn_credential_path(resource_name)
+    end
+
+    # The default url to be used after deleting a second factor key. You can overwrite
+    # this method in your own SecondFactorWebauthnCredentialsController.
+    def after_destroy_path
       new_second_factor_webauthn_credential_path(resource_name)
     end
   end
