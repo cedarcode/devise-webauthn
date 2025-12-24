@@ -26,6 +26,10 @@ module Devise
         invoke "devise:webauthn:webauthn_id", [], resource_name: options[:resource_name]
       end
 
+      def generate_javascript_configuration
+        invoke "devise:webauthn:javascript"
+      end
+
       def final_message
         say "\nAlmost done! Now edit `config/initializers/webauthn.rb` and set the `allowed_origins` for your app.",
             :yellow
