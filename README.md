@@ -272,6 +272,7 @@ Used for registering new credentials (passkeys or security keys).
     - For creating 2FA security keys: `second_factor_webauthn_credentials_path(resource_name)`
 - Requires a `create-options` attribute containing JSON-serialized WebAuthn creation options
 - Must contain a hidden input with class `js-webauthn-response` to store the credential response
+- Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 
 #### `<webauthn-get>`
 
@@ -293,6 +294,7 @@ Used for authenticating with existing credentials.
         - For 2FA with WebAuthn: `two_factor_authentication_path(resource_name)`
 - Requires a `get-options` attribute containing JSON-serialized WebAuthn request options
 - Must contain a hidden input with class `js-webauthn-response` to store the credential response
+- Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 
 ## Development
 
