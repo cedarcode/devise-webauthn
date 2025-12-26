@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- WebAuthn JavaScript is now bundled as engine assets using custom HTML elements (`<webauthn-create>`, `<webauthn-get>`) instead of generating a Stimulus controller into the host application.
+
 ## [v0.2.2](https://github.com/cedarcode/devise-webauthn/compare/v0.2.1...v0.2.2/) - 2025-12-11
 
 - Generate webauthn credentials table with not null constraints in attributes that must be present.
