@@ -7,6 +7,7 @@ module Devise
         credential_param.present? && session[:two_factor_authentication_challenge].present?
       end
 
+      # rubocop:disable Metrics/AbcSize
       def authenticate!
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
         stored_credential = WebauthnCredential.find_by(external_id: credential_from_params.id)
@@ -16,14 +17,17 @@ module Devise
         verify_credential(credential_from_params, stored_credential)
 
         resource = stored_credential.public_send(resource_name)
+        resource.remember_me = session[:current_authentication_remember_me] if resource.respond_to?(:remember_me=)
         success!(resource)
 
         session.delete(:current_authentication_resource_id)
+        session.delete(:current_authentication_remember_me)
       rescue WebAuthn::Error
         fail!(:webauthn_credential_verification_failed)
       ensure
         session.delete(:two_factor_authentication_challenge)
       end
+      # rubocop:enable Metrics/AbcSize
 
       private
 
