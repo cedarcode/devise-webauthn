@@ -9,6 +9,7 @@ module Devise
           session[:two_factor_authentication_challenge].present?
       end
 
+      # rubocop:disable Metrics/AbcSize
       def authenticate!
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
         resource = resource_class.find_by(id: session[:current_authentication_resource_id])
@@ -26,6 +27,7 @@ module Devise
       ensure
         session.delete(:two_factor_authentication_challenge)
       end
+      # rubocop:enable Metrics/AbcSize
 
       private
 
