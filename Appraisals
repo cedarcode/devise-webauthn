@@ -27,3 +27,7 @@ appraise "rails-7_1" do
   gem "rspec-rails", "~> 7.1"
   gem "sqlite3", "~> 1.7"
 end
+
+appraise "devise-5_0" do
+  gem "devise", "~> 5.0.0.rc"
+end
