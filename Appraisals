@@ -36,5 +36,5 @@ appraise "devise-5_0" do
   gem "importmap-rails", "~> 2.0"
   gem "pry-byebug", "~> 3.10"
   gem "rspec-rails", ">= 7.1"
-  gem "sqlite3", ">= 1.6"
+  gem "sqlite3", ">= 1.6", "!= 1.7.0", "!= 1.7.1", "!= 1.7.2", "!= 1.7.3"
 end
