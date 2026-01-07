@@ -30,4 +30,11 @@ end
 
 appraise "devise-5_0" do
   gem "devise", "~> 5.0.0.rc"
+
+  gem "rails", ">= 7.1"
+  gem "capybara", "~> 3.39"
+  gem "importmap-rails", "~> 2.0"
+  gem "pry-byebug", "~> 3.10"
+  gem "rspec-rails", ">= 7.1"
+  gem "sqlite3", ">= 1.6"
 end
