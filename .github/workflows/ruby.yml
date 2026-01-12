@@ -38,6 +38,9 @@ jobs:
           - rails_7_1
 
         exclude:
+          - ruby: 3.2
+            gemfile: rails_edge
+
           - ruby: 3.1
             gemfile: rails_edge
           - ruby: 3.1
