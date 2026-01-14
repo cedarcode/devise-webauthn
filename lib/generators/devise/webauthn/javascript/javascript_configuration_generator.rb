@@ -16,7 +16,7 @@ module Devise
         elsif using_node?
           setup_node
         else
-          say "Could not detect JavaScript setup. Please manually configure webauthn.js loading.", :red
+          say "Could not detect JavaScript setup. Please manually configure `devise/webauthn.js` loading.", :red
         end
       end
 
@@ -33,15 +33,15 @@ module Devise
       def setup_importmap
         say "Detected importmap-rails setup", :green
 
-        append_to_file "config/importmap.rb", %(pin "webauthn", to: "webauthn.js"\n)
+        append_to_file "config/importmap.rb", %(pin "devise/webauthn", to: "devise/webauthn.js"\n)
         say "Added pin to config/importmap.rb", :green
 
         if File.exist?(File.join(destination_root, "app/javascript/application.js"))
-          append_to_file "app/javascript/application.js", %(import "webauthn"\n)
+          append_to_file "app/javascript/application.js", %(import "devise/webauthn"\n)
           say "Added import to app/javascript/application.js", :green
         else
           say "Could not find app/javascript/application.js!", :red
-          say "   Please add `import \"webauthn\"` to your application.js file manually."
+          say "   Please add `import \"devise/webauthn\"` to your application.js file manually."
         end
       end
 
@@ -50,12 +50,13 @@ module Devise
 
         if File.exist?(File.join(destination_root, "app/views/layouts/application.html.erb"))
           inject_into_file "app/views/layouts/application.html.erb",
-                           %(\n    <%= javascript_include_tag "webauthn" %>),
+                           %(\n    <%= javascript_include_tag "devise/webauthn" %>),
                            before: "</head>"
           say "Added javascript_include_tag to app/views/layouts/application.html.erb", :green
         else
           say "Could not find app/views/layouts/application.html.erb.", :red
-          say "   Please add `<%= javascript_include_tag \"webauthn\" %>`  within the <head> tag in your custom layout."
+          say "   Please add `<%= javascript_include_tag \"devise/webauthn\" %>` " \
+              "within the <head> tag in your custom layout."
         end
       end
     end

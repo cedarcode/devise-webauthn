@@ -23,11 +23,11 @@ RSpec.describe Devise::Webauthn::JavascriptConfigurationGenerator, type: :genera
       end
 
       it "appends the pin to config/importmap.rb" do
-        assert_file "config/importmap.rb", /pin "webauthn", to: "webauthn.js"/
+        assert_file "config/importmap.rb", %r{pin "devise/webauthn", to: "devise/webauthn.js"}
       end
 
       it "appends the import to app/javascript/application.js" do
-        assert_file "app/javascript/application.js", /import "webauthn"/
+        assert_file "app/javascript/application.js", %r{import "devise/webauthn"}
       end
     end
 
@@ -37,7 +37,7 @@ RSpec.describe Devise::Webauthn::JavascriptConfigurationGenerator, type: :genera
       end
 
       it "appends the pin to config/importmap.rb" do
-        assert_file "config/importmap.rb", /pin "webauthn", to: "webauthn.js"/
+        assert_file "config/importmap.rb", %r{pin "devise/webauthn", to: "devise/webauthn.js"}
       end
 
       it "does not create application.js" do
@@ -59,12 +59,12 @@ RSpec.describe Devise::Webauthn::JavascriptConfigurationGenerator, type: :genera
 
       it "injects javascript_include_tag into the layout" do
         assert_file "app/views/layouts/application.html.erb",
-                    /<%= javascript_include_tag "webauthn" %>/
+                    %r{<%= javascript_include_tag "devise/webauthn" %>}
       end
 
       it "places the tag before </head>" do
         content = File.read(File.join(destination_root, "app/views/layouts/application.html.erb"))
-        expect(content).to match(%r{<%= javascript_include_tag "webauthn" %>\s*</head>})
+        expect(content).to match(%r{<%= javascript_include_tag "devise/webauthn" %>\s*</head>})
       end
     end
 

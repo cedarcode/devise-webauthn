@@ -78,16 +78,16 @@ Then, follow these steps to integrate Devise::Webauthn:
    The install generator automatically configures JavaScript loading based on your setup:
 
    **For importmap-rails:**
-   - Adds `pin "webauthn", to: "webauthn.js"` to `config/importmap.rb`
-   - Adds `import "webauthn"` to `app/javascript/application.js`
+   - Adds `pin "devise/webauthn", to: "devise/webauthn.js"` to `config/importmap.rb`
+   - Adds `import "devise/webauthn"` to `app/javascript/application.js`
 
    **For node setups (esbuild, Bun, etc.):**
-   - Adds `<%= javascript_include_tag "webauthn" %>` to your application layout
+   - Adds `<%= javascript_include_tag "devise/webauthn" %>` to your application layout
 
    If the automatic setup doesn't work for your configuration, you can manually include the JavaScript:
    ```erb
-   <%= javascript_include_tag "webauthn" %>
-    ```
+   <%= javascript_include_tag "devise/webauthn" %>
+   ```
 
 #### Behavior
 

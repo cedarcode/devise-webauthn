@@ -37,7 +37,7 @@ module Devise
 
       initializer "devise.webauthn.assets" do
         if ::Rails.application.config.respond_to?(:assets)
-          ::Rails.application.config.assets.precompile += %w[webauthn.js]
+          ::Rails.application.config.assets.precompile += %w[devise/webauthn.js]
         end
       end
     end
