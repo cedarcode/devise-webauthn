@@ -8,7 +8,7 @@ export class WebauthnCreateElement extends HTMLElement {
         const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(options);
         const credential = await navigator.credentials.create({ publicKey });
 
-        this.querySelector('.js-webauthn-response').value = JSON.stringify(credential);
+        this.querySelector('[data-webauthn-target="response"]').value = JSON.stringify(credential);
 
         this.closest('form').submit();
       } catch (error) {
@@ -41,7 +41,7 @@ export class WebauthnGetElement extends HTMLElement {
         const publicKey = PublicKeyCredential.parseRequestOptionsFromJSON(options);
         const credential = await navigator.credentials.get({ publicKey });
 
-        this.querySelector('.js-webauthn-response').value = JSON.stringify(credential);
+        this.querySelector('[data-webauthn-target="response"]').value = JSON.stringify(credential);
 
         this.closest('form').submit();
       } catch (error) {

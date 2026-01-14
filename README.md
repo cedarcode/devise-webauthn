@@ -258,7 +258,7 @@ Used for registering new credentials (passkeys or security keys).
 ```html
 <form action="/passkeys" method="post">
   <webauthn-create data-options-json="<%= create_passkey_options(@user).to_json %>">
-    <input type="hidden" name="public_key_credential" class="js-webauthn-response">
+    <input type="hidden" name="public_key_credential" data-webauthn-target="response">
     <input type="text" name="name" placeholder="Passkey name">
     <button type="submit">Create Passkey</button>
   </webauthn-create>
@@ -271,7 +271,7 @@ Used for registering new credentials (passkeys or security keys).
     - For creating passkeys: `passkeys_path(resource_name)`
     - For creating 2FA security keys: `second_factor_webauthn_credentials_path(resource_name)`
 - Requires a `data-options-json` attribute containing JSON-serialized WebAuthn creation options
-- Must contain a hidden input with class `js-webauthn-response` to store the credential response
+- Must contain a hidden input with `data-webauthn-target="response"` to store the credential response
 - Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 
 #### `<webauthn-get>`
@@ -281,7 +281,7 @@ Used for authenticating with existing credentials.
 ```html
 <form action="/users/sign_in" method="post">
   <webauthn-get data-options-json="<%= passkey_authentication_options.to_json %>">
-    <input type="hidden" name="public_key_credential" class="js-webauthn-response">
+    <input type="hidden" name="public_key_credential" data-webauthn-target="response">
     <button type="submit">Sign in with Passkey</button>
   </webauthn-get>
 </form>
@@ -293,7 +293,7 @@ Used for authenticating with existing credentials.
         - For passkey sign-in: `session_path(resource_name)`
         - For 2FA with WebAuthn: `two_factor_authentication_path(resource_name)`
 - Requires a `data-options-json` attribute containing JSON-serialized WebAuthn request options
-- Must contain a hidden input with class `js-webauthn-response` to store the credential response
+- Must contain a hidden input with `data-webauthn-target="response"` to store the credential response
 - Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 
 ## Development
