@@ -10,7 +10,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_create(data: { options_json: create_passkey_options(resource).to_json }) do
+          tag.webauthn_create(data: { options_json: create_passkey_options(resource) }) do
             concat f.hidden_field(:public_key_credential, class: "js-webauthn-response")
             concat capture(f, &block)
           end
@@ -23,7 +23,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_get(data: { options_json: passkey_authentication_options.to_json }) do
+          tag.webauthn_get(data: { options_json: passkey_authentication_options }) do
             concat f.hidden_field(:public_key_credential, class: "js-webauthn-response")
 
             concat f.button(text, type: "submit", class: button_classes, &block)
@@ -37,7 +37,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_create(data: { options_json: create_security_key_options(resource).to_json }) do
+          tag.webauthn_create(data: { options_json: create_security_key_options(resource) }) do
             concat f.hidden_field(:public_key_credential, class: "js-webauthn-response")
             concat capture(f, &block)
           end
@@ -50,7 +50,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_get(data: { options_json: security_key_authentication_options(resource).to_json }) do
+          tag.webauthn_get(data: { options_json: security_key_authentication_options(resource) }) do
             concat f.hidden_field(:public_key_credential, class: "js-webauthn-response")
             concat f.button(text, type: "submit", class: button_classes, &block)
           end
