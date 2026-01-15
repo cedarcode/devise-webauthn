@@ -16,7 +16,6 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
 
     raw_credential = fake_client.create(challenge: creation_options.challenge)
     webauthn_credential = WebAuthn::Credential.from_create(raw_credential)
-    webauthn_credential.verify(creation_options.challenge)
 
     account.second_factor_webauthn_credentials.create!(
       external_id: webauthn_credential.id,

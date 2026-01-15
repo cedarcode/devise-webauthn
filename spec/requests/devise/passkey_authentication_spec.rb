@@ -13,7 +13,6 @@ RSpec.describe "Passkey authentication flow", type: :request do
     challenge = WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32))
     raw_credential = fake_client.create(challenge: challenge)
     webauthn_credential = WebAuthn::Credential.from_create(raw_credential)
-    webauthn_credential.verify(challenge)
 
     account.passkeys.create!(
       external_id: webauthn_credential.id,
