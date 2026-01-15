@@ -36,6 +36,7 @@ jobs:
           - rails_8_0
           - rails_7_2
           - rails_7_1
+          - devise_5_0
 
         exclude:
           - ruby: 3.2
