@@ -2,7 +2,7 @@
 
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
-    before_action :authenticate_scope!, only: %i[new create destroy options_for_create]
+    before_action :authenticate_scope!, only: %i[new create update destroy options_for_create]
     before_action :set_resource, only: :options_for_get
 
     def new; end
