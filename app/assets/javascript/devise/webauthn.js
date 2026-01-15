@@ -42,7 +42,6 @@ export class WebauthnCreateElement extends HTMLElement {
       return JSON.stringify(credential);
     } catch (e) {
       console.warn("Authenticator returned a malformed credential, attempting to fix it. Error was:", e);
-      console.error(e);
     }
 
     const response = credential.response;
