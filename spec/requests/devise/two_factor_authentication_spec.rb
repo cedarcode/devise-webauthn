@@ -32,7 +32,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
     )
   end
 
-  describe "sign-in with 2FA-enabled user" do
+  describe "sign-in with 2FA enabled" do
     let!(:security_key) { create_security_key_for(user, client) }
 
     it "completes authentication with valid password and valid credential" do
@@ -181,7 +181,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
     end
   end
 
-  describe "sign-in without 2FA" do
+  describe "sign-in with 2FA disabled" do
     it "authenticates user directly with valid password" do
       post account_session_path, params: { account: { email: user.email, password: password } }
 
