@@ -6,9 +6,7 @@ Devise::Webauthn is a [Devise](https://github.com/heartcombo/devise) extension t
 ## Requirements
 
 - **Ruby**: 2.7+
-- **Stimulus Rails**: This gem requires [stimulus-rails](https://github.com/hotwired/stimulus-rails) to be installed and configured in your application.
-> **Note:** Stimulus Rails is needed for the generated code to work out of the box.  
-> If you prefer not to have this dependency, you’ll need to manually implement the JavaScript logic for WebAuthn interactions.
+- **JavaScript**: This gem includes WebAuthn JavaScript as custom HTML elements. You'll need to import the JavaScript file in your application.
 
 ## Installation
 
@@ -31,7 +29,7 @@ Or install it yourself as:
 First, ensure you have Devise set up in your Rails application. For a full guide on setting up Devise, refer to the [Devise documentation](https://github.com/heartcombo/devise?tab=readme-ov-file#getting-started).
 Then, follow these steps to integrate Devise::Webauthn:
 1. **Run Devise::Webauthn Generator:**
-   Run the generator to set up necessary configurations, migrations, and Stimulus controller:
+   Run the generator to set up necessary configurations and migrations:
    ```bash
    $ bin/rails generate devise:webauthn:install
    ```
@@ -45,7 +43,7 @@ Then, follow these steps to integrate Devise::Webauthn:
     - Create the WebAuthn initializer (`config/initializers/webauthn.rb`)
     - Generate the `WebauthnCredential` model and migration
     - Add `webauthn_id` field to your devise model (e.g., `User`)
-    - Install the Stimulus controller
+    - Configure JavaScript loading for your application (see [JavaScript Setup](#javascript-setup))
 
 2. **Run Migrations:**
    After running the generator, execute the migrations to update your database schema:
@@ -75,6 +73,29 @@ Then, follow these steps to integrate Devise::Webauthn:
       config.rp_name = "Your App Name"
     end
     ```
+
+5. **Include bundled WebAuthn JavaScript in your application:**
+   The install generator automatically configures JavaScript loading based on your setup:
+
+   **For importmap-rails:**
+   - Adds `pin "devise/webauthn", to: "devise/webauthn.js"` to `config/importmap.rb`
+   - Adds `import "devise/webauthn"` to `app/javascript/application.js`
+
+   **For node setups (esbuild, Bun, etc.):**
+   - Adds `<%= javascript_include_tag "devise/webauthn" %>` to your application layout
+
+   If the automatic setup doesn't work for your configuration, you can manually include the JavaScript:
+   ```erb
+   <%= javascript_include_tag "devise/webauthn" %>
+   ```
+
+#### Behavior
+
+When the form is submitted:
+1. The default form submission is prevented
+2. The browser's WebAuthn prompt is triggered with the provided options
+3. Upon successful authentication, the credential response is stored in the hidden input
+4. The form is submitted with the credential data
 
 ## How It Works
 
@@ -138,6 +159,77 @@ To add a passkeys creation form:
 <% end %>
 ```
 
+### Customizing Javascript Error Handling
+
+By default, WebAuthn errors during registration or authentication are displayed using the browser's `alert()` dialog. You can customize this behavior by listening to the `webauthn:prompt:error` event.
+
+#### Listening for WebAuthn Errors
+
+The custom elements dispatch a `webauthn:prompt:error` event whenever an error occurs during the WebAuthn prompt interaction (registration or authentication). You can listen for this event and provide custom error handling:
+
+```javascript
+document.addEventListener('webauthn:prompt:error', (event) => {
+  event.preventDefault(); // Prevent the default alert
+
+  const { error, action } = event.detail;
+
+  // Your custom error handling
+  console.error(`WebAuthn ${action} failed:`, error);
+  showFlashMessage(error.message, 'error');
+});
+```
+
+#### Event Details
+
+The event includes the following information in `event.detail`:
+- `error`: The error object thrown during the WebAuthn operation
+- `action`: Either `"create"` (for registration) or `"get"` (for authentication)
+
+#### Handling Specific Error Types
+
+WebAuthn operations can fail for various reasons. Here are some common error types you might want to handle:
+
+```javascript
+document.addEventListener('webauthn:prompt:error', (event) => {
+  event.preventDefault();
+
+  const { error, action } = event.detail;
+
+  switch (error.name) {
+    case 'NotAllowedError':
+      // User cancelled the operation or timeout
+      showFlashMessage('Operation cancelled or timed out', 'warning');
+      break;
+
+    default:
+      // Generic error message
+      showFlashMessage(`Authentication error: ${error.message}`, 'error');
+  }
+});
+```
+
+#### Different Handling for Registration vs Authentication
+
+You can provide different error handling based on whether the error occurred during registration or authentication:
+
+```javascript
+document.addEventListener('webauthn:prompt:error', (event) => {
+  event.preventDefault();
+
+  const { error, action } = event.detail;
+
+  if (action === 'create') {
+    // Handle registration errors
+    handleRegistrationError(error);
+  } else if (action === 'get') {
+    // Handle authentication errors
+    handleAuthenticationError(error);
+  }
+});
+```
+
+**Note:** If you don't call `event.preventDefault()`, the default `alert()` will still be shown.
+
 ### Customizing Controllers
 Similar to [controllers customization on Devise](https://github.com/heartcombo/devise?tab=readme-ov-file#configuring-controllers), you can customize the Devise::Webauthn controllers.
 
@@ -155,6 +247,54 @@ devise_for :users, controllers: {
 
 3. Change or extend the generated controllers as needed.
 
+### Manually implementing WebAuthn forms
+
+The gem provides two custom HTML elements for WebAuthn operations. While the [form helpers](#helper-methods) handle this automatically, you can use these elements directly for custom implementations.
+
+#### `<webauthn-create>`
+
+Used for registering new credentials (passkeys or security keys).
+
+```html
+<form action="/passkeys" method="post">
+  <webauthn-create data-options-json="<%= create_passkey_options(@user).to_json %>">
+    <input type="hidden" name="public_key_credential" data-webauthn-target="response">
+    <input type="text" name="name" placeholder="Passkey name">
+    <button type="submit">Create Passkey</button>
+  </webauthn-create>
+</form>
+```
+
+**Requirements:**
+- Must be wrapped in a `<form>` element
+  - The form's action should point to the appropriate endpoint – you can use the provided url helpers:
+    - For creating passkeys: `passkeys_path(resource_name)`
+    - For creating 2FA security keys: `second_factor_webauthn_credentials_path(resource_name)`
+- Requires a `data-options-json` attribute containing JSON-serialized WebAuthn creation options
+- Must contain a hidden input with `data-webauthn-target="response"` to store the credential response
+- Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
+
+#### `<webauthn-get>`
+
+Used for authenticating with existing credentials.
+
+```html
+<form action="/users/sign_in" method="post">
+  <webauthn-get data-options-json="<%= passkey_authentication_options.to_json %>">
+    <input type="hidden" name="public_key_credential" data-webauthn-target="response">
+    <button type="submit">Sign in with Passkey</button>
+  </webauthn-get>
+</form>
+```
+
+**Requirements:**
+- Must be wrapped in a `<form>` element
+    - The form's action should point to the appropriate endpoint – you can use the provided url helpers:
+        - For passkey sign-in: `session_path(resource_name)`
+        - For 2FA with WebAuthn: `two_factor_authentication_path(resource_name)`
+- Requires a `data-options-json` attribute containing JSON-serialized WebAuthn request options
+- Must contain a hidden input with `data-webauthn-target="response"` to store the credential response
+- Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 
 ## Development
 

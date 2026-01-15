@@ -15,7 +15,7 @@ module ActionDispatch
                  controller: controllers[:two_factor_authentications]
 
         resources :second_factor_webauthn_credentials,
-                  only: %i[new create destroy],
+                  only: %i[new create update destroy],
                   controller: controllers[:second_factor_webauthn_credentials]
       end
     end

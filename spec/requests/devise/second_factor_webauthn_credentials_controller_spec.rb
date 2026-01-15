@@ -90,6 +90,41 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
     end
   end
 
+  describe "PATCH #update" do
+    let!(:security_key) do
+      user.second_factor_webauthn_credentials.create!(
+        external_id: "external-id",
+        name: "My Security Key",
+        public_key: "public-key",
+        sign_count: 0,
+        authentication_factor: "second_factor"
+      )
+    end
+
+    context "when user is not authenticated" do
+      it "redirects to the sign-in page" do
+        patch account_second_factor_webauthn_credential_path(security_key)
+
+        expect(response).to redirect_to(new_account_session_path)
+      end
+    end
+
+    context "when user is authenticated" do
+      before do
+        sign_in user, scope: :account
+      end
+
+      it "promotes the security key, sets a notice and redirects" do
+        patch account_second_factor_webauthn_credential_path(security_key)
+
+        expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
+        expect(flash[:notice]).to eq I18n.t("devise.second_factor_webauthn_credentials.security_key_promoted")
+
+        expect(security_key.reload.authentication_factor).to eq("first_factor")
+      end
+    end
+  end
+
   describe "DELETE #destroy" do
     context "when user is not authenticated" do
       it "redirects to the sign-in page" do

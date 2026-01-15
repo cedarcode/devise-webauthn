@@ -5,19 +5,19 @@ appraise "rails-edge" do
 end
 
 appraise "rails-8_1" do
-  gem "rails", "~> 8.1"
+  gem "rails", "~> 8.1.x"
 end
 
 appraise "rails-8_0" do
-  gem "rails", "~> 8.0"
+  gem "rails", "~> 8.0.x"
 end
 
 appraise "rails-7_2" do
-  gem "rails", "~> 7.2"
+  gem "rails", "~> 7.2.x"
 end
 
 appraise "rails-7_1" do
-  gem "rails", "~> 7.1"
+  gem "rails", "~> 7.1.x"
 
   gem "capybara", "~> 3.39"
   gem "importmap-rails", "~> 2.0"
