@@ -7,6 +7,7 @@
   - Given so, you don't need Stimulus anymore for this engine to work so you can safely remove the previously generated Stimulus controllers form your app.
 - Add endpoint to `SecondFactorWebauthnCredentialsController` for "upgrading" second factor webauthn credentials (i. e., security keys) to passkeys.
 - Loosen `devise` upper constraint to allow for v5
+- Fix `Remember me` checkbox not honored when going through the 2FA challenge flow
 
 ## [v0.2.2](https://github.com/cedarcode/devise-webauthn/compare/v0.2.1...v0.2.2/) - 2025-12-11
 

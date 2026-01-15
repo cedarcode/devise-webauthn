@@ -19,9 +19,11 @@ module Devise
 
         verify_credential(credential_from_params, stored_credential)
 
+        resource.remember_me = session[:current_authentication_remember_me] if resource.respond_to?(:remember_me=)
         success!(resource)
 
         session.delete(:current_authentication_resource_id)
+        session.delete(:current_authentication_remember_me)
       rescue WebAuthn::Error
         fail!(:webauthn_credential_verification_failed)
       ensure
