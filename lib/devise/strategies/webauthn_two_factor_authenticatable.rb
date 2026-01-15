@@ -4,19 +4,21 @@ module Devise
   module Strategies
     class WebauthnTwoFactorAuthenticatable < Devise::Strategies::Base
       def valid?
-        credential_param.present? && session[:two_factor_authentication_challenge].present?
+        credential_param.present? &&
+          session[:current_authentication_resource_id].present? &&
+          session[:two_factor_authentication_challenge].present?
       end
 
       # rubocop:disable Metrics/AbcSize
       def authenticate!
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
-        stored_credential = WebauthnCredential.find_by(external_id: credential_from_params.id)
+        resource = resource_class.find_by(id: session[:current_authentication_resource_id])
+        stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)
 
         return fail!(:webauthn_credential_not_found) if stored_credential.blank?
 
         verify_credential(credential_from_params, stored_credential)
 
-        resource = stored_credential.public_send(resource_name)
         resource.remember_me = session[:current_authentication_remember_me] if resource.respond_to?(:remember_me=)
         success!(resource)
 
@@ -45,8 +47,8 @@ module Devise
         stored_credential.update!(sign_count: credential_from_params.sign_count)
       end
 
-      def resource_name
-        mapping.to.name.underscore
+      def resource_class
+        mapping.to
       end
     end
   end

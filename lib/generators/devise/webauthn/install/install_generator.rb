@@ -26,8 +26,8 @@ module Devise
         invoke "devise:webauthn:webauthn_id", [], resource_name: options[:resource_name]
       end
 
-      def generate_stimulus_controller
-        invoke "devise:webauthn:stimulus"
+      def generate_javascript_configuration
+        invoke "devise:webauthn:javascript"
       end
 
       def final_message
