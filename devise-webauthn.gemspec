@@ -29,6 +29,6 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
   spec.required_ruby_version = ">= 2.7"
 
-  spec.add_dependency "devise", "~> 4.9"
+  spec.add_dependency "devise", ">= 4.9"
   spec.add_dependency "webauthn", "~> 3.0"
 end
