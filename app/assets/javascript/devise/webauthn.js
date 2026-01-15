@@ -4,8 +4,8 @@ export class WebauthnCreateElement extends HTMLElement {
       event.preventDefault();
 
       try {
-        const options = JSON.parse(this.getAttribute('data-options-json'));
-        const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(options);
+        const response = await fetch(this.getAttribute('data-options-url'));
+        const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(await response.json());
         const credential = await navigator.credentials.create({ publicKey });
 
         this.querySelector('[data-webauthn-target="response"]').value = JSON.stringify(credential);
@@ -37,8 +37,8 @@ export class WebauthnGetElement extends HTMLElement {
       event.preventDefault();
 
       try {
-        const options = JSON.parse(this.getAttribute('data-options-json'));
-        const publicKey = PublicKeyCredential.parseRequestOptionsFromJSON(options);
+        const response = await fetch(this.getAttribute('data-options-url'));
+        const publicKey = PublicKeyCredential.parseRequestOptionsFromJSON(await response.json());
         const credential = await navigator.credentials.get({ publicKey });
 
         this.querySelector('[data-webauthn-target="response"]').value = JSON.stringify(credential);
