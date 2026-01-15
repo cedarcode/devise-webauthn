@@ -31,9 +31,9 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
         .with("devise:webauthn:webauthn_id", [], resource_name: "user")
     end
 
-    it "invokes the stimulus controller generator" do
+    it "invokes the javascript configuration generator" do
       expect(generator).to have_received(:invoke)
-        .with("devise:webauthn:stimulus")
+        .with("devise:webauthn:javascript")
     end
   end
 

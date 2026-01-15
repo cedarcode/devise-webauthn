@@ -8,16 +8,12 @@ module Devise
         form_with(
           url: passkeys_path(resource),
           method: :post,
-          class: form_classes,
-          data: {
-            action: "webauthn-credentials#create:prevent",
-            controller: "webauthn-credentials",
-            webauthn_credentials_options_param: create_passkey_options(resource)
-          }
+          class: form_classes
         ) do |f|
-          concat f.hidden_field(:public_key_credential,
-                                data: { "webauthn-credentials-target": "credentialHiddenInput" })
-          concat capture(f, &block)
+          tag.webauthn_create(data: { options_json: create_passkey_options(resource) }) do
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
+            concat capture(f, &block)
+          end
         end
       end
 
@@ -25,16 +21,13 @@ module Devise
         form_with(
           url: session_path,
           method: :post,
-          data: {
-            action: "webauthn-credentials#get:prevent",
-            controller: "webauthn-credentials",
-            webauthn_credentials_options_param: passkey_authentication_options
-          },
           class: form_classes
         ) do |f|
-          concat f.hidden_field(:public_key_credential,
-                                data: { "webauthn-credentials-target": "credentialHiddenInput" })
-          concat f.button(text, type: "submit", class: button_classes, &block)
+          tag.webauthn_get(data: { options_json: passkey_authentication_options }) do
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
+
+            concat f.button(text, type: "submit", class: button_classes, &block)
+          end
         end
       end
 
@@ -42,16 +35,12 @@ module Devise
         form_with(
           url: second_factor_webauthn_credentials_path(resource),
           method: :post,
-          class: form_classes,
-          data: {
-            action: "webauthn-credentials#create:prevent",
-            controller: "webauthn-credentials",
-            webauthn_credentials_options_param: create_security_key_options(resource)
-          }
+          class: form_classes
         ) do |f|
-          concat f.hidden_field(:public_key_credential,
-                                data: { "webauthn-credentials-target": "credentialHiddenInput" })
-          concat capture(f, &block)
+          tag.webauthn_create(data: { options_json: create_security_key_options(resource) }) do
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
+            concat capture(f, &block)
+          end
         end
       end
 
@@ -59,16 +48,12 @@ module Devise
         form_with(
           url: two_factor_authentication_path(resource),
           method: :post,
-          data: {
-            action: "webauthn-credentials#get:prevent",
-            controller: "webauthn-credentials",
-            webauthn_credentials_options_param: security_key_authentication_options(resource)
-          },
           class: form_classes
         ) do |f|
-          concat f.hidden_field(:public_key_credential,
-                                data: { "webauthn-credentials-target": "credentialHiddenInput" })
-          concat f.button(text, type: "submit", class: button_classes, &block)
+          tag.webauthn_get(data: { options_json: security_key_authentication_options(resource) }) do
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
+            concat f.button(text, type: "submit", class: button_classes, &block)
+          end
         end
       end
 
