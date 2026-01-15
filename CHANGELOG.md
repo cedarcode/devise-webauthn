@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [v0.3.0](https://github.com/cedarcode/devise-webauthn/compare/v0.2.2...v0.3.0/) - 2026-01-16
+
 ### Added
 
 - WebAuthn JavaScript is now bundled as engine assets using custom HTML elements (`<webauthn-create>`, `<webauthn-get>`) instead of generating a Stimulus controller into the host application. [#84](https://github.com/cedarcode/devise-webauthn/pull/84) [@santiagorodriguez96]
