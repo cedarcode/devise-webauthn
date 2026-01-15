@@ -2,27 +2,48 @@
 
 ## Unreleased
 
-- BREAKING!: WebAuthn JavaScript is now bundled as engine assets using custom HTML elements (`<webauthn-create>`, `<webauthn-get>`) instead of generating a Stimulus controller into the host application.
-  - [Form helpers](https://github.com/cedarcode/devise-webauthn/blob/355a6836315439f71265bb368bff4e8067033072/lib/devise/webauthn/helpers/credentials_helper.rb#L7-L58) use the bundle js asset now instead of the Stimulus controllers, so they expect it to be included in your application.
-  - Given so, you don't need Stimulus anymore for this engine to work so you can safely remove the previously generated Stimulus controllers form your app.
+### Added
+
+- WebAuthn JavaScript is now bundled as engine assets using custom HTML elements (`<webauthn-create>`, `<webauthn-get>`) instead of generating a Stimulus controller into the host application.
 - Add endpoint to `SecondFactorWebauthnCredentialsController` for "upgrading" second factor webauthn credentials (i. e., security keys) to passkeys.
-- Loosen `devise` upper constraint to allow for v5
+
+### Changed
+
+- Loosen `devise` upper constraint to allow for v5.
+- BREAKING!: Our [Form helpers](https://github.com/cedarcode/devise-webauthn/blob/355a6836315439f71265bb368bff4e8067033072/lib/devise/webauthn/helpers/credentials_helper.rb#L7-L58) now use the bundled WebAuthn JS asset now instead of the Stimulus controllers, so they expect it to be included in your application.
+  - Previously generated Stimulus controller for handling WebAuthn client logic are no longer generated.
+  - Stimulus is no longer needed for this engine to work.
+
+### Fixed
+
 - Fix `Remember me` checkbox not honored when going through the 2FA challenge flow
 
 ## [v0.2.2](https://github.com/cedarcode/devise-webauthn/compare/v0.2.1...v0.2.2/) - 2025-12-11
 
-- Generate webauthn credentials table with not null constraints in attributes that must be present.
+### Added
+
 - Update controllers and views generators to generate 2FA-related controllers and views.
 - Add flash messages when removing credentials.
 
+### Changed
+
+- Generate webauthn credentials table with not null constraints in attributes that must be present.
+
 ## [v0.2.1](https://github.com/cedarcode/devise-webauthn/compare/v0.2.0...v0.2.1/) - 2025-12-10
 
+### Added
+
 - Add form helpers for security key registration and 2FA authentication.
+
+### Fixed
+
 - Fix incorrect call to `resource_name` instead of using passed `resource` param in `login_with_security_key_button` helper.
 - Fix `NoMethodError` when calling `second_factor_enabled?` on resources without 2FA.
 - Avoid assuming `email` as the authentication key of the resource in form helpers.
 
 ## [v0.2.0](https://github.com/cedarcode/devise-webauthn/compare/v0.1.2...v0.2.0/) - 2025-12-03
+
+### Added
 
 - Add new `webauthn_two_factor_authenticatable` module for enabling 2FA using WebAuthn credentials.
 
