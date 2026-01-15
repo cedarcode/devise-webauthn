@@ -1,5 +1,7 @@
 export class WebauthnCreateElement extends HTMLElement {
   connectedCallback() {
+    this.style.display = 'contents';
+
     this.closest('form').addEventListener('submit', async (event) => {
       event.preventDefault();
 
@@ -67,6 +69,8 @@ export class WebauthnCreateElement extends HTMLElement {
 
 export class WebauthnGetElement extends HTMLElement {
   connectedCallback() {
+    this.style.display = 'contents';
+
     this.closest('form').addEventListener('submit', async (event) => {
       event.preventDefault();
 
