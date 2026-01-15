@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- WebAuthn JavaScript is now bundled as engine assets using custom HTML elements (`<webauthn-create>`, `<webauthn-get>`) instead of generating a Stimulus controller into the host application.
+- BREAKING!: WebAuthn JavaScript is now bundled as engine assets using custom HTML elements (`<webauthn-create>`, `<webauthn-get>`) instead of generating a Stimulus controller into the host application.
+  - [Form helpers](https://github.com/cedarcode/devise-webauthn/blob/355a6836315439f71265bb368bff4e8067033072/lib/devise/webauthn/helpers/credentials_helper.rb#L7-L58) use the bundle js asset now instead of the Stimulus controllers, so they expect it to be included in your application.
+  - Given so, you don't need Stimulus anymore for this engine to work so you can safely remove the previously generated Stimulus controllers form your app.
 
 ## [v0.2.2](https://github.com/cedarcode/devise-webauthn/compare/v0.2.1...v0.2.2/) - 2025-12-11
 
