@@ -8,7 +8,7 @@ export class WebauthnCreateElement extends HTMLElement {
         const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(options);
         const credential = await navigator.credentials.create({ publicKey });
 
-        this.querySelector('[data-webauthn-target="response"]').value = JSON.stringify(credential);
+        this.querySelector('[data-webauthn-target="response"]').value = await this.stringifyRegistrationCredentialWithGracefullyHandlingAuthenticatorIssues(credential);
 
         this.closest('form').submit();
       } catch (error) {
@@ -29,6 +29,40 @@ export class WebauthnCreateElement extends HTMLElement {
       alert(error.message || error);
     }
   }
+
+  // Stringifies registration credentials gracefully handling malformed ones (e.g., due to issues with
+  // certain authenticators like 1Password).
+  // It first tries to stringify them normally, and if the credential cannot be stringified (because its
+  // malformed), it attempts a workaround to convert the malformed credential into a valid format. This
+  // workaround was introduced for 1Password and might fail for other authenticators.
+  //
+  // Authenticators that return a proper credential should not affected by this workaround!
+  async stringifyRegistrationCredentialWithGracefullyHandlingAuthenticatorIssues(credential) {
+    try {
+      return JSON.stringify(credential);
+    } catch (e) {
+      console.warn("Authenticator returned a malformed credential, attempting to fix it. Error was:", e);
+    }
+
+    const response = credential.response;
+    const publicKey = response.getPublicKey ? await response.getPublicKey() : null;
+
+    return JSON.stringify({
+      type: credential.type,
+      id: credential.id,
+      rawId: credential.id,
+      authenticatorAttachment: credential.authenticatorAttachment,
+      clientExtensionResults: await credential.getClientExtensionResults(),
+      response: {
+        attestationObject: toBase64Url(response.attestationObject),
+        authenticatorData: toBase64Url(response.authenticatorData),
+        clientDataJSON: toBase64Url(response.clientDataJSON),
+        publicKey: toBase64Url(publicKey),
+        publicKeyAlgorithm: response.getPublicKeyAlgorithm(),
+        transports: response.getTransports(),
+      },
+    });
+  }
 }
 
 export class WebauthnGetElement extends HTMLElement {
@@ -41,7 +75,7 @@ export class WebauthnGetElement extends HTMLElement {
         const publicKey = PublicKeyCredential.parseRequestOptionsFromJSON(options);
         const credential = await navigator.credentials.get({ publicKey });
 
-        this.querySelector('[data-webauthn-target="response"]').value = JSON.stringify(credential);
+        this.querySelector('[data-webauthn-target="response"]').value = await this.stringifyAuthenticationCredentialWithGracefullyHandlingAuthenticatorIssues(credential);
 
         this.closest('form').submit();
       } catch (error) {
@@ -62,6 +96,46 @@ export class WebauthnGetElement extends HTMLElement {
       alert(error.message || error);
     }
   }
+
+  // Stringifies authentication credentials gracefully handling malformed ones (e.g., due to issues with
+  // certain authenticators like 1Password).
+  // It first tries to stringify them normally, and if the credential cannot be stringified (because its
+  // malformed), it attempts a workaround to convert the malformed credential into a valid format. This
+  // workaround was introduced for 1Password and might fail for other authenticators.
+  //
+  // Authenticators that return a proper credential should not affected by this workaround!
+  async stringifyAuthenticationCredentialWithGracefullyHandlingAuthenticatorIssues(credential) {
+    try {
+      return JSON.stringify(credential);
+    } catch (e) {
+      console.warn("Authenticator returned a malformed credential, attempting to fix it. Error was:", e);
+    }
+
+    const response = credential.response;
+
+    return JSON.stringify({
+      type: credential.type,
+      id: credential.id,
+      rawId: credential.id,
+      authenticatorAttachment: credential.authenticatorAttachment,
+      clientExtensionResults: await credential.getClientExtensionResults(),
+      response: {
+        authenticatorData: toBase64Url(response.authenticatorData),
+        clientDataJSON: toBase64Url(response.clientDataJSON),
+        signature: toBase64Url(response.signature),
+        userHandle: response.userHandle ? toBase64Url(response.userHandle) : null,
+      },
+    });
+  }
+}
+
+function toBase64Url(buffer) {
+  if (!buffer) return null;
+
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  const base64 = btoa(binary);
+
+  return base64.replaceAll("+", "-").replaceAll("/", "_");
 }
 
 customElements.define('webauthn-create', WebauthnCreateElement);
