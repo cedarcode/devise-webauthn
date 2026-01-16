@@ -9,6 +9,8 @@ function isWebAuthnSupported() {
 
 export class WebauthnCreateElement extends HTMLElement {
   connectedCallback() {
+    this.style.display = 'contents';
+
     if (!isWebAuthnSupported()) {
       this.handleWebauthnUnsupported();
       return;
@@ -88,6 +90,8 @@ export class WebauthnCreateElement extends HTMLElement {
 
 export class WebauthnGetElement extends HTMLElement {
   connectedCallback() {
+    this.style.display = 'contents';
+
     if (!isWebAuthnSupported()) {
       this.handleWebauthnUnsupported();
       return;
