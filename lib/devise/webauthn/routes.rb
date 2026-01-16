@@ -6,10 +6,11 @@ module ActionDispatch
       protected
 
       def devise_passkey_authentication(_mapping, controllers)
-        resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys] do
-          get :options_for_get, on: :collection
-          get :options_for_create, on: :collection
-        end
+        resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys]
+        resources :passkey_authentication_options, only: %i[index],
+                                                   controller: controllers[:passkey_authentication_options]
+        resources :passkey_registration_options, only: %i[index],
+                                                 controller: controllers[:passkey_registration_options]
       end
 
       def devise_two_factor_authentication(_mapping, controllers)

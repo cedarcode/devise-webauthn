@@ -22,8 +22,10 @@ module Devise
     #
     module UrlHelpers
       {
-        passkeys: [nil, :options_for_get, :options_for_create],
+        passkeys: [nil],
         passkey: [nil, :new],
+        passkey_authentication_options: [nil],
+        passkey_registration_options: [nil],
         two_factor_authentication: [nil, :new],
         second_factor_webauthn_credentials: [nil, :options_for_get, :options_for_create],
         second_factor_webauthn_credential: [nil, :new]

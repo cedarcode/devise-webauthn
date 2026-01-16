@@ -10,7 +10,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_create(data: { options_url: options_for_create_passkeys_path(resource) }) do
+          tag.webauthn_create(data: { options_url: passkey_registration_options_path(resource) }) do
             concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
             concat capture(f, &block)
           end
@@ -23,7 +23,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_get(data: { options_url: options_for_get_passkeys_path(resource) }) do
+          tag.webauthn_get(data: { options_url: passkey_authentication_options_path(resource) }) do
             concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
 
             concat f.button(text, type: "submit", class: button_classes, &block)
