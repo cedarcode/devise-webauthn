@@ -14,6 +14,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
     authenticator.remove!
   end
 
+  # rubocop:disable RSpec/MultipleExpectations
   describe "sign in using passkeys" do
     before do
       add_passkey_to_authenticator(authenticator, user)
@@ -23,6 +24,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
       visit new_account_session_path
       click_button "Log in with passkeys"
 
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content("Signed in successfully.")
     end
 
@@ -34,14 +36,18 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
       click_button "Log in"
 
+      expect(page).to have_current_path(new_account_two_factor_authentication_path)
       expect(page).to have_content("Two-factor authentication is required to sign in.")
 
       click_button "Use security key"
 
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content("Signed in successfully.")
     end
   end
+  # rubocop:enable RSpec/MultipleExpectations
 
+  # rubocop:disable RSpec/MultipleExpectations
   describe "sign in with security keys as second factor" do
     before do
       add_security_key_to_authenticator(authenticator, user)
@@ -55,10 +61,12 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
       click_button "Log in"
 
+      expect(page).to have_current_path(new_account_two_factor_authentication_path)
       expect(page).to have_content("Two-factor authentication is required to sign in.")
 
       click_button "Use security key"
 
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content("Signed in successfully.")
       expect(remember_cookie).to be_nil
     end
@@ -77,10 +85,12 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
         click_button "Log in"
 
+        expect(page).to have_current_path(new_account_two_factor_authentication_path)
         expect(page).to have_content("Two-factor authentication is required to sign in.")
 
         click_button "Use security key"
 
+        expect(page).to have_current_path(new_account_two_factor_authentication_path)
         expect(page).to have_content("Webauthn credential verification failed.")
         expect(page).to have_button("Use security key")
       end
@@ -96,15 +106,18 @@ RSpec.describe "SignInWithWebauthn", type: :system do
 
         click_button "Log in"
 
+        expect(page).to have_current_path(new_account_two_factor_authentication_path)
         expect(page).to have_content("Two-factor authentication is required to sign in.")
 
         click_button "Use security key"
 
+        expect(page).to have_current_path(root_path)
         expect(page).to have_content("Signed in successfully.")
         expect(remember_cookie).to be_present
       end
     end
   end
+  # rubocop:enable RSpec/MultipleExpectations
 
   def remember_cookie
     page.driver.browser.manage.cookie_named("remember_account_token")
