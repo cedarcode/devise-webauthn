@@ -159,6 +159,19 @@ To add a passkeys creation form:
 <% end %>
 ```
 
+### Handling unsupported WebAuthn
+
+The custom elements check for WebAuthn API support when they connect to the DOM. If the browser doesn't support WebAuthn, a `webauthn:unsupported` event is dispatched and the form submission handler is not attached.
+
+```javascript
+document.addEventListener('webauthn:unsupported', (event) => {
+  const { action } = event.detail; // 'create' or 'get'
+
+  // Hide the WebAuthn form and show a message
+  hideWebauthnFormWithMessage('Your browser does not support WebAuthn');
+});
+```
+
 ### Customizing Javascript Error Handling
 
 By default, WebAuthn errors during registration or authentication are displayed using the browser's `alert()` dialog. You can customize this behavior by listening to the `webauthn:prompt:error` event.

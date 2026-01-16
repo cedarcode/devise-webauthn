@@ -15,6 +15,7 @@
 - BREAKING!: Our [Form helpers](https://github.com/cedarcode/devise-webauthn/blob/355a6836315439f71265bb368bff4e8067033072/lib/devise/webauthn/helpers/credentials_helper.rb#L7-L58) now use the bundled WebAuthn JS asset now instead of the Stimulus controllers, so they expect it to be included in your application. [#84](https://github.com/cedarcode/devise-webauthn/pull/84) [@santiagorodriguez96]
   - Previously generated Stimulus controller for handling WebAuthn client logic are no longer generated.
   - Stimulus is no longer needed for this engine to work.
+- Make helpers for generating WebAuthn options public methods. [#106](https://github.com/cedarcode/devise-webauthn/pull/106) [@santiagorodriguez96]
 
 ### Fixed
 
