@@ -1,6 +1,20 @@
+function isWebAuthnSupported() {
+  return !!(
+    navigator.credentials &&
+    navigator.credentials.create &&
+    navigator.credentials.get &&
+    window.PublicKeyCredential
+  );
+}
+
 export class WebauthnCreateElement extends HTMLElement {
   connectedCallback() {
     this.style.display = 'contents';
+
+    if (!isWebAuthnSupported()) {
+      this.handleWebauthnUnsupported();
+      return;
+    }
 
     this.closest('form').addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -30,6 +44,13 @@ export class WebauthnCreateElement extends HTMLElement {
     if (this.dispatchEvent(event)) {
       alert(error.message || error);
     }
+  }
+
+  handleWebauthnUnsupported() {
+    this.dispatchEvent(new CustomEvent('webauthn:unsupported', {
+      detail: { action: 'create' },
+      bubbles: true
+    }));
   }
 
   // Stringifies registration credentials gracefully handling malformed ones (e.g., due to issues with
@@ -71,6 +92,11 @@ export class WebauthnGetElement extends HTMLElement {
   connectedCallback() {
     this.style.display = 'contents';
 
+    if (!isWebAuthnSupported()) {
+      this.handleWebauthnUnsupported();
+      return;
+    }
+
     this.closest('form').addEventListener('submit', async (event) => {
       event.preventDefault();
 
@@ -99,6 +125,13 @@ export class WebauthnGetElement extends HTMLElement {
     if (this.dispatchEvent(event)) {
       alert(error.message || error);
     }
+  }
+
+  handleWebauthnUnsupported() {
+    this.dispatchEvent(new CustomEvent('webauthn:unsupported', {
+      detail: { action: 'get' },
+      bubbles: true
+    }));
   }
 
   // Stringifies authentication credentials gracefully handling malformed ones (e.g., due to issues with
