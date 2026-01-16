@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+class <%= @scope_prefix %>PasskeysRegistrationOptionsController < Devise::PasskeysController
+  # GET /resource/passkeys
+  # def index
+  #   super
+  # end
+end
