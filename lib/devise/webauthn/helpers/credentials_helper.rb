@@ -57,8 +57,6 @@ module Devise
         end
       end
 
-      private
-
       def create_passkey_options(resource)
         @create_passkey_options ||= begin
           options = WebAuthn::Credential.options_for_create(
@@ -127,6 +125,8 @@ module Devise
           options
         end
       end
+
+      private
 
       def resource_human_palatable_identifier
         authentication_keys = resource.class.authentication_keys
