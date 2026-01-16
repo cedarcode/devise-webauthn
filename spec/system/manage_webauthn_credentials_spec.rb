@@ -26,6 +26,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         fill_in "Passkey name", with: "My Passkey"
         click_button "Create Passkey"
 
+        expect(page).to have_current_path(new_account_passkey_path)
         expect(page).to have_content("Passkey created successfully.")
       end
     end
@@ -42,6 +43,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         fill_in "Passkey name", with: "My Passkey"
         click_button "Create Passkey"
 
+        expect(page).to have_current_path(new_account_passkey_path)
         expect(page).to have_content("Passkey verification failed.")
       end
     end
@@ -55,6 +57,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         fill_in "Security Key name", with: "My Security Key"
         click_button "Create Security Key"
 
+        expect(page).to have_current_path(new_account_second_factor_webauthn_credential_path)
         expect(page).to have_content("Security Key created successfully.")
       end
     end
@@ -71,6 +74,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         fill_in "Security Key name", with: "My Security Key"
         click_button "Create Security Key"
 
+        expect(page).to have_current_path(new_account_second_factor_webauthn_credential_path)
         expect(page).to have_content("Webauthn credential verification failed.")
       end
     end
@@ -93,6 +97,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
           click_button "Upgrade to Passkey"
         end
 
+        expect(page).to have_current_path(root_path)
         expect(page).to have_content("Security Key promoted to passkey successfully.")
 
         within passkeys_section do
