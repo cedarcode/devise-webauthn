@@ -2,8 +2,7 @@
 
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
-    before_action :authenticate_scope!, only: %i[new create update destroy options_for_create]
-    before_action :set_resource, only: :options_for_get
+    before_action :authenticate_scope!
 
     def new; end
 
@@ -43,39 +42,6 @@ module Devise
       redirect_to after_destroy_path
     end
 
-    def options_for_get
-      security_key_authentication_options =
-        WebAuthn::Credential.options_for_get(
-          allow: @resource.webauthn_credentials.pluck(:external_id),
-          user_verification: "discouraged"
-        )
-
-      # Store challenge in session for later verification
-      session[:two_factor_authentication_challenge] = security_key_authentication_options.challenge
-
-      render json: security_key_authentication_options
-    end
-
-    def options_for_create
-      create_security_key_options =
-        WebAuthn::Credential.options_for_create(
-          user: {
-            id: resource.webauthn_id,
-            name: resource_human_palatable_identifier
-          },
-          exclude: resource.webauthn_credentials.pluck(:external_id),
-          authenticator_selection: {
-            resident_key: "discouraged",
-            user_verification: "discouraged"
-          }
-        )
-
-      # Store challenge in session for later verification
-      session[:webauthn_challenge] = create_security_key_options.challenge
-
-      render json: create_security_key_options
-    end
-
     private
 
     def authenticate_scope!
@@ -112,17 +78,6 @@ module Devise
     # this method in your own SecondFactorWebauthnCredentialsController.
     def after_destroy_path
       new_second_factor_webauthn_credential_path(resource_name)
-    end
-
-    def resource_human_palatable_identifier
-      authentication_keys = resource.class.authentication_keys
-      authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
-
-      authentication_keys.filter_map { |authentication_key| resource.public_send(authentication_key) }.first
-    end
-
-    def set_resource
-      @resource = resource_class.find(session[:current_authentication_resource_id])
     end
   end
 end

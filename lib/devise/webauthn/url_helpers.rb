@@ -27,8 +27,10 @@ module Devise
         passkey_authentication_options: [nil],
         passkey_registration_options: [nil],
         two_factor_authentication: [nil, :new],
-        second_factor_webauthn_credentials: [nil, :options_for_get, :options_for_create],
-        second_factor_webauthn_credential: [nil, :new]
+        second_factor_webauthn_credentials: [nil],
+        second_factor_webauthn_credential: [nil, :new],
+        security_key_authentication_options: [nil],
+        security_key_registration_options: [nil]
       }.each do |route, actions|
         %i[path url].each do |path_or_url|
           actions.each do |action|

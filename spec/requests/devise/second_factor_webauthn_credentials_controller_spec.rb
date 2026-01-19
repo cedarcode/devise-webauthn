@@ -41,7 +41,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
     context "when user is authenticated" do
       before do
         sign_in user
-        get options_for_create_account_second_factor_webauthn_credentials_path # To set the challenge in session
+        get account_security_key_registration_options_path # To set the challenge in session
       end
 
       context "with valid parameters" do
@@ -157,89 +157,4 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
     end
   end
-
-  # rubocop:disable RSpec/MultipleExpectations
-  describe "GET #options_for_get" do
-    before do
-      user.webauthn_credentials.create!(
-        external_id: "second-factor-id",
-        name: "Second Factor Key",
-        public_key: "pk",
-        sign_count: 0,
-        authentication_factor: :second_factor
-      )
-
-      # rubocop:disable RSpec/AnyInstance
-      allow_any_instance_of(described_class)
-        .to receive(:set_resource) do |instance|
-          instance.instance_variable_set(:@resource, user)
-        end
-      # rubocop:enable RSpec/AnyInstance
-    end
-
-    it "returns authentication options and stores the challenge in the session" do
-      get options_for_get_account_second_factor_webauthn_credentials_path
-
-      expect(response).to have_http_status(:ok)
-      expect(response.media_type).to eq("application/json")
-
-      body = response.parsed_body
-      expect(body).to include("challenge")
-      expect(body["userVerification"]).to eq("discouraged")
-
-      expect(body["allowCredentials"].size).to eq(1)
-
-      expect(session[:two_factor_authentication_challenge]).to be_present
-    end
-  end
-
-  describe "GET #options_for_create" do
-    context "when user is authenticated" do
-      before do
-        sign_in user, scope: :account
-      end
-
-      it "returns security key creation options and stores the challenge in the session" do
-        get options_for_create_account_second_factor_webauthn_credentials_path
-
-        expect(response).to have_http_status(:ok)
-        expect(response.media_type).to eq("application/json")
-
-        body = response.parsed_body
-        expect(body).to include("challenge")
-        expect(body.dig("user", "name")).to eq(user.email)
-
-        expect(body.dig("authenticatorSelection", "residentKey")).to eq("discouraged")
-        expect(body.dig("authenticatorSelection", "userVerification")).to eq("discouraged")
-
-        expect(session[:webauthn_challenge]).to be_present
-      end
-
-      it "includes existing first-factor credentials in the excludeCredentials list" do
-        user.webauthn_credentials.create!(
-          external_id: "existing-id",
-          name: "Existing Key",
-          public_key: "pk",
-          sign_count: 0,
-          authentication_factor: :first_factor
-        )
-
-        get options_for_create_account_second_factor_webauthn_credentials_path
-
-        body = response.parsed_body
-        exclude_credentials = body["excludeCredentials"] || []
-
-        expect(exclude_credentials.size).to eq(user.webauthn_credentials.count)
-      end
-    end
-
-    context "when user is not authenticated" do
-      it "redirects to the sign-in page" do
-        get options_for_create_account_second_factor_webauthn_credentials_path
-
-        expect(response).to redirect_to(new_account_session_path)
-      end
-    end
-  end
-  # rubocop:enable RSpec/MultipleExpectations
 end

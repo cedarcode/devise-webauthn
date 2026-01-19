@@ -20,10 +20,11 @@ module ActionDispatch
 
         resources :second_factor_webauthn_credentials,
                   only: %i[new create update destroy],
-                  controller: controllers[:second_factor_webauthn_credentials] do
-                    get :options_for_get, on: :collection
-                    get :options_for_create, on: :collection
-                  end
+                  controller: controllers[:second_factor_webauthn_credentials]
+        resources :security_key_authentication_options, only: %i[index],
+                                                        controller: controllers[:security_key_authentication_options]
+        resources :security_key_registration_options, only: %i[index],
+                                                      controller: controllers[:security_key_registration_options]
       end
     end
   end

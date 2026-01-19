@@ -38,7 +38,7 @@ module Devise
           class: form_classes
         ) do |f|
           tag.webauthn_create(
-            data: { options_url: options_for_create_second_factor_webauthn_credentials_path(resource) }
+            data: { options_url: security_key_registration_options_path(resource) }
           ) do
             concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
             concat capture(f, &block)
@@ -52,7 +52,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_get(data: { options_url: options_for_get_second_factor_webauthn_credentials_path(resource) }) do
+          tag.webauthn_get(data: { options_url: security_key_authentication_options_path(resource) }) do
             concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
             concat f.button(text, type: "submit", class: button_classes, &block)
           end
