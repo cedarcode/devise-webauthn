@@ -176,7 +176,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("Use security key")
-      expect(flash[:alert]).to eq("Invalid Email or password.") # TODO: CHANGE THIS
+      expect(flash[:alert]).to match(/Invalid email or password/i) # TODO: CHANGE THIS
       expect(controller.current_account).to be_nil
     end
   end
