@@ -44,6 +44,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to eq(I18n.t("devise.failure.two_factor_required"))
+      get account_security_key_authentication_options_path # To set the challenge in session
       expect(session[:current_authentication_resource_id]).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
@@ -83,6 +84,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
+      get account_security_key_authentication_options_path # To set the challenge in session
       expect(session[:current_authentication_resource_id]).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
@@ -112,6 +114,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
+      get account_security_key_authentication_options_path # To set the challenge in session
       expect(session[:current_authentication_resource_id]).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
@@ -142,6 +145,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
+      get account_security_key_authentication_options_path # To set the challenge in session
       expect(session[:current_authentication_resource_id]).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
@@ -169,6 +173,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
+      get account_security_key_authentication_options_path # To set the challenge in session
       expect(session[:current_authentication_resource_id]).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
