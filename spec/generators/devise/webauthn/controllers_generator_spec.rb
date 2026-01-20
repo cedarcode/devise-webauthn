@@ -20,6 +20,10 @@ RSpec.describe Devise::Webauthn::ControllersGenerator, type: :generator do
       assert_no_file "app/controllers/passkeys_controller.rb"
       assert_no_file "app/controllers/second_factor_webauthn_credentials_controller.rb"
       assert_no_file "app/controllers/two_factor_authentications_controller.rb"
+      assert_no_file "app/controllers/passkey/authenticator_options_controller.rb"
+      assert_no_file "app/controllers/passkey/registration_options_controller.rb"
+      assert_no_file "app/controllers/security_key/authenticator_options_controller.rb"
+      assert_no_file "app/controllers/security_key/registration_options_controller.rb"
     end
   end
 
@@ -32,6 +36,10 @@ RSpec.describe Devise::Webauthn::ControllersGenerator, type: :generator do
       assert_file "app/controllers/users/passkeys_controller.rb", /Users::PasskeysController/
       assert_file "app/controllers/users/second_factor_webauthn_credentials_controller.rb", /Users::SecondFactorWebauthnCredentialsController/
       assert_file "app/controllers/users/two_factor_authentications_controller.rb", /Users::TwoFactorAuthenticationsController/
+      assert_file "app/controllers/users/passkey/authentication_options_controller.rb", /Users::Passkey::AuthenticationOptionsController/
+      assert_file "app/controllers/users/passkey/registration_options_controller.rb", /Users::Passkey::RegistrationOptionsController/
+      assert_file "app/controllers/users/security_key/authentication_options_controller.rb", /Users::SecurityKey::AuthenticationOptionsController/
+      assert_file "app/controllers/users/security_key/registration_options_controller.rb", /Users::SecurityKey::RegistrationOptionsController/
     end
   end
 end

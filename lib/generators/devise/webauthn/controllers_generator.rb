@@ -9,6 +9,10 @@ module Devise
         passkeys
         second_factor_webauthn_credentials
         two_factor_authentications
+        passkey/authentication_options
+        passkey/registration_options
+        security_key/authentication_options
+        security_key/registration_options
       ].freeze
 
       desc "Create inherited Devise::Webauthn controllers in your app/controllers folder."
