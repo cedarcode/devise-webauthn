@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class <%= @scope_prefix %>Passkey::RegistrationOptionsController < Devise::PasskeyRegistrationOptionsController
+class <%= @scope_prefix %>Passkey::RegistrationOptionsController < Devise::Passkey::RegistrationOptionsController
   # GET /resource/passkey_registration_options
   # def index
   #   super

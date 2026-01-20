@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class <%= @scope_prefix %>SecurityKey::RegistrationOptionsController < Devise::SecurityKeyRegistrationOptionsController
+class <%= @scope_prefix %>SecurityKey::RegistrationOptionsController < Devise::SecurityKey::RegistrationOptionsController
   # GET /resource/securiy_key_registration_options
   # def index
   #   super
