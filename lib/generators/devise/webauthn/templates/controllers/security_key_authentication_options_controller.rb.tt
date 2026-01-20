@@ -1,8 +1,0 @@
-# frozen_string_literal: true
-
-class <%= @scope_prefix %>SecurityKeyAuthenticationOptionsController < Devise::SecurityKeyAuthenticationOptionsController
-  # GET /resource/security_key_authentication_options
-  # def index
-  #   super
-  # end
-end
