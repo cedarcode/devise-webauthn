@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+class <%= @scope_prefix %>PasskeyAuthenticationOptionsController < Devise::PasskeyAuthenticationOptionsController
+  # GET /resource/passkey_authentication_options
+  # def index
+  #   super
+  # end
+end
