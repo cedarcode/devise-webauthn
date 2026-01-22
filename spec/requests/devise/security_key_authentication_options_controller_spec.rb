@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Devise::SecurityKey::AuthenticationOptionsController, type: :request do
+RSpec.describe Devise::SecurityKeyAuthenticationOptionsController, type: :request do
   let(:user) { Account.create!(email: "test@example.com", password: "password123") }
 
   describe "GET #index" do

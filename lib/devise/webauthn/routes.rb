@@ -8,10 +8,9 @@ module ActionDispatch
       def devise_passkey_authentication(_mapping, controllers)
         resources :passkeys, only: %i[new create destroy], controller: controllers[:passkeys]
 
-        resource :passkey do
-          resources :authentication_options, only: :index, controller: controllers[:"passkey/authentication_options"]
-          resources :registration_options, only: :index, controller: controllers[:"passkey/registration_options"]
-        end
+        resources :passkey_authentication_options, only: :index,
+                                                   controller: controllers[:passkey_authentication_options]
+        resources :passkey_registration_options, only: :index, controller: controllers[:passkey_registration_options]
       end
 
       def devise_two_factor_authentication(_mapping, controllers)
@@ -23,12 +22,10 @@ module ActionDispatch
                   only: %i[new create update destroy],
                   controller: controllers[:second_factor_webauthn_credentials]
 
-        resource :security_key do
-          resources :authentication_options, only: %i[index],
-                                             controller: controllers[:"security_key/authentication_options"]
-          resources :registration_options, only: %i[index],
-                                           controller: controllers[:"security_key/registration_options"]
-        end
+        resources :security_key_authentication_options, only: %i[index],
+                                                        controller: controllers[:security_key_authentication_options]
+        resources :security_key_registration_options, only: %i[index],
+                                                      controller: controllers[:security_key_registration_options]
       end
     end
   end

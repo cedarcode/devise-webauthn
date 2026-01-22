@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Devise::Passkey::RegistrationOptionsController, type: :request do
+RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
   let(:user) { Account.create!(email: "test@example.com", password: "password123") }
 
   describe "GET #index" do

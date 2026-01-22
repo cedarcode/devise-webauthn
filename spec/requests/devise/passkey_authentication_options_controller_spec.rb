@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Devise::Passkey::AuthenticationOptionsController, type: :request do
+RSpec.describe Devise::PasskeyAuthenticationOptionsController, type: :request do
   describe "GET #index" do
     it "stores the challenge in session and returns it as json" do
       get account_passkey_authentication_options_path
