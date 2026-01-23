@@ -42,4 +42,30 @@ RSpec.describe Devise::Webauthn::ControllersGenerator, type: :generator do
       assert_file "app/controllers/users/security_key_registration_options_controller.rb", /Users::SecurityKeyRegistrationOptionsController/
     end
   end
+
+  context "when using -c to select specific controllers" do
+    let(:generator_instance) do
+      generator(["users"], controllers: %w[passkeys two_factor_authentications])
+    end
+
+    it "generates only the selected controllers" do
+      invoke generator_instance
+
+      assert_file "app/controllers/users/passkeys_controller.rb", /Users::PasskeysController/
+      assert_file "app/controllers/users/two_factor_authentications_controller.rb",
+                  /Users::TwoFactorAuthenticationsController/
+
+      assert_no_file "app/controllers/users/second_factor_webauthn_credentials_controller.rb"
+    end
+  end
+
+  context "when -c includes an unknown controller" do
+    let(:generator_instance) do
+      generator(["users"], controllers: %w[passkeys not_a_real_controller])
+    end
+
+    it "raises an error" do
+      expect { invoke generator_instance }.to raise_error(Thor::Error)
+    end
+  end
 end
