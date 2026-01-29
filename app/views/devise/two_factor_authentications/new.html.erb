@@ -1,1 +1,3 @@
-<%= login_with_security_key_button('Use security key', resource: @resource) %>
+<%= login_with_security_key_form_for(resource: @resource) do |form| %>
+  <%= form.submit 'Use security key' %>
+<% end %>
