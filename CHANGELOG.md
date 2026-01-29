@@ -5,6 +5,16 @@
 ### Changed
 
 - Options for getting or creating passkeys and security keys are now served by dedicated Rails controllers and retrieved via JavaScript fetch requests. [#73](https://github.com/cedarcode/devise-webauthn/pull/73) [@nicolastemciuc]
+- BREAKING: `login_with_passkey_button` and `login_with_security_key_button` helpers have been renamed to `login_with_passkey_form_for` and `login_with_security_key_form_for`. They now take a block and no longer generate the submit button automatically. You need to explicitly add the button inside the block:
+  ```erb
+  <%# Before %>
+  <%%= login_with_passkey_button("Log in with passkeys", session_path: user_session_path) %>
+
+  <%# After %>
+  <%%= login_with_passkey_form_for(session_path: user_session_path) do |form| %>
+    <%%= form.submit "Log in with passkeys" %>
+  <%% end %>
+  ```
 
 ## [v0.3.0](https://github.com/cedarcode/devise-webauthn/compare/v0.2.2...v0.3.0/) - 2026-01-16
 
