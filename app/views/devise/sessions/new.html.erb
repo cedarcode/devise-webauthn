@@ -23,6 +23,8 @@
   </div>
 <% end %>
 
-<%= login_with_passkey_button_for(resource_name, "Log in with passkeys") %>
+<%= login_with_passkey_form_for(resource_name) do |form| %>
+  <%= form.submit "Log in with passkeys" %>
+<% end %>
 
 <%= render "devise/shared/links" %>

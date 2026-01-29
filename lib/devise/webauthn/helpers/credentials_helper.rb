@@ -16,8 +16,7 @@ module Devise
         end
       end
 
-      def login_with_passkey_button_for(resource_or_resource_name, text = nil, button_classes: nil,
-                                        form_classes: nil, &block)
+      def login_with_passkey_form_for(resource_or_resource_name, form_classes: nil, &block)
         form_with(
           url: session_path(resource_or_resource_name),
           method: :post,
@@ -25,8 +24,7 @@ module Devise
         ) do |f|
           tag.webauthn_get(data: { options_url: passkey_authentication_options_path(resource_or_resource_name) }) do
             concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
-
-            concat f.button(text, type: "submit", class: button_classes, &block)
+            concat capture(f, &block)
           end
         end
       end
@@ -46,8 +44,7 @@ module Devise
         end
       end
 
-      def login_with_security_key_button_for(resource_or_resource_name, text = nil, button_classes: nil,
-                                             form_classes: nil, &block)
+      def login_with_security_key_form_for(resource_or_resource_name, form_classes: nil, &block)
         form_with(
           url: two_factor_authentication_path(resource_or_resource_name),
           method: :post,
@@ -57,7 +54,7 @@ module Devise
                              options_url: security_key_authentication_options_path(resource_or_resource_name)
                            }) do
             concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
-            concat f.button(text, type: "submit", class: button_classes, &block)
+            concat capture(f, &block)
           end
         end
       end
