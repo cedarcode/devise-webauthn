@@ -79,7 +79,6 @@ RSpec.describe "Manage webauthn credentials", type: :system do
       end
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     context "when user has existing security keys" do
       before do
         add_security_key_to_authenticator(authenticator, user, name: "Existing Key")
@@ -111,7 +110,6 @@ RSpec.describe "Manage webauthn credentials", type: :system do
       end
     end
   end
-  # rubocop:enable RSpec/MultipleExpectations
 
   private
 

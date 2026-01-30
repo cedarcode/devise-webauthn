@@ -14,7 +14,6 @@ RSpec.describe "SignInWithWebauthn", type: :system do
     authenticator.remove!
   end
 
-  # rubocop:disable RSpec/MultipleExpectations
   describe "sign in using passkeys" do
     before do
       add_passkey_to_authenticator(authenticator, user)
@@ -45,9 +44,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
       expect(page).to have_content("Signed in successfully.")
     end
   end
-  # rubocop:enable RSpec/MultipleExpectations
 
-  # rubocop:disable RSpec/MultipleExpectations
   describe "sign in with security keys as second factor" do
     before do
       add_security_key_to_authenticator(authenticator, user)
@@ -117,7 +114,6 @@ RSpec.describe "SignInWithWebauthn", type: :system do
       end
     end
   end
-  # rubocop:enable RSpec/MultipleExpectations
 
   def remember_cookie
     page.driver.browser.manage.cookie_named("remember_account_token")
