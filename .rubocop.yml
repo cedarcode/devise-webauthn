@@ -27,7 +27,7 @@ Gemspec/DevelopmentDependencies:
   Enabled: false
 
 RSpec/MultipleExpectations:
-  Max: 3
+  Enabled: false
 
 RSpec/ExampleLength:
   Max: 20
