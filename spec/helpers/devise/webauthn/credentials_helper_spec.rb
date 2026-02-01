@@ -25,7 +25,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
   end
 
   describe "#passkey_creation_form_for" do
-    it "renders a form with webauthn_create element" do
+    it "renders a form with webauthn_create element and hidden credential field" do
       html = helper.passkey_creation_form_for(user) do |form|
         form.submit "Create Passkey"
       end
@@ -47,7 +47,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
   end
 
   describe "#login_with_passkey_form_for" do
-    it "renders a form with webauthn_get element" do
+    it "renders a form with webauthn_get element and hidden credential field" do
       html = helper.login_with_passkey_form_for(session_path: "/accounts/sign_in") do |form|
         form.submit "Log in with passkeys"
       end
