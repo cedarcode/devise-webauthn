@@ -13,7 +13,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
     allow(helper).to receive_messages(resource: user, session: {})
   end
 
-  def parsed(html)
+  def parse(html)
     Capybara.string(html)
   end
 
@@ -30,7 +30,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Create Passkey"
       end
 
-      page = parsed(html)
+      page = parse(html)
       expect(page).to have_css("form")
       expect(page).to have_css("webauthn-create[data-options-url='/accounts/passkey_registration_options']")
       expect(page).to have_hidden_credential_field
@@ -42,7 +42,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Create"
       end
 
-      expect(parsed(html)).to have_css("form.custom-form")
+      expect(parse(html)).to have_css("form.custom-form")
     end
   end
 
@@ -52,7 +52,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Log in with passkeys"
       end
 
-      page = parsed(html)
+      page = parse(html)
       expect(page).to have_css("form[action='/accounts/sign_in']")
       expect(page).to have_css("webauthn-get[data-options-url='/accounts/passkey_authentication_options']")
       expect(page).to have_hidden_credential_field
@@ -64,7 +64,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Login"
       end
 
-      expect(parsed(html)).to have_css("form.passkey-form")
+      expect(parse(html)).to have_css("form.passkey-form")
     end
 
     it "allows custom content in the block" do
@@ -74,7 +74,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         end
       end
 
-      page = parsed(html)
+      page = parse(html)
       expect(page).to have_css("div.button-wrapper")
       expect(page).to have_css("input.btn-primary[type='submit']")
     end
@@ -86,7 +86,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Add Security Key"
       end
 
-      page = parsed(html)
+      page = parse(html)
       expect(page).to have_css("form")
       expect(page).to have_css("webauthn-create[data-options-url='/accounts/security_key_registration_options']")
       expect(page).to have_hidden_credential_field
@@ -98,7 +98,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Add"
       end
 
-      expect(parsed(html)).to have_css("form.security-key-form")
+      expect(parse(html)).to have_css("form.security-key-form")
     end
   end
 
@@ -108,7 +108,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Use security key"
       end
 
-      page = parsed(html)
+      page = parse(html)
       expect(page).to have_css("form")
       expect(page).to have_css("webauthn-get[data-options-url='/accounts/security_key_authentication_options']")
       expect(page).to have_hidden_credential_field
@@ -120,7 +120,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         form.submit "Verify"
       end
 
-      expect(parsed(html)).to have_css("form.two-factor-form")
+      expect(parse(html)).to have_css("form.two-factor-form")
     end
 
     it "allows custom content in the block" do
@@ -128,7 +128,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
         helper.safe_join([helper.content_tag(:p, "Authenticate with your security key"), form.submit("Authenticate")])
       end
 
-      page = parsed(html)
+      page = parse(html)
       expect(page).to have_css("p", text: "Authenticate with your security key")
       expect(page).to have_button("Authenticate")
     end
