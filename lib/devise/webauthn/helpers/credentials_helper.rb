@@ -23,7 +23,7 @@ module Devise
           method: :post,
           class: form_classes
         ) do |f|
-          tag.webauthn_get(data: { options_url: passkey_authentication_options_path(resource) }) do
+          tag.webauthn_get(data: { options_url: passkey_authentication_options_path(resource_name) }) do
             concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
 
             concat f.button(text, type: "submit", class: button_classes, &block)
