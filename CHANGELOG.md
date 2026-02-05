@@ -5,6 +5,7 @@
 ### Changed
 
 - Options for getting or creating passkeys and security keys are now served by dedicated Rails controllers and retrieved via JavaScript fetch requests. [#73](https://github.com/cedarcode/devise-webauthn/pull/73) [@nicolastemciuc]
+- BREAKING!: Remove helpers for generating WebAuthn options. [#106](https://github.com/cedarcode/devise-webauthn/pull/115) [@nicolastemciuc]
 
 ## [v0.3.0](https://github.com/cedarcode/devise-webauthn/compare/v0.2.2...v0.3.0/) - 2026-01-16
 
