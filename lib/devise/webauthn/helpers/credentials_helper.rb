@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ModuleLength
 module Devise
   module Webauthn
     module CredentialsHelper
@@ -59,75 +58,6 @@ module Devise
         end
       end
 
-      def create_passkey_options(resource)
-        @create_passkey_options ||= begin
-          options = WebAuthn::Credential.options_for_create(
-            user: {
-              id: resource.webauthn_id,
-              name: resource_human_palatable_identifier
-            },
-            exclude: resource.passkeys.pluck(:external_id),
-            authenticator_selection: {
-              resident_key: "required",
-              user_verification: "required"
-            }
-          )
-
-          # Store challenge in session for later verification
-          session[:webauthn_challenge] = options.challenge
-
-          options
-        end
-      end
-
-      def passkey_authentication_options
-        @passkey_authentication_options ||= begin
-          options = WebAuthn::Credential.options_for_get(
-            user_verification: "required"
-          )
-
-          # Store challenge in session for later verification
-          session[:authentication_challenge] = options.challenge
-
-          options
-        end
-      end
-
-      def create_security_key_options(resource)
-        @create_security_key_options ||= begin
-          options = WebAuthn::Credential.options_for_create(
-            user: {
-              id: resource.webauthn_id,
-              name: resource_human_palatable_identifier
-            },
-            exclude: resource.webauthn_credentials.pluck(:external_id),
-            authenticator_selection: {
-              resident_key: "discouraged",
-              user_verification: "discouraged"
-            }
-          )
-
-          # Store challenge in session for later verification
-          session[:webauthn_challenge] = options.challenge
-
-          options
-        end
-      end
-
-      def security_key_authentication_options(resource)
-        @security_key_authentication_options ||= begin
-          options = WebAuthn::Credential.options_for_get(
-            allow: resource.webauthn_credentials.pluck(:external_id),
-            user_verification: "discouraged"
-          )
-
-          # Store challenge in session for later verification
-          session[:two_factor_authentication_challenge] = options.challenge
-
-          options
-        end
-      end
-
       private
 
       def resource_human_palatable_identifier
@@ -139,4 +69,3 @@ module Devise
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength
