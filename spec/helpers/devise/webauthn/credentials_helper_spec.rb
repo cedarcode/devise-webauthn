@@ -48,7 +48,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
 
   describe "#login_with_passkey_form_for" do
     it "renders a form with webauthn_get element and hidden credential field" do
-      html = helper.login_with_passkey_form_for(session_path: "/accounts/sign_in") do |form|
+      html = helper.login_with_passkey_form_for(:account) do |form|
         form.submit "Log in with passkeys"
       end
 
@@ -60,7 +60,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
     end
 
     it "accepts form_classes option" do
-      html = helper.login_with_passkey_form_for(session_path: "/sign_in", form_classes: "passkey-form") do |form|
+      html = helper.login_with_passkey_form_for(:account, form_classes: "passkey-form") do |form|
         form.submit "Login"
       end
 
@@ -68,7 +68,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
     end
 
     it "allows custom content in the block" do
-      html = helper.login_with_passkey_form_for(session_path: "/sign_in") do |form|
+      html = helper.login_with_passkey_form_for(:account) do |form|
         helper.content_tag(:div, class: "button-wrapper") do
           form.submit "Sign in", class: "btn-primary"
         end
@@ -104,7 +104,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
 
   describe "#login_with_security_key_form_for" do
     it "renders a form with webauthn_get element" do
-      html = helper.login_with_security_key_form_for(resource: user) do |form|
+      html = helper.login_with_security_key_form_for(:account) do |form|
         form.submit "Use security key"
       end
 
@@ -116,7 +116,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
     end
 
     it "accepts form_classes option" do
-      html = helper.login_with_security_key_form_for(resource: user, form_classes: "two-factor-form") do |form|
+      html = helper.login_with_security_key_form_for(:account, form_classes: "two-factor-form") do |form|
         form.submit "Verify"
       end
 
@@ -124,7 +124,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
     end
 
     it "allows custom content in the block" do
-      html = helper.login_with_security_key_form_for(resource: user) do |form|
+      html = helper.login_with_security_key_form_for(:account) do |form|
         helper.safe_join([helper.content_tag(:p, "Authenticate with your security key"), form.submit("Authenticate")])
       end
 

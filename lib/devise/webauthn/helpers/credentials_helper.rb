@@ -58,15 +58,6 @@ module Devise
           end
         end
       end
-
-      private
-
-      def resource_human_palatable_identifier
-        authentication_keys = resource.class.authentication_keys
-        authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
-
-        authentication_keys.filter_map { |authentication_key| resource.public_send(authentication_key) }.first
-      end
     end
   end
 end
