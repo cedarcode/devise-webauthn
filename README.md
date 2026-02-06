@@ -145,7 +145,9 @@ $ bin/rails generate devise:webauthn:views -v passkeys
 ```
 
 ### Helper methods
-Devise::Webauthn provides helpers that can be used in your views. For example, for a resource named `user`, you can use the following helpers:
+Devise::Webauthn provides helpers that can be used in your views. These helpers accept either a resource name (e.g., `:user`) or a resource object (e.g., `@user`) as the first argument.
+
+For example, for a resource named `user`, you can use the following helpers:
 
 To add a button for logging in with passkeys:
 ```erb
