@@ -266,6 +266,8 @@ GEM
       rspec-expectations (~> 3.13)
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
+    rspec-retry (0.6.2)
+      rspec-core (> 3.3)
     rspec-support (3.13.4)
     rubocop (1.79.1)
       json (~> 2.3)
@@ -351,6 +353,7 @@ DEPENDENCIES
   puma (~> 6.6)
   rails (~> 8.0)
   rspec-rails (~> 8.0)
+  rspec-retry
   rubocop (~> 1.79)
   rubocop-rails (~> 2.32)
   rubocop-rspec (~> 3.6)
