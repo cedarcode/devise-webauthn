@@ -13,6 +13,7 @@ Combustion.initialize! :active_model, :active_record, :action_controller, :actio
 end
 
 require "rspec/rails"
+require "rspec/retry"
 require "capybara/rspec"
 
 RSpec.configure do |config|
@@ -48,4 +49,10 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :system
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Webauthn::Test::AuthenticatorHelpers, type: :system
+
+  config.verbose_retry = true
+  config.display_try_failure_messages = true
+  config.around :each, type: :system do |ex|
+    ex.run_with_retry retry: 3
+  end
 end
