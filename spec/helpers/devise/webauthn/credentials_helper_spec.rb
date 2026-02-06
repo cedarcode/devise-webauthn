@@ -44,6 +44,18 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
 
       expect(parse(html)).to have_css("form.custom-form")
     end
+
+    it "allows custom content in the block" do
+      html = helper.passkey_creation_form_for(user) do |form|
+        helper.content_tag(:div, class: "button-wrapper") do
+          form.submit "Create", class: "btn-primary"
+        end
+      end
+
+      page = parse(html)
+      expect(page).to have_css("div.button-wrapper")
+      expect(page).to have_css("input.btn-primary[type='submit']")
+    end
   end
 
   describe "#login_with_passkey_form_for" do
@@ -99,6 +111,18 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       end
 
       expect(parse(html)).to have_css("form.security-key-form")
+    end
+
+    it "allows custom content in the block" do
+      html = helper.security_key_creation_form_for(user) do |form|
+        helper.content_tag(:div, class: "button-wrapper") do
+          form.submit "Add", class: "btn-primary"
+        end
+      end
+
+      page = parse(html)
+      expect(page).to have_css("div.button-wrapper")
+      expect(page).to have_css("input.btn-primary[type='submit']")
     end
   end
 
