@@ -151,7 +151,7 @@ For example, for a resource named `user`, you can use the following helpers:
 
 To add a button for logging in with passkeys:
 ```erb
-<%= login_with_passkey_button_for(:user, "Log in with passkeys", session_path: user_session_path) %>
+<%= login_with_passkey_button_for(:user, "Log in with passkeys") %>
 ```
 
 To add a passkeys creation form:

@@ -17,10 +17,10 @@ module Devise
         end
       end
 
-      def login_with_passkey_button_for(resource_or_resource_name, text = nil, session_path:, button_classes: nil,
+      def login_with_passkey_button_for(resource_or_resource_name, text = nil, button_classes: nil,
                                         form_classes: nil, &block)
         form_with(
-          url: session_path,
+          url: session_path(resource_or_resource_name),
           method: :post,
           class: form_classes
         ) do |f|
