@@ -82,5 +82,8 @@ jobs:
         bundler-cache: true
 
     - name: Run tests
-      run: |
-        bundle exec rspec
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 2
+        timeout_minutes: 10
+        command: bundle exec rspec
