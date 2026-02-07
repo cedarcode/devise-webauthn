@@ -81,14 +81,17 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
 
     it "allows custom content in the block" do
       html = helper.login_with_passkey_form_for(:account) do |form|
-        helper.content_tag(:div, class: "button-wrapper") do
-          form.submit "Sign in", class: "btn-primary"
-        end
+        # artifact of the test, concat simulates ERB's <%= %>
+        helper.concat form.submit("Sign in", class: "btn-primary")
+        helper.concat form.check_box(:remember_me)
+        helper.concat form.label(:remember_me, "Remember me")
       end
 
       page = parse(html)
-      expect(page).to have_css("div.button-wrapper")
+
       expect(page).to have_css("input.btn-primary[type='submit']")
+      expect(page).to have_css("input[type='checkbox'][name='remember_me']")
+      expect(page).to have_css("label[for='remember_me']", text: "Remember me")
     end
   end
 
