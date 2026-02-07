@@ -27,7 +27,7 @@ module Devise
       end
 
       def generate_javascript_configuration
-        invoke "devise:webauthn:javascript"
+        invoke "devise:webauthn:javascript_configuration"
       end
 
       def final_message
