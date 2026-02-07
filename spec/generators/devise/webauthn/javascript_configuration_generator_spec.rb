@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "generators/devise/webauthn/javascript/javascript_configuration_generator"
+require "generators/devise/webauthn/javascript_configuration/javascript_configuration_generator"
 
 RSpec.describe Devise::Webauthn::JavascriptConfigurationGenerator, type: :generator do
   tests described_class
