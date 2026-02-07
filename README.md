@@ -149,9 +149,18 @@ Devise::Webauthn provides helpers that can be used in your views. These helpers 
 
 For example, for a resource named `user`, you can use the following helpers:
 
-To add a button for logging in with passkeys:
+To add a form for logging in with passkeys:
 ```erb
-<%= login_with_passkey_button_for(:user, "Log in with passkeys") %>
+<%= login_with_passkey_form_for(:user) do |form| %>
+  <%= form.submit "Log in with passkeys" %>
+<% end %>
+```
+
+To add a form for logging in with security keys (2FA):
+```erb
+<%= login_with_security_key_form_for(@resource) do |form| %>
+  <%= form.submit "Use security key" %>
+<% end %>
 ```
 
 To add a passkeys creation form:
