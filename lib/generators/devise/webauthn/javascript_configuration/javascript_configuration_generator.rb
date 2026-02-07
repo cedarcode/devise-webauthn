@@ -6,7 +6,7 @@ module Devise
   module Webauthn
     class JavascriptConfigurationGenerator < Rails::Generators::Base
       hide!
-      namespace "devise:webauthn:javascript"
+      namespace "devise:webauthn:javascript_configuration"
 
       desc "Configure JavaScript loading for devise-webauthn"
 

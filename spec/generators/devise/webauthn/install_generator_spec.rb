@@ -33,7 +33,7 @@ RSpec.describe Devise::Webauthn::InstallGenerator, type: :generator do
 
     it "invokes the javascript configuration generator" do
       expect(generator).to have_received(:invoke)
-        .with("devise:webauthn:javascript")
+        .with("devise:webauthn:javascript_configuration")
     end
   end
 
