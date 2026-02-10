@@ -38,10 +38,10 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Create Passkey")
     end
 
-    it "accepts form_attributes option" do
+    it "accepts html_options option" do
       html = helper.passkey_creation_form_for(
         user,
-        form_attributes: {
+        html_options: {
           class: "custom-form",
           id: "passkey-form",
           data: { turbo: false }
@@ -79,10 +79,10 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Log in with passkeys")
     end
 
-    it "accepts form_attributes option" do
+    it "accepts html_options option" do
       html = helper.login_with_passkey_form_for(
         :account,
-        form_attributes: {
+        html_options: {
           class: "passkey-form",
           id: "passkey-login",
           data: { controller: "auth" }
@@ -123,10 +123,10 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Add Security Key")
     end
 
-    it "accepts form_attributes option" do
+    it "accepts html_options option" do
       html = helper.security_key_creation_form_for(
         user,
-        form_attributes: {
+        html_options: {
           class: "security-key-form",
           id: "security-key-registration",
           data: { turbo: false }
@@ -164,10 +164,10 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Use security key")
     end
 
-    it "accepts form_attributes option" do
+    it "accepts html_options option" do
       html = helper.login_with_security_key_form_for(
         :account,
-        form_attributes: {
+        html_options: {
           class: "two-factor-form",
           id: "security-key-auth",
           data: { turbo_method: "post" }
