@@ -10,7 +10,8 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
   end
 
   before do
-    Rails.application.try(:reload_routes_unless_loaded)
+    require "devise/version"
+    Rails.application.reload_routes_unless_loaded if Rails::VERSION::MAJOR >= 8 && Devise::VERSION < "5"
   end
 
   def parse(html)
