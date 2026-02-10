@@ -38,12 +38,19 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Create Passkey")
     end
 
-    it "accepts form_classes option" do
-      html = helper.passkey_creation_form_for(user, form_classes: "custom-form") do |form|
+    it "accepts form_attributes option" do
+      html = helper.passkey_creation_form_for(
+        user,
+        form_attributes: {
+          class: "custom-form",
+          id: "passkey-form",
+          data: { turbo: false }
+        }
+      ) do |form|
         form.submit "Create"
       end
 
-      expect(parse(html)).to have_css("form.custom-form")
+      expect(parse(html)).to have_css('form.custom-form#passkey-form[data-turbo="false"]')
     end
 
     it "allows custom content in the block" do
@@ -72,12 +79,19 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Log in with passkeys")
     end
 
-    it "accepts form_classes option" do
-      html = helper.login_with_passkey_form_for(:account, form_classes: "passkey-form") do |form|
+    it "accepts form_attributes option" do
+      html = helper.login_with_passkey_form_for(
+        :account,
+        form_attributes: {
+          class: "passkey-form",
+          id: "passkey-login",
+          data: { controller: "auth" }
+        }
+      ) do |form|
         form.submit "Login"
       end
 
-      expect(parse(html)).to have_css("form.passkey-form")
+      expect(parse(html)).to have_css('form.passkey-form#passkey-login[data-controller="auth"]')
     end
 
     it "allows custom content in the block" do
@@ -109,12 +123,19 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Add Security Key")
     end
 
-    it "accepts form_classes option" do
-      html = helper.security_key_creation_form_for(user, form_classes: "security-key-form") do |form|
+    it "accepts form_attributes option" do
+      html = helper.security_key_creation_form_for(
+        user,
+        form_attributes: {
+          class: "security-key-form",
+          id: "security-key-registration",
+          data: { turbo: false }
+        }
+      ) do |form|
         form.submit "Add"
       end
 
-      expect(parse(html)).to have_css("form.security-key-form")
+      expect(parse(html)).to have_css('form.security-key-form#security-key-registration[data-turbo="false"]')
     end
 
     it "allows custom content in the block" do
@@ -143,12 +164,19 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Use security key")
     end
 
-    it "accepts form_classes option" do
-      html = helper.login_with_security_key_form_for(:account, form_classes: "two-factor-form") do |form|
+    it "accepts form_attributes option" do
+      html = helper.login_with_security_key_form_for(
+        :account,
+        form_attributes: {
+          class: "two-factor-form",
+          id: "security-key-auth",
+          data: { turbo_method: "post" }
+        }
+      ) do |form|
         form.submit "Verify"
       end
 
-      expect(parse(html)).to have_css("form.two-factor-form")
+      expect(parse(html)).to have_css('form.two-factor-form#security-key-auth[data-turbo-method="post"]')
     end
 
     it "allows custom content in the block" do
