@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [v0.3.1](https://github.com/cedarcode/devise-webauthn/compare/v0.3.0...v0.3.1/) - 2026-02-10
+
 ### Fixed
 
 - Fix `install_generator` invoking missing `devise:webauthn:javascript` task. [#118](https://github.com/cedarcode/devise-webauthn/pull/118) [@joaquintomas2003]
