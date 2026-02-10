@@ -10,7 +10,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
   end
 
   before do
-    allow(helper).to receive_messages(resource: user, session: {})
+    Rails.application.reload_routes_unless_loaded
   end
 
   def parse(html)
