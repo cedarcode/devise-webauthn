@@ -10,7 +10,7 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
   end
 
   before do
-    Rails.application.reload_routes_unless_loaded
+    Rails.application.try(:reload_routes_unless_loaded)
   end
 
   def parse(html)
