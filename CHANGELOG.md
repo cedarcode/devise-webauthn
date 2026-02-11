@@ -42,6 +42,9 @@
   - Previously generated Stimulus controller for handling WebAuthn client logic are no longer generated.
   - Stimulus is no longer needed for this engine to work.
 - Make helpers for generating WebAuthn options public methods. [#106](https://github.com/cedarcode/devise-webauthn/pull/106) [@santiagorodriguez96]
+- BREAKING!: Our controller for managing second factor credentials now uses a separate method for each endpoint for setting the URL to redirect to. [#80](https://github.com/cedarcode/devise-webauthn/pull/80) [@nicolastemciuc]
+  - What used to be just an `after_update_path` for all endpoints, now it's an `after_(create|update|destroy)_path` for each endpoint.
+  - If you had overriden the controller to change the `after_update_path`, be mindful that now `create` and `destroy` endpoints will call its own method.
 
 ### Fixed
 
