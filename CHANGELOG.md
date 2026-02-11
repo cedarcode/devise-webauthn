@@ -22,7 +22,11 @@
 
 - Fix form helpers (`passkey_creation_form_for`, `login_with_passkey_button`, `security_key_creation_form_for`, `login_with_security_key_button`) to accept a `resource_name` instead of requiring the `resource` object from the view context. [#114](https://github.com/cedarcode/devise-webauthn/pull/114) [@RenzoMinelli]
 
+## [v0.3.1](https://github.com/cedarcode/devise-webauthn/compare/v0.3.0...v0.3.1/) - 2026-02-10
 
+### Fixed
+
+- Fix `install_generator` invoking missing `devise:webauthn:javascript` task. [#118](https://github.com/cedarcode/devise-webauthn/pull/118) [@joaquintomas2003]
 
 ## [v0.3.0](https://github.com/cedarcode/devise-webauthn/compare/v0.2.2...v0.3.0/) - 2026-01-16
 
