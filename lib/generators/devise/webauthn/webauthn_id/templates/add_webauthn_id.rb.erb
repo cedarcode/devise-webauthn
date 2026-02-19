@@ -1,0 +1,29 @@
+# frozen_string_literal: true
+
+class AddWebauthnIdTo<%= user_table_name.camelize %> < ActiveRecord::Migration[<%= Rails.version.to_f %>]
+  def up
+    add_column :<%= user_table_name %>, :webauthn_id, :string
+    add_index :<%= user_table_name %>, :webauthn_id, unique: true
+
+    # WARNING: The code below backfills webauthn_id for all existing records
+    # one row at a time. For larger tables, consider removing it and running
+    # the backfill separately (e.g., in a background job or maintenance task).
+    #
+    # Worth noting: PostgreSQL and MySQL support single-query backfills:
+    #
+    #   PostgreSQL:
+    #     UPDATE <%= user_table_name %> SET webauthn_id = encode(gen_random_bytes(64), 'base64') WHERE webauthn_id IS NULL
+    #
+    #   MySQL:
+    #     UPDATE <%= user_table_name %> SET webauthn_id = TO_BASE64(RANDOM_BYTES(64)) WHERE webauthn_id IS NULL
+    #
+    execute("SELECT id FROM <%= user_table_name %> WHERE webauthn_id IS NULL").each do |row|
+      webauthn_id = WebAuthn.generate_user_id
+      execute("UPDATE <%= user_table_name %> SET webauthn_id = #{connection.quote(webauthn_id)} WHERE id = #{row['id']}")
+    end
+  end
+
+  def down
+    remove_column :<%= user_table_name %>, :webauthn_id
+  end
+end

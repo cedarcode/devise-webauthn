@@ -6,17 +6,22 @@ require "rails/generators/active_record"
 module Devise
   module Webauthn
     class WebauthnIdGenerator < Rails::Generators::Base
+      include Rails::Generators::Migration
+
       hide!
       namespace "devise:webauthn:webauthn_id"
+
+      source_root File.expand_path("templates", __dir__)
 
       desc "Add webauthn_id field to User model"
       class_option :resource_name, type: :string, default: "user", desc: "The resource name for Devise (default: user)"
 
+      def self.next_migration_number(dirname)
+        ActiveRecord::Generators::Base.next_migration_number(dirname)
+      end
+
       def generate_migration
-        invoke "active_record:migration", [
-          "add_webauthn_id_to_#{user_table_name}",
-          "webauthn_id:string:uniq"
-        ]
+        migration_template "add_webauthn_id.rb.erb", "db/migrate/add_webauthn_id_to_#{user_table_name}.rb"
       end
 
       def show_instructions

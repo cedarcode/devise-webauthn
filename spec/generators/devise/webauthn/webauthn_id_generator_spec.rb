@@ -9,25 +9,35 @@ RSpec.describe Devise::Webauthn::WebauthnIdGenerator, type: :generator do
 
   before do
     prepare_destination
-    allow(generator_instance).to receive(:invoke)
     invoke generator_instance
   end
 
   context "when using default resource name" do
     let(:generator_instance) { generator }
 
-    it "invokes the active_record:migration generator with correct arguments" do
-      expect(generator).to have_received(:invoke).with("active_record:migration",
-                                                       ["add_webauthn_id_to_users", "webauthn_id:string:uniq"])
+    it "creates a migration that adds webauthn_id to users" do
+      assert_migration "db/migrate/add_webauthn_id_to_users.rb" do |migration|
+        assert_match(/add_column :users, :webauthn_id, :string/, migration)
+        assert_match(/add_index :users, :webauthn_id, unique: true/, migration)
+      end
+    end
+
+    it "creates a migration that backfills existing records" do
+      assert_migration "db/migrate/add_webauthn_id_to_users.rb" do |migration|
+        assert_match(/SELECT id FROM users WHERE webauthn_id IS NULL/, migration)
+        assert_match(/WebAuthn\.generate_user_id/, migration)
+      end
     end
   end
 
   context "when using a custom resource name" do
     let(:generator_instance) { generator([destination_root], ["--resource_name=admin"]) }
 
-    it "invokes the active_record:migration generator with correct arguments" do
-      expect(generator).to have_received(:invoke).with("active_record:migration",
-                                                       ["add_webauthn_id_to_admins", "webauthn_id:string:uniq"])
+    it "creates a migration that adds webauthn_id to admins" do
+      assert_migration "db/migrate/add_webauthn_id_to_admins.rb" do |migration|
+        assert_match(/add_column :admins, :webauthn_id, :string/, migration)
+        assert_match(/add_index :admins, :webauthn_id, unique: true/, migration)
+      end
     end
   end
 end
