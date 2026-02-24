@@ -19,7 +19,9 @@ class AddWebauthnIdTo<%= user_table_name.camelize %> < ActiveRecord::Migration[<
     #
     execute("SELECT id FROM <%= user_table_name %> WHERE webauthn_id IS NULL").each do |row|
       webauthn_id = WebAuthn.generate_user_id
-      execute("UPDATE <%= user_table_name %> SET webauthn_id = #{connection.quote(webauthn_id)} WHERE id = #{row['id']}")
+      execute(ActiveRecord::Base.sanitize_sql_array(
+        ["UPDATE <%= user_table_name %> SET webauthn_id = ? WHERE id = ?", webauthn_id, row["id"]]
+      ))
     end
   end
 
