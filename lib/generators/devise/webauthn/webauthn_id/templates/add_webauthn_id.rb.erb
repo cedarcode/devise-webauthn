@@ -23,6 +23,16 @@ class AddWebauthnIdTo<%= user_table_name.camelize %> < ActiveRecord::Migration[<
         ["UPDATE <%= user_table_name %> SET webauthn_id = ? WHERE id = ?", webauthn_id, row["id"]]
       ))
     end
+    # Note: if your application creates records using methods that skip
+    # callbacks (e.g., insert_all), consider adding a database default
+    # to ensure webauthn_id is always set. For example, in PostgreSQL:
+    #
+    #   change_column_default :<%= user_table_name %>, :webauthn_id, from: nil, to: -> { "encode(gen_random_bytes(64), 'base64')" }
+    #
+    # For the same reason, you may want to add a NOT NULL constraint in a
+    # separate migration after the backfill is complete:
+    #
+    #   change_column_null :<%= user_table_name %>, :webauthn_id, false
   end
 
   def down
