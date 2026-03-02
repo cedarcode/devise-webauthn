@@ -2,15 +2,29 @@
 
 RSpec.describe Devise::Models::PasskeyAuthenticatable, type: :model do
   describe "webauthn_id initialization" do
-    it "generates a webauthn_id on initialize" do
-      user = Account.new(email: "user@example.com", password: "password", password_confirmation: "password")
+    it "generates a webauthn_id on create" do
+      user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password")
       expect(user.webauthn_id).to be_present
     end
 
-    it "keeps existing webauthn_id" do
-      user = Account.new(email: "user@example.com", password: "password", password_confirmation: "password",
-                         webauthn_id: "custom")
+    it "does not generate a webauthn_id on initialize" do
+      user = Account.new(email: "user@example.com", password: "password", password_confirmation: "password")
+      expect(user.webauthn_id).to be_nil
+    end
+
+    it "keeps webauthn_id if created with one" do
+      user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password",
+                             webauthn_id: "custom")
       expect(user.webauthn_id).to eq("custom")
+    end
+
+    it "generates a webauthn_id on update if missing" do
+      user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password")
+      user.update_column(:webauthn_id, nil) # rubocop:disable Rails/SkipsModelValidations
+      user.reload
+
+      user.update!(email: "updated@example.com")
+      expect(user.webauthn_id).to be_present
     end
   end
 

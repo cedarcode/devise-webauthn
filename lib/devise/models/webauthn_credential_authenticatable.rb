@@ -12,7 +12,7 @@ module Devise
 
         validates :webauthn_id, uniqueness: true, allow_blank: true
 
-        after_initialize do
+        before_validation do
           self.webauthn_id ||= WebAuthn.generate_user_id
         end
       end
