@@ -6,7 +6,7 @@
 
 - Options for getting or creating passkeys and security keys are now served by dedicated Rails controllers and retrieved via JavaScript fetch requests. [#73](https://github.com/cedarcode/devise-webauthn/pull/73) [@nicolastemciuc]
 - BREAKING!: Remove helpers for generating WebAuthn options. [#106](https://github.com/cedarcode/devise-webauthn/pull/115) [@nicolastemciuc]
-- BREAKING: Replace `form_classes:` keyword argument with `html_options:` in all form helper methods (`passkey_creation_form_for`, `login_with_passkey_form_for`, `security_key_creation_form_for`, `login_with_security_key_form_for`). This allows passing any HTML attributes to the form, not just CSS classes. [@RenzoMinelli]
+- BREAKING: Replace `form_classes:` keyword argument with direct keyword arguments in all form helper methods (`passkey_creation_form_for`, `login_with_passkey_form_for`, `security_key_creation_form_for`, `login_with_security_key_form_for`). All options are delegated to `form_with`, allowing you to pass any HTML attributes or form options directly. [@RenzoMinelli]
 ```erb
 <%# Before %>
 <%= passkey_creation_form_for(:user, form_classes: "my-class") do |form| %>
@@ -14,7 +14,7 @@
 <% end %>
 
 <%# After %>
-<%= passkey_creation_form_for(:user, html_options: { class: "my-class", id: "my-form" }) do |form| %>
+<%= passkey_creation_form_for(:user, class: "my-class", id: "my-form", data: { turbo: false }) do |form| %>
   ...
 <% end %>
 ```
