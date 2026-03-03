@@ -3,7 +3,9 @@ function isWebAuthnSupported() {
     navigator.credentials &&
     navigator.credentials.create &&
     navigator.credentials.get &&
-    window.PublicKeyCredential
+    window.PublicKeyCredential &&
+    PublicKeyCredential.parseCreationOptionsFromJSON &&
+    PublicKeyCredential.parseRequestOptionsFromJSON
   );
 }
 
