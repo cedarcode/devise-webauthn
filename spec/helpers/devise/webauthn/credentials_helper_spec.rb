@@ -38,14 +38,12 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Create Passkey")
     end
 
-    it "accepts html_options option" do
+    it "accepts options passed directly" do
       html = helper.passkey_creation_form_for(
         user,
-        html_options: {
-          class: "custom-form",
-          id: "passkey-form",
-          data: { turbo: false }
-        }
+        class: "custom-form",
+        id: "passkey-form",
+        data: { turbo: false }
       ) do |form|
         form.submit "Create"
       end
@@ -79,14 +77,12 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Log in with passkeys")
     end
 
-    it "accepts html_options option" do
+    it "accepts options passed directly" do
       html = helper.login_with_passkey_form_for(
         :account,
-        html_options: {
-          class: "passkey-form",
-          id: "passkey-login",
-          data: { controller: "auth" }
-        }
+        class: "passkey-form",
+        id: "passkey-login",
+        data: { controller: "auth" }
       ) do |form|
         form.submit "Login"
       end
@@ -123,14 +119,12 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Add Security Key")
     end
 
-    it "accepts html_options option" do
+    it "accepts options passed directly" do
       html = helper.security_key_creation_form_for(
         user,
-        html_options: {
-          class: "security-key-form",
-          id: "security-key-registration",
-          data: { turbo: false }
-        }
+        class: "security-key-form",
+        id: "security-key-registration",
+        data: { turbo: false }
       ) do |form|
         form.submit "Add"
       end
@@ -164,14 +158,12 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Use security key")
     end
 
-    it "accepts html_options option" do
+    it "accepts options passed directly" do
       html = helper.login_with_security_key_form_for(
         :account,
-        html_options: {
-          class: "two-factor-form",
-          id: "security-key-auth",
-          data: { turbo_method: "post" }
-        }
+        class: "two-factor-form",
+        id: "security-key-auth",
+        data: { turbo_method: "post" }
       ) do |form|
         form.submit "Verify"
       end
