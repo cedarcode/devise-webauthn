@@ -1,0 +1,41 @@
+# frozen_string_literal: true
+
+class AddWebauthnIdTo<%= user_table_name.camelize %> < ActiveRecord::Migration[<%= Rails.version.to_f %>]
+  def up
+    add_column :<%= user_table_name %>, :webauthn_id, :string
+    add_index :<%= user_table_name %>, :webauthn_id, unique: true
+
+    # WARNING: The code below backfills webauthn_id for all existing records
+    # one row at a time. For larger tables, consider removing it and running
+    # the backfill separately (e.g., in a background job or maintenance task).
+    #
+    # Worth noting: PostgreSQL and MySQL support single-query backfills:
+    #
+    #   PostgreSQL:
+    #     UPDATE <%= user_table_name %> SET webauthn_id = encode(gen_random_bytes(64), 'base64') WHERE webauthn_id IS NULL
+    #
+    #   MySQL:
+    #     UPDATE <%= user_table_name %> SET webauthn_id = TO_BASE64(RANDOM_BYTES(64)) WHERE webauthn_id IS NULL
+    #
+    execute("SELECT id FROM <%= user_table_name %> WHERE webauthn_id IS NULL").each do |row|
+      webauthn_id = WebAuthn.generate_user_id
+      execute(ActiveRecord::Base.sanitize_sql_array(
+        ["UPDATE <%= user_table_name %> SET webauthn_id = ? WHERE id = ?", webauthn_id, row["id"]]
+      ))
+    end
+    # Note: if your application creates records using methods that skip
+    # callbacks (e.g., insert_all), consider adding a database default
+    # to ensure webauthn_id is always set. For example, in PostgreSQL:
+    #
+    #   change_column_default :<%= user_table_name %>, :webauthn_id, from: nil, to: -> { "encode(gen_random_bytes(64), 'base64')" }
+    #
+    # For the same reason, you may want to add a NOT NULL constraint in a
+    # separate migration after the backfill is complete:
+    #
+    #   change_column_null :<%= user_table_name %>, :webauthn_id, false
+  end
+
+  def down
+    remove_column :<%= user_table_name %>, :webauthn_id
+  end
+end
