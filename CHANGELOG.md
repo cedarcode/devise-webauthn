@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Dispatch webauthn:unsupported for browsers missing parseOptionsFromJSON [#127](https://github.com/cedarcode/devise-webauthn/pull/127) [@santiagorodriguez96]
+
 ### Changed
 
 - Options for getting or creating passkeys and security keys are now served by dedicated Rails controllers and retrieved via JavaScript fetch requests. [#73](https://github.com/cedarcode/devise-webauthn/pull/73) [@nicolastemciuc]
