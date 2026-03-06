@@ -4,14 +4,24 @@
 
 ### Added
 
-- Dispatch webauthn:unsupported for browsers missing parseOptionsFromJSON [#127](https://github.com/cedarcode/devise-webauthn/pull/127) [@santiagorodriguez96]
+- Dispatch `webauthn:unsupported` for browsers missing `parseOptionsFromJSON`. [#127](https://github.com/cedarcode/devise-webauthn/pull/127) [@santiagorodriguez96]
 
 ### Changed
 
-- Change `webauthn_id` generation from `after_initialize` to `before_validation` and add a data backfill to the `webauthn_id` migration generator for existing records. [@santiagorodriguez96]
+- Change `webauthn_id` generation from `after_initialize` to `before_validation` and add a data backfill to the `webauthn_id` migration generator for existing records. [#125](https://github.com/cedarcode/devise-webauthn/pull/125) [@santiagorodriguez96]
 - Options for getting or creating passkeys and security keys are now served by dedicated Rails controllers and retrieved via JavaScript fetch requests. [#73](https://github.com/cedarcode/devise-webauthn/pull/73) [@nicolastemciuc]
 - BREAKING!: Remove helpers for generating WebAuthn options. [#106](https://github.com/cedarcode/devise-webauthn/pull/115) [@nicolastemciuc]
-- BREAKING!: Replace `form_classes:` keyword argument with direct keyword arguments in all form helper methods (`passkey_creation_form_for`, `login_with_passkey_form_for`, `security_key_creation_form_for`, `login_with_security_key_form_for`). All options are delegated to `form_with`, allowing you to pass any HTML attributes or form options directly. [@RenzoMinelli]
+- BREAKING!: `login_with_passkey_button` and `login_with_security_key_button` helpers have been renamed to `login_with_passkey_form_for` and `login_with_security_key_form_for`. They now take a block and no longer generate the submit button automatically. You need to explicitly add the button inside the block. [#112](https://github.com/cedarcode/devise-webauthn/pull/112) [@RenzoMinelli]
+```erb
+<%# Before %>
+<%= login_with_passkey_button(:user, "Log in with passkeys") %>
+
+<%# After %>
+<%= login_with_passkey_form_for(:user) do |form| %>
+  <%= form.submit "Log in with passkeys" %>
+<% end %>
+```
+- BREAKING!: Replace `form_classes:` keyword argument with direct keyword arguments in all form helper methods (`passkey_creation_form_for`, `login_with_passkey_form_for`, `security_key_creation_form_for`, `login_with_security_key_form_for`). All options are delegated to `form_with`, allowing you to pass any HTML attributes or form options directly. [#111](https://github.com/cedarcode/devise-webauthn/pull/111) [@RenzoMinelli]
 ```erb
 <%# Before %>
 <%= passkey_creation_form_for(:user, form_classes: "my-class") do |form| %>
@@ -21,17 +31,6 @@
 <%# After %>
 <%= passkey_creation_form_for(:user, class: "my-class", id: "my-form", data: { turbo: false }) do |form| %>
   ...
-<% end %>
-```
-
-- BREAKING!: `login_with_passkey_button` and `login_with_security_key_button` helpers have been renamed to `login_with_passkey_form_for` and `login_with_security_key_form_for`. They now take a block and no longer generate the submit button automatically. You need to explicitly add the button inside the block:
-```erb
-<%# Before %>
-<%= login_with_passkey_button(:user, "Log in with passkeys") %>
-
-<%# After %>
-<%= login_with_passkey_form_for(:user) do |form| %>
-  <%= form.submit "Log in with passkeys" %>
 <% end %>
 ```
 
