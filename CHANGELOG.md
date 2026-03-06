@@ -4,7 +4,7 @@
 
 ### Added
 
-- Dispatch webauthn:unsupported for browsers missing parseOptionsFromJSON [#127](https://github.com/cedarcode/devise-webauthn/pull/127) [@santiagorodriguez96]
+- Dispatch `webauthn:unsupported` for browsers missing `parseOptionsFromJSON`. [#127](https://github.com/cedarcode/devise-webauthn/pull/127) [@santiagorodriguez96]
 
 ### Changed
 
