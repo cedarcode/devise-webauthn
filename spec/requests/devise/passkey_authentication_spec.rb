@@ -22,11 +22,12 @@ RSpec.describe "Passkey authentication flow", type: :request do
     )
   end
 
-  def generate_assertion(fake_client, challenge:, credential:)
+  def generate_assertion(fake_client, challenge:, credential:, user_handle: nil)
     fake_client.get(
       challenge: challenge,
       allow_credentials: [credential.external_id],
-      user_verified: true
+      user_verified: true,
+      user_handle: user_handle
     )
   end
 
@@ -43,7 +44,8 @@ RSpec.describe "Passkey authentication flow", type: :request do
       assertion = generate_assertion(
         client,
         challenge: session[:authentication_challenge],
-        credential: passkey
+        credential: passkey,
+        user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
       )
 
       expect do
@@ -64,7 +66,8 @@ RSpec.describe "Passkey authentication flow", type: :request do
       assertion = generate_assertion(
         client,
         challenge: session[:authentication_challenge],
-        credential: passkey
+        credential: passkey,
+        user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
       )
       passkey.destroy!
 
@@ -83,7 +86,8 @@ RSpec.describe "Passkey authentication flow", type: :request do
 
       assertion = client.get(
         challenge: WebAuthn.configuration.encoder.encode("invalid_challenge"),
-        allow_credentials: [passkey.external_id]
+        allow_credentials: [passkey.external_id],
+        user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
       )
 
       post account_session_path, params: {
@@ -93,6 +97,45 @@ RSpec.describe "Passkey authentication flow", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("Log in")
       expect(flash[:alert]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
+      expect(controller.current_account).to be_nil
+    end
+
+    it "rejects sign-in when userHandle is missing from the response" do
+      get new_account_session_path
+
+      assertion = client.get(
+        challenge: session[:authentication_challenge],
+        allow_credentials: [passkey.external_id],
+        user_verified: true
+      )
+
+      post account_session_path, params: {
+        public_key_credential: assertion.to_json
+      }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(flash[:alert]).to eq(I18n.t("devise.failure.passkey_not_found"))
+      expect(controller.current_account).to be_nil
+    end
+
+    it "rejects sign-in when userHandle does not match the passkey owner" do
+      other_user = Account.create!(email: "other@example.com", password: password)
+
+      get new_account_session_path
+
+      assertion = client.get(
+        challenge: session[:authentication_challenge],
+        allow_credentials: [passkey.external_id],
+        user_verified: true,
+        user_handle: WebAuthn.configuration.encoder.decode(other_user.webauthn_id)
+      )
+
+      post account_session_path, params: {
+        public_key_credential: assertion.to_json
+      }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(flash[:alert]).to eq(I18n.t("devise.failure.passkey_not_found"))
       expect(controller.current_account).to be_nil
     end
 
