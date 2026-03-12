@@ -9,13 +9,13 @@ module Devise
 
       def authenticate!
         passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
-        stored_passkey = WebauthnCredential.passkey.find_by(external_id: passkey_from_params.id)
+        resource = resource_class.find_by(webauthn_id: passkey_from_params.user_handle)
+        stored_passkey = resource&.passkeys&.find_by(external_id: passkey_from_params.id)
 
         return fail!(:passkey_not_found) if stored_passkey.blank?
 
         verify_passkeys(passkey_from_params, stored_passkey)
 
-        resource = stored_passkey.public_send(resource_name)
         success!(resource)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)
@@ -40,8 +40,8 @@ module Devise
         stored_passkey.update!(sign_count: passkey_from_params.sign_count)
       end
 
-      def resource_name
-        mapping.to.name.underscore
+      def resource_class
+        mapping.to
       end
     end
   end

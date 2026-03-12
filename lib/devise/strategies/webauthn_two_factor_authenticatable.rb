@@ -16,6 +16,9 @@ module Devise
         stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)
 
         return fail!(:webauthn_credential_not_found) if stored_credential.blank?
+        if user_handle_mismatch?(credential_from_params, resource)
+          return fail!(:webauthn_credential_verification_failed)
+        end
 
         verify_credential(credential_from_params, stored_credential)
 
@@ -45,6 +48,11 @@ module Devise
         )
 
         stored_credential.update!(sign_count: credential_from_params.sign_count)
+      end
+
+      def user_handle_mismatch?(credential_from_params, resource)
+        credential_from_params.user_handle.present? &&
+          credential_from_params.user_handle != resource.webauthn_id
       end
 
       def resource_class
