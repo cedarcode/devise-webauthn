@@ -7,7 +7,7 @@ module Devise
         passkey_param.present? && session[:authentication_challenge].present?
       end
 
-      def authenticate!
+      def authenticate! # rubocop:disable Metrics/AbcSize
         passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
 
         return fail!(:passkey_not_found) if passkey_from_params.user_handle.nil?
