@@ -9,6 +9,9 @@ module Devise
 
       def authenticate!
         passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
+
+        return fail!(:passkey_not_found) if passkey_from_params.user_handle.nil?
+
         resource = resource_class.find_by(webauthn_id: passkey_from_params.user_handle)
         stored_passkey = resource&.passkeys&.find_by(external_id: passkey_from_params.id)
 
