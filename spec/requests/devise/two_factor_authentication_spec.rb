@@ -164,6 +164,60 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(controller.current_account).to be_nil
     end
 
+    it "completes authentication when userHandle matches the authenticated user" do
+      post account_session_path, params: { account: { email: user.email, password: password } }
+
+      expect(response).to redirect_to(new_account_two_factor_authentication_path)
+
+      follow_redirect!
+
+      expect(response).to have_http_status(:ok)
+      get account_security_key_authentication_options_path
+
+      assertion = client.get(
+        challenge: session[:two_factor_authentication_challenge],
+        allow_credentials: [security_key.external_id],
+        user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
+      )
+
+      expect do
+        post account_two_factor_authentication_path, params: {
+          public_key_credential: assertion.to_json
+        }
+
+        expect(response).to redirect_to(root_path)
+        expect(controller.current_account).to eq(user)
+      end.to change { security_key.reload.sign_count }.by(1)
+    end
+
+    it "rejects 2FA when userHandle does not match the authenticated user" do
+      other_user = Account.create!(email: "other@example.com", password: password)
+
+      post account_session_path, params: { account: { email: user.email, password: password } }
+
+      expect(response).to redirect_to(new_account_two_factor_authentication_path)
+
+      follow_redirect!
+
+      expect(response).to have_http_status(:ok)
+      get account_security_key_authentication_options_path
+
+      assertion = client.get(
+        challenge: session[:two_factor_authentication_challenge],
+        allow_credentials: [security_key.external_id],
+        user_handle: WebAuthn.configuration.encoder.decode(other_user.webauthn_id)
+      )
+
+      post account_two_factor_authentication_path, params: {
+        public_key_credential: assertion.to_json
+      }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("Use security key")
+      expect(flash[:alert]).to eq(I18n.t("devise.failure.webauthn_credential_verification_failed"))
+      expect(controller.current_account).to be_nil
+    end
+
     it "re-renders 2FA page when credential param is missing" do
       post account_session_path, params: { account: { email: user.email, password: password } }
 
