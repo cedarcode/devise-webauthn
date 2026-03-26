@@ -20,12 +20,26 @@ RSpec.describe "SignInWithWebauthn", type: :system do
       add_passkey_to_authenticator(authenticator, user)
     end
 
-    it "allows to create a passkey and then sign in with it" do
+    it "allows to sign in with it and does not set the remember cookie when remember me is not checked" do
       visit new_account_session_path
       click_button "Log in with passkeys"
 
       expect(page).to have_current_path(root_path)
       expect(page).to have_content("Signed in successfully.")
+      expect(remember_cookie).to be_nil
+    end
+
+    it "allows to sign in with it and sets the remember cookie when remember me is checked" do
+      visit new_account_session_path
+
+      within "#passkey-login" do
+        check "Remember me"
+        click_button "Log in with passkeys"
+      end
+
+      expect(page).to have_current_path(root_path)
+      expect(page).to have_content("Signed in successfully.")
+      expect(remember_cookie).to be_present
     end
 
     it "can use them as second factor authentication" do
@@ -100,11 +114,13 @@ RSpec.describe "SignInWithWebauthn", type: :system do
       it "sets remember cookie when remember me is checked" do
         visit new_account_session_path
 
-        fill_in "Email", with: user.email
-        fill_in "Password", with: "$3cretp@ssword123"
-        check "Remember me"
+        within "#password-login" do
+          fill_in "Email", with: user.email
+          fill_in "Password", with: "$3cretp@ssword123"
+          check "Remember me"
 
-        click_button "Log in"
+          click_button "Log in"
+        end
 
         expect(page).to have_current_path(new_account_two_factor_authentication_path)
         expect(page).to have_content("Two-factor authentication is required to sign in.")
