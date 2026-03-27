@@ -19,6 +19,7 @@ module Devise
 
         verify_passkeys(passkey_from_params, stored_passkey)
 
+        remember_me(resource)
         success!(resource)
       rescue WebAuthn::Error
         fail!(:passkey_verification_failed)
@@ -41,6 +42,18 @@ module Devise
         )
 
         stored_passkey.update!(sign_count: passkey_from_params.sign_count)
+      end
+
+      def remember_me(resource)
+        resource.remember_me = remember_me? if resource.respond_to?(:remember_me=)
+      end
+
+      def remember_me?
+        params_auth_hash.is_a?(Hash) && Devise::TRUE_VALUES.include?(params_auth_hash[:remember_me])
+      end
+
+      def params_auth_hash
+        params[scope]
       end
 
       def resource_class
