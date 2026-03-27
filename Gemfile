@@ -10,7 +10,7 @@ gemspec
 gem "appraisal", "~> 2.5", require: false
 gem "capybara", "~> 3.40"
 gem "combustion", "~> 1.3"
-gem "devise", "~> 4.9"
+gem "devise", github: "cedarcode/devise", branch: "sr--2fa-interface"
 gem "importmap-rails", "~> 2.2"
 gem "propshaft", "~> 1.2"
 gem "pry-byebug", "~> 3.11"
