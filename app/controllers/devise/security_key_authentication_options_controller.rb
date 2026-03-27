@@ -20,7 +20,7 @@ module Devise
     private
 
     def set_resource
-      @resource = resource_class.find(session[:current_authentication_resource_id])
+      @resource = resource_class.find(session[:devise_two_factor_resource_id])
     end
   end
 end

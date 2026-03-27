@@ -9,12 +9,13 @@ module Devise
     module WebauthnTwoFactorAuthenticatable
       extend ActiveSupport::Concern
       include WebauthnCredentialAuthenticatable
+      include Devise::Models::TwoFactorAuthenticatable
 
       included do
         has_many :second_factor_webauthn_credentials, -> { second_factor }, class_name: "WebauthnCredential"
       end
 
-      def second_factor_enabled?
+      def webauthn_two_factor_enabled?
         webauthn_credentials.any?
       end
     end
