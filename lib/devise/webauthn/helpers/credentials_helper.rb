@@ -40,7 +40,7 @@ module Devise
 
       def login_with_security_key_form_for(resource_or_resource_name, **options, &block)
         form_with(
-          **options, url: two_factor_authentication_path(resource_or_resource_name), method: :post
+          **options, url: two_factor_path(resource_or_resource_name), method: :post
         ) do |f|
           tag.webauthn_get(data: {
                              options_url: security_key_authentication_options_path(resource_or_resource_name)
