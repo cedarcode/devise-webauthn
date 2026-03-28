@@ -25,8 +25,8 @@
 
 <%= login_with_passkey_form_for(resource_name, id: "passkey-login") do |form| %>
   <div class="field">
-    <%= check_box_tag "account[remember_me]", id: "passkey_remember_me" %>
-    <%= label_tag "passkey_remember_me", "Remember me" %>
+    <%= form.check_box :remember_me %>
+    <%= form.label :remember_me %>
   </div>
 
   <%= form.submit "Log in with passkeys" %>

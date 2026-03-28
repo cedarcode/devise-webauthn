@@ -56,7 +56,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
           assert_difference("user.second_factor_webauthn_credentials.count", 1) do
             post account_second_factor_webauthn_credentials_path, params: {
               public_key_credential: credential.to_json,
-              name: "My Security Key"
+              account: { name: "My Security Key" }
             }
           end
 
@@ -78,7 +78,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
           assert_difference("user.second_factor_webauthn_credentials.count", 0) do
             post account_second_factor_webauthn_credentials_path, params: {
               public_key_credential: invalid_credential.to_json,
-              name: "My Security Key"
+              account: { name: "My Security Key" }
             }
           end
 
