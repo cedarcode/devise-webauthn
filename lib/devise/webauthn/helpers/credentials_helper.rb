@@ -33,7 +33,8 @@ module Devise
         scope = Devise::Mapping.find_scope!(resource_or_resource_name)
 
         form_with(
-          **options, scope: scope, url: second_factor_webauthn_credentials_path(resource_or_resource_name), method: :post
+          **options, scope: scope, url: second_factor_webauthn_credentials_path(resource_or_resource_name),
+                     method: :post
         ) do |f|
           tag.webauthn_create(
             data: { options_url: security_key_registration_options_path(resource_or_resource_name) }
