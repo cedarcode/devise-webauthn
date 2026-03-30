@@ -56,7 +56,7 @@ module Devise
 
       resource.second_factor_webauthn_credentials.create(
         external_id: security_key_from_params.id,
-        name: params.dig(resource_name, :name),
+        name: params[:name],
         public_key: security_key_from_params.public_key,
         sign_count: security_key_from_params.sign_count
       )

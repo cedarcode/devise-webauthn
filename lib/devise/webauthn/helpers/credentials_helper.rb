@@ -4,13 +4,11 @@ module Devise
   module Webauthn
     module CredentialsHelper
       def passkey_creation_form_for(resource_or_resource_name, **options, &block)
-        scope = Devise::Mapping.find_scope!(resource_or_resource_name)
-
         form_with(
-          **options, scope: scope, url: passkeys_path(resource_or_resource_name), method: :post
+          **options, url: passkeys_path(resource_or_resource_name), method: :post
         ) do |f|
           tag.webauthn_create(data: { options_url: passkey_registration_options_path(resource_or_resource_name) }) do
-            concat hidden_field_tag(:public_key_credential, nil, data: { webauthn_target: "response" })
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
             concat capture(f, &block)
           end
         end
@@ -30,31 +28,26 @@ module Devise
       end
 
       def security_key_creation_form_for(resource_or_resource_name, **options, &block)
-        scope = Devise::Mapping.find_scope!(resource_or_resource_name)
-
         form_with(
-          **options, scope: scope, url: second_factor_webauthn_credentials_path(resource_or_resource_name),
-                     method: :post
+          **options, url: second_factor_webauthn_credentials_path(resource_or_resource_name), method: :post
         ) do |f|
           tag.webauthn_create(
             data: { options_url: security_key_registration_options_path(resource_or_resource_name) }
           ) do
-            concat hidden_field_tag(:public_key_credential, nil, data: { webauthn_target: "response" })
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
             concat capture(f, &block)
           end
         end
       end
 
       def login_with_security_key_form_for(resource_or_resource_name, **options, &block)
-        scope = Devise::Mapping.find_scope!(resource_or_resource_name)
-
         form_with(
-          **options, scope: scope, url: two_factor_authentication_path(resource_or_resource_name), method: :post
+          **options, url: two_factor_authentication_path(resource_or_resource_name), method: :post
         ) do |f|
           tag.webauthn_get(data: {
                              options_url: security_key_authentication_options_path(resource_or_resource_name)
                            }) do
-            concat hidden_field_tag(:public_key_credential, nil, data: { webauthn_target: "response" })
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
             concat capture(f, &block)
           end
         end

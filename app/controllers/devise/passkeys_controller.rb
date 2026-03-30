@@ -47,7 +47,7 @@ module Devise
 
       resource.passkeys.create(
         external_id: passkey_from_params.id,
-        name: params.dig(resource_name, :name),
+        name: params[:name],
         public_key: passkey_from_params.public_key,
         sign_count: passkey_from_params.sign_count
       )

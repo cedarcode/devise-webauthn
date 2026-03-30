@@ -46,7 +46,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
           assert_difference("user.passkeys.count", 1) do
             post account_passkeys_path, params: {
               public_key_credential: credential.to_json,
-              account: { name: "My Passkey" }
+              name: "My Passkey"
             }
           end
 
@@ -68,7 +68,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
           assert_difference("user.passkeys.count", 0) do
             post account_passkeys_path, params: {
               public_key_credential: invalid_credential.to_json,
-              account: { name: "My Passkey" }
+              name: "My Passkey"
             }
           end
 
