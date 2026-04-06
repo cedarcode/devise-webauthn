@@ -1,11 +1,12 @@
 # Changelog
 
-## Unreleased
+## [v0.4.0](https://github.com/cedarcode/devise-webauthn/compare/v0.3.1...v0.4.0/) - 2026-04-06
 
 ### Added
 
 - Dispatch `webauthn:unsupported` for browsers missing `parseOptionsFromJSON`. [#127](https://github.com/cedarcode/devise-webauthn/pull/127) [@santiagorodriguez96]
 - Scope `login_with_passkey_form_for` to the Devise resource so that form builder fields (e.g. `f.check_box :remember_me`) are properly namespaced (e.g. `account[remember_me]`). [#134](https://github.com/cedarcode/devise-webauthn/pull/134) [@RenzoMinelli]
+- Allow specifying which controller to override. [#110](https://github.com/cedarcode/devise-webauthn/pull/110) [@nicolastemciuc]
 
 ### Changed
 
@@ -37,6 +38,8 @@
 
 ### Fixed
 
+- Validate `userHandle` from authenticator response against `webauthn_id`. [#131](https://github.com/cedarcode/devise-webauthn/pull/131) [@santiagorodriguez96]
+- Fix `Remember me` checkbox not honored when logging in with passkeys. [#133](https://github.com/cedarcode/devise-webauthn/pull/133) [@santiagorodriguez96]
 - Fix form helpers (`passkey_creation_form_for`, `login_with_passkey_button`, `security_key_creation_form_for`, `login_with_security_key_button`) to accept a `resource_name` instead of requiring the `resource` object from the view context. [#114](https://github.com/cedarcode/devise-webauthn/pull/114) [@RenzoMinelli]
 
 ## [v0.3.1](https://github.com/cedarcode/devise-webauthn/compare/v0.3.0...v0.3.1/) - 2026-02-10
