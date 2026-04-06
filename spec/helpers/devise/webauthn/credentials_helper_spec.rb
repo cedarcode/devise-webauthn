@@ -101,8 +101,8 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       page = parse(html)
 
       expect(page).to have_css("input.btn-primary[type='submit']")
-      expect(page).to have_css("input[type='checkbox'][name='remember_me']")
-      expect(page).to have_css("label[for='remember_me']", text: "Remember me")
+      expect(page).to have_css("input[type='checkbox'][name='account[remember_me]']")
+      expect(page).to have_css("label[for='account_remember_me']", text: "Remember me")
     end
   end
 

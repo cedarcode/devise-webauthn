@@ -15,11 +15,13 @@ module Devise
       end
 
       def login_with_passkey_form_for(resource_or_resource_name, **options, &block)
+        scope = Devise::Mapping.find_scope!(resource_or_resource_name)
+
         form_with(
-          **options, url: session_path(resource_or_resource_name), method: :post
+          **options, scope: scope, url: session_path(resource_or_resource_name), method: :post
         ) do |f|
           tag.webauthn_get(data: { options_url: passkey_authentication_options_path(resource_or_resource_name) }) do
-            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
+            concat hidden_field_tag(:public_key_credential, nil, data: { webauthn_target: "response" })
             concat capture(f, &block)
           end
         end
