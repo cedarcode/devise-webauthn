@@ -6,7 +6,7 @@
 
 - Dispatch `webauthn:unsupported` for browsers missing `parseOptionsFromJSON`. [#127](https://github.com/cedarcode/devise-webauthn/pull/127) [@santiagorodriguez96]
 - Scope `login_with_passkey_form_for` to the Devise resource so that form builder fields (e.g. `f.check_box :remember_me`) are properly namespaced (e.g. `account[remember_me]`). [#134](https://github.com/cedarcode/devise-webauthn/pull/134) [@RenzoMinelli]
-- Allow specifying which controller to override. [#110](https://github.com/cedarcode/devise-webauthn/pull/110) [@nicolastemciuc]
+- Allow passing a -c flag to the controller generator to specify which controller to override. [#110](https://github.com/cedarcode/devise-webauthn/pull/110) [@nicolastemciuc]
 
 ### Changed
 
