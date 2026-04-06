@@ -1,5 +1,7 @@
 # Changelog
 
+## Unreleased
+
 ## [v0.4.0](https://github.com/cedarcode/devise-webauthn/compare/v0.3.1...v0.4.0/) - 2026-04-06
 
 ### Added
