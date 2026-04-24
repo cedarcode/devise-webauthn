@@ -1,3 +1,5 @@
 <%= login_with_security_key_form_for(resource_name) do |form| %>
   <%= form.submit 'Use security key' %>
 <% end %>
+
+<%= two_factor_method_links(@resource, :webauthn) %>
