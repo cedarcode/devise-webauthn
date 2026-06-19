@@ -19,4 +19,8 @@ gem "rubocop-rspec", "~> 3.6"
 gem "selenium-webdriver"
 gem "sqlite3", "~> 2.7"
 
+install_if -> { RUBY_VERSION >= "3.1" && RUBY_VERSION < "3.2" } do
+  gem "i18n", "!= 1.15.0"
+end
+
 gemspec path: "../"
