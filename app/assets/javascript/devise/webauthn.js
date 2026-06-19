@@ -19,6 +19,8 @@ export class WebauthnCreateElement extends HTMLElement {
     }
 
     this.closest('form').addEventListener('submit', async (event) => {
+      if (this.dataset.ceremonyCompleted) return;
+
       event.preventDefault();
 
       try {
@@ -28,8 +30,10 @@ export class WebauthnCreateElement extends HTMLElement {
 
         this.querySelector('[data-webauthn-target="response"]').value = await this.stringifyRegistrationCredentialWithGracefullyHandlingAuthenticatorIssues(credential);
 
-        this.closest('form').submit();
+        this.dataset.ceremonyCompleted = "true";
+        this.closest('form').requestSubmit();
       } catch (error) {
+        delete this.dataset.ceremonyCompleted;
         this.handleError(error);
       }
     });
@@ -100,6 +104,8 @@ export class WebauthnGetElement extends HTMLElement {
     }
 
     this.closest('form').addEventListener('submit', async (event) => {
+      if (this.dataset.ceremonyCompleted) return;
+
       event.preventDefault();
 
       try {
@@ -109,8 +115,10 @@ export class WebauthnGetElement extends HTMLElement {
 
         this.querySelector('[data-webauthn-target="response"]').value = await this.stringifyAuthenticationCredentialWithGracefullyHandlingAuthenticatorIssues(credential);
 
-        this.closest('form').submit();
+        this.dataset.ceremonyCompleted = "true";
+        this.closest('form').requestSubmit();
       } catch (error) {
+        delete this.dataset.ceremonyCompleted;
         this.handleError(error);
       }
     });
