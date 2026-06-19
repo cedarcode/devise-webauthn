@@ -14,6 +14,10 @@ end
 
 appraise "rails-7_2" do
   gem "rails", "~> 7.2.x"
+
+  install_if "-> { RUBY_VERSION >= \"3.1\" && RUBY_VERSION < \"3.2\" }" do
+    gem "i18n", "!= 1.15.0"
+  end
 end
 
 appraise "rails-7_1" do
@@ -25,6 +29,10 @@ appraise "rails-7_1" do
   gem "rack", "~> 2.2"
   gem "rspec-rails", "~> 7.1"
   gem "sqlite3", "~> 1.7"
+
+  install_if "-> { RUBY_VERSION >= \"3.1\" && RUBY_VERSION < \"3.2\" }" do
+    gem "i18n", "!= 1.15.0"
+  end
 end
 
 appraise "devise-5_0" do
@@ -39,4 +47,8 @@ appraise "devise-5_0" do
   end
   gem "rspec-rails", ">= 7.1"
   gem "sqlite3", ">= 1.6", "!= 1.7.0", "!= 1.7.1", "!= 1.7.2", "!= 1.7.3"
+
+  install_if "-> { RUBY_VERSION >= \"3.1\" && RUBY_VERSION < \"3.2\" }" do
+    gem "i18n", "!= 1.15.0"
+  end
 end
