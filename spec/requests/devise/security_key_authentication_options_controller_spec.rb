@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe Devise::SecurityKeyAuthenticationOptionsController, type: :request do
   let(:user) { Account.create!(email: "test@example.com", password: "password123") }
 
-  describe "GET #index" do
+  describe "POST #create" do
     before do
       user.passkeys.create!(
         external_id: "external-id",
@@ -23,7 +23,7 @@ RSpec.describe Devise::SecurityKeyAuthenticationOptionsController, type: :reques
     end
 
     it "returns authentication options and stores the challenge in the session" do
-      get account_security_key_authentication_options_path
+      post account_security_key_authentication_options_path
 
       expect(response).to have_http_status(:ok)
 

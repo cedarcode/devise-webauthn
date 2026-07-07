@@ -2,9 +2,11 @@
 
 module Devise
   class SecurityKeyAuthenticationOptionsController < DeviseController
+    skip_forgery_protection
+
     before_action :set_resource
 
-    def index
+    def create
       security_key_authentication_options =
         WebAuthn::Credential.options_for_get(
           allow: @resource.webauthn_credentials.pluck(:external_id),

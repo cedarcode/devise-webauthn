@@ -35,7 +35,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
     let!(:passkey) { create_passkey_for(user, client) }
 
     before do
-      get account_passkey_authentication_options_path # To set the challenge in session
+      post account_passkey_authentication_options_path # To set the challenge in session
     end
 
     it "completes authentication with valid credential" do

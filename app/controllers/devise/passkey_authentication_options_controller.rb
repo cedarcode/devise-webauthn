@@ -2,7 +2,9 @@
 
 module Devise
   class PasskeyAuthenticationOptionsController < DeviseController
-    def index
+    skip_forgery_protection
+
+    def create
       passkey_options =
         WebAuthn::Credential.options_for_get(
           user_verification: "required"

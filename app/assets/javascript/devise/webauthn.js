@@ -24,8 +24,8 @@ export class WebauthnCreateElement extends HTMLElement {
       event.preventDefault();
 
       try {
-        const response = await fetch(this.getAttribute('data-options-url'));
-        const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(await response.json());
+        const options = await fetchOptions(this.getAttribute('data-options-url'));
+        const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(options);
         const credential = await navigator.credentials.create({ publicKey });
 
         this.querySelector('[data-webauthn-target="response"]').value = await this.stringifyRegistrationCredentialWithGracefullyHandlingAuthenticatorIssues(credential);
@@ -109,8 +109,8 @@ export class WebauthnGetElement extends HTMLElement {
       event.preventDefault();
 
       try {
-        const response = await fetch(this.getAttribute('data-options-url'));
-        const publicKey = PublicKeyCredential.parseRequestOptionsFromJSON(await response.json());
+        const options = await fetchOptions(this.getAttribute('data-options-url'));
+        const publicKey = PublicKeyCredential.parseRequestOptionsFromJSON(options);
         const credential = await navigator.credentials.get({ publicKey });
 
         this.querySelector('[data-webauthn-target="response"]').value = await this.stringifyAuthenticationCredentialWithGracefullyHandlingAuthenticatorIssues(credential);
@@ -174,6 +174,19 @@ export class WebauthnGetElement extends HTMLElement {
       },
     });
   }
+}
+
+async function fetchOptions(url) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json' }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Fetching WebAuthn options failed with status ${response.status}`);
+  }
+
+  return response.json();
 }
 
 function toBase64Url(buffer) {
