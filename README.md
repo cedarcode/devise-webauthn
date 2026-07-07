@@ -283,7 +283,7 @@ Used for registering new credentials (passkeys or security keys).
 
 ```html
 <form action="/passkeys" method="post">
-  <webauthn-create data-options-json="<%= create_passkey_options(@user).to_json %>">
+  <webauthn-create data-options-url="<%= passkey_registration_options_path(:user) %>">
     <input type="hidden" name="public_key_credential" data-webauthn-target="response">
     <input type="text" name="name" placeholder="Passkey name">
     <button type="submit">Create Passkey</button>
@@ -296,9 +296,11 @@ Used for registering new credentials (passkeys or security keys).
   - The form's action should point to the appropriate endpoint – you can use the provided url helpers:
     - For creating passkeys: `passkeys_path(resource_name)`
     - For creating 2FA security keys: `second_factor_webauthn_credentials_path(resource_name)`
-- Requires a `data-options-json` attribute containing JSON-serialized WebAuthn creation options
+- Requires a `data-options-url` attribute pointing to the endpoint serving the WebAuthn creation options – you can use the provided url helpers:
+  - For passkey creation options: `passkey_registration_options_path(resource_name)`
+  - For 2FA security key creation options: `security_key_registration_options_path(resource_name)`
 - Must contain a hidden input with `data-webauthn-target="response"` to store the credential response
-- Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
+- Must contain the submit button – the element intercepts form submission, fetches the options, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 
 #### `<webauthn-get>`
 
@@ -306,7 +308,7 @@ Used for authenticating with existing credentials.
 
 ```html
 <form action="/users/sign_in" method="post">
-  <webauthn-get data-options-json="<%= passkey_authentication_options.to_json %>">
+  <webauthn-get data-options-url="<%= passkey_authentication_options_path(:user) %>">
     <input type="hidden" name="public_key_credential" data-webauthn-target="response">
     <button type="submit">Sign in with Passkey</button>
   </webauthn-get>
@@ -318,9 +320,11 @@ Used for authenticating with existing credentials.
     - The form's action should point to the appropriate endpoint – you can use the provided url helpers:
         - For passkey sign-in: `session_path(resource_name)`
         - For 2FA with WebAuthn: `two_factor_authentication_path(resource_name)`
-- Requires a `data-options-json` attribute containing JSON-serialized WebAuthn request options
+- Requires a `data-options-url` attribute pointing to the endpoint serving the WebAuthn request options – you can use the provided url helpers:
+  - For passkey authentication options: `passkey_authentication_options_path(resource_name)`
+  - For 2FA security key authentication options: `security_key_authentication_options_path(resource_name)`
 - Must contain a hidden input with `data-webauthn-target="response"` to store the credential response
-- Must contain the submit button — the element intercepts form submission, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
+- Must contain the submit button – the element intercepts form submission, fetches the options, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 
 ## Development
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- BREAKING!: The WebAuthn options endpoints (`passkey_registration_options`, `passkey_authentication_options`, `security_key_registration_options` and `security_key_authentication_options`) now respond to `POST` instead of `GET`, since they mutate server state (they store the WebAuthn challenge in the session). If you overrode any of these controllers, rename the overridden `index` action to `create`; if you copied the bundled JavaScript into your app, update your copy. [@santiagorodriguez96]
+
 ## [v0.4.0](https://github.com/cedarcode/devise-webauthn/compare/v0.3.1...v0.4.0/) - 2026-04-06
 
 ### Added
