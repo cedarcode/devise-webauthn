@@ -10,6 +10,8 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
   let(:client) { WebAuthn::FakeClient.new(origin) }
 
   def create_security_key_for(account, fake_client)
+    account.update!(webauthn_id: WebAuthn.generate_user_id)
+
     creation_options = WebAuthn::Credential.options_for_create(
       user: { id: account.webauthn_id, name: account.email }
     )
@@ -191,7 +193,8 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
     end
 
     it "rejects 2FA when userHandle does not match the authenticated user" do
-      other_user = Account.create!(email: "other@example.com", password: password)
+      other_user = Account.create!(email: "other@example.com", password: password,
+                                   webauthn_id: WebAuthn.generate_user_id)
 
       post account_session_path, params: { account: { email: user.email, password: password } }
 

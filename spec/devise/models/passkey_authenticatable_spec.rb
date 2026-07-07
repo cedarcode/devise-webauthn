@@ -1,30 +1,27 @@
 # frozen_string_literal: true
 
 RSpec.describe Devise::Models::PasskeyAuthenticatable, type: :model do
-  describe "webauthn_id initialization" do
-    it "generates a webauthn_id on create" do
+  describe "#ensure_webauthn_id!" do
+    it "does not generate a webauthn_id on create" do
       user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password")
-      expect(user.webauthn_id).to be_present
-    end
-
-    it "does not generate a webauthn_id on initialize" do
-      user = Account.new(email: "user@example.com", password: "password", password_confirmation: "password")
       expect(user.webauthn_id).to be_nil
     end
 
-    it "keeps webauthn_id if created with one" do
-      user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password",
-                             webauthn_id: "custom")
-      expect(user.webauthn_id).to eq("custom")
+    it "generates and persists a webauthn_id when missing" do
+      user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password")
+
+      webauthn_id = user.ensure_webauthn_id!
+
+      expect(webauthn_id).to be_present
+      expect(user.reload.webauthn_id).to eq(webauthn_id)
     end
 
-    it "generates a webauthn_id on update if missing" do
-      user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password")
-      user.update_column(:webauthn_id, nil) # rubocop:disable Rails/SkipsModelValidations
-      user.reload
+    it "does not replace an existing webauthn_id" do
+      user = Account.create!(email: "user@example.com", password: "password", password_confirmation: "password",
+                             webauthn_id: "custom")
 
-      user.update!(email: "updated@example.com")
-      expect(user.webauthn_id).to be_present
+      expect(user.ensure_webauthn_id!).to eq("custom")
+      expect(user.reload.webauthn_id).to eq("custom")
     end
   end
 
@@ -43,7 +40,8 @@ RSpec.describe Devise::Models::PasskeyAuthenticatable, type: :model do
 
   describe "validations" do
     it "validates uniqueness of webauthn_id" do
-      existing = Account.create!(email: "existing@example.com", password: "password", password_confirmation: "password")
+      existing = Account.create!(email: "existing@example.com", password: "password",
+                                 password_confirmation: "password", webauthn_id: WebAuthn.generate_user_id)
       user = Account.new(email: "new@example.com", webauthn_id: existing.webauthn_id)
       expect(user).not_to be_valid
       expect(user.errors[:webauthn_id]).to include("has already been taken")

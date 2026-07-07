@@ -39,7 +39,7 @@ module Devise
             "privateKey" => encoded_private_key,
             "signCount" => 0
           }
-          credential_json["userHandle"] = resource.webauthn_id if passkey
+          credential_json["userHandle"] = resource.ensure_webauthn_id! if passkey
 
           authenticator.add_credential(credential_json)
 

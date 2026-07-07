@@ -38,6 +38,20 @@ RSpec.describe Devise::SecurityKeyRegistrationOptionsController, type: :request 
         expect(first_challenge).to be_present
         expect(second_challenge).not_to eq(first_challenge)
       end
+
+      it "generates and persists a webauthn_id for a user without one" do
+        expect { post account_security_key_registration_options_path }
+          .to change { user.reload.webauthn_id }.from(nil)
+
+        expect(response.parsed_body["user"]["id"]).to eq(user.webauthn_id)
+      end
+
+      it "does not replace an existing webauthn_id" do
+        user.update!(webauthn_id: WebAuthn.generate_user_id)
+
+        expect { post account_security_key_registration_options_path }
+          .not_to(change { user.reload.webauthn_id })
+      end
     end
   end
 end

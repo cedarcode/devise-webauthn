@@ -5,6 +5,7 @@ module Devise
     skip_forgery_protection
 
     before_action :authenticate_scope!
+    before_action :ensure_webauthn_id
 
     def create
       create_security_key_options =
@@ -31,6 +32,10 @@ module Devise
     def authenticate_scope!
       send(:"authenticate_#{resource_name}!", force: true)
       self.resource = send(:"current_#{resource_name}")
+    end
+
+    def ensure_webauthn_id
+      resource.ensure_webauthn_id!
     end
 
     def resource_human_palatable_identifier
