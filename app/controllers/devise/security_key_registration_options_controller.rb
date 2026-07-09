@@ -2,9 +2,11 @@
 
 module Devise
   class SecurityKeyRegistrationOptionsController < DeviseController
+    skip_forgery_protection
+
     before_action :authenticate_scope!
 
-    def index
+    def create
       create_security_key_options =
         WebAuthn::Credential.options_for_create(
           user: {

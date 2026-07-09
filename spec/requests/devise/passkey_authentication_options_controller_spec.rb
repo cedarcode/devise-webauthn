@@ -3,9 +3,9 @@
 require "spec_helper"
 
 RSpec.describe Devise::PasskeyAuthenticationOptionsController, type: :request do
-  describe "GET #index" do
+  describe "POST #create" do
     it "stores the challenge in session and returns it as json" do
-      get account_passkey_authentication_options_path
+      post account_passkey_authentication_options_path
 
       expect(response).to have_http_status(:ok)
 
@@ -15,10 +15,10 @@ RSpec.describe Devise::PasskeyAuthenticationOptionsController, type: :request do
     end
 
     it "generates a new challenge on each request" do
-      get account_passkey_authentication_options_path
+      post account_passkey_authentication_options_path
       first_challenge = session[:authentication_challenge]
 
-      get account_passkey_authentication_options_path
+      post account_passkey_authentication_options_path
       second_challenge = session[:authentication_challenge]
 
       expect(first_challenge).to be_present
