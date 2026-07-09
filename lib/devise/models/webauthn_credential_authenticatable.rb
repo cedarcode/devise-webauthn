@@ -16,7 +16,9 @@ module Devise
       def ensure_webauthn_id!
         return webauthn_id if webauthn_id.present?
 
-        update_column(:webauthn_id, WebAuthn.generate_user_id) # rubocop:disable Rails/SkipsModelValidations
+        self.webauthn_id = WebAuthn.generate_user_id
+        save!(validate: false)
+
         webauthn_id
       end
     end
