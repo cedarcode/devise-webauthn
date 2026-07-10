@@ -11,10 +11,15 @@ module Devise
         has_many :webauthn_credentials, dependent: :destroy
 
         validates :webauthn_id, uniqueness: true, allow_blank: true
+      end
 
-        before_validation do
-          self.webauthn_id ||= WebAuthn.generate_user_id
-        end
+      def ensure_webauthn_id!
+        return webauthn_id if webauthn_id.present?
+
+        self.webauthn_id = WebAuthn.generate_user_id
+        save!(validate: false)
+
+        webauthn_id
       end
     end
   end

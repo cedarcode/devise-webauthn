@@ -10,6 +10,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
   let(:client) { WebAuthn::FakeClient.new(origin) }
 
   def create_passkey_for(account, fake_client)
+    account.update!(webauthn_id: WebAuthn.generate_user_id)
     challenge = WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32))
     raw_credential = fake_client.create(challenge: challenge)
     webauthn_credential = WebAuthn::Credential.from_create(raw_credential)
@@ -119,7 +120,8 @@ RSpec.describe "Passkey authentication flow", type: :request do
     end
 
     it "rejects sign-in when userHandle does not match the passkey owner" do
-      other_user = Account.create!(email: "other@example.com", password: password)
+      other_user = Account.create!(email: "other@example.com", password: password,
+                                   webauthn_id: WebAuthn.generate_user_id)
 
       get new_account_session_path
 
