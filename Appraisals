@@ -14,12 +14,16 @@ end
 
 appraise "rails-7_2" do
   gem "rails", "~> 7.2.x"
+
+  # ActiveSupport 7.x passes `quirks_mode` to JSON.generate, which json 3 rejects.
+  gem "json", "< 3"
 end
 
 appraise "rails-7_1" do
   gem "rails", "~> 7.1.x"
 
   gem "capybara", "~> 3.39"
+  gem "json", "< 3"
   gem "importmap-rails", "~> 2.0"
   gem "pry-byebug", "~> 3.10"
   gem "rack", "~> 2.2"
@@ -36,6 +40,9 @@ appraise "devise-5_0" do
   gem "pry-byebug", "~> 3.10"
   install_if "-> { RUBY_VERSION < \"3.0\" }" do
     gem "rack", "~> 2.2"
+  end
+  install_if "-> { RUBY_VERSION < \"3.2\" }" do
+    gem "json", "< 3"
   end
   gem "rspec-rails", ">= 7.1"
   gem "sqlite3", ">= 1.6", "!= 1.7.0", "!= 1.7.1", "!= 1.7.2", "!= 1.7.3"
