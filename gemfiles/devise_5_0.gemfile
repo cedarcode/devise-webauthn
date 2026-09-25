@@ -23,4 +23,8 @@ install_if -> { RUBY_VERSION < "3.0" } do
   gem "rack", "~> 2.2"
 end
 
+install_if -> { RUBY_VERSION < "3.2" } do
+  gem "json", "< 3"
+end
+
 gemspec path: "../"
