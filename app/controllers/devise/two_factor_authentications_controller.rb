@@ -2,6 +2,8 @@
 
 module Devise
   class TwoFactorAuthenticationsController < DeviseController
+    include Devise::Webauthn::PendingTwoFactorSignIn
+
     prepend_before_action :set_resource, only: :new
     prepend_before_action :ensure_sign_in_initiated
     prepend_before_action :require_no_authentication
@@ -25,14 +27,18 @@ module Devise
     private
 
     def ensure_sign_in_initiated
-      return if session[:current_authentication_resource_id].present?
+      return if pending_two_factor_sign_in(resource_name).present?
 
       set_flash_message! :alert, :sign_in_not_initiated, scope: :"devise.failure"
-      redirect_to new_session_path(resource_name)
+      if is_navigational_format?
+        redirect_to new_session_path(resource_name)
+      else
+        render json: { error: find_message(:sign_in_not_initiated, scope: :"devise.failure") }, status: :unauthorized
+      end
     end
 
     def set_resource
-      @resource = resource_class.find(session[:current_authentication_resource_id])
+      @resource = resource_class.find(pending_two_factor_sign_in(resource_name)["id"])
     end
   end
 end

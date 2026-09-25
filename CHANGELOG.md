@@ -8,10 +8,12 @@
 - Add the `:cache` challenge store, which keeps challenges in `Rails.cache` instead of the session. [#152](https://github.com/cedarcode/devise-webauthn/pull/152) [@RenzoMinelli]
 - Accept `public_key_credential` as a JSON object as well as a JSON string. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Respond with JSON from the passkey and security key controllers when the request is not navigational, through Devise's responder. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
+- Return a `two_factor_token` to API clients when a password sign-in needs a second factor, and accept it instead of the session to finish two-factor sign-in. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
 
 ### Changed
 
 - Passkey sign-in no longer stores the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
+- Two-factor sign-in with a security key follows the same `skip_session_storage` setting. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
 - The WebAuthn options controllers only call `skip_forgery_protection` when it is defined, so they load under an `ActionController::API` parent. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
