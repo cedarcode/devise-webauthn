@@ -4,6 +4,7 @@ module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
     include Devise::Webauthn::PublicKeyCredentialParam
+    include Devise::Webauthn::CredentialResponses
 
     before_action :authenticate_scope!
 
@@ -13,36 +14,30 @@ module Devise
       security_key_from_params = WebAuthn::Credential.from_create(public_key_credential_param)
 
       if verify_and_save_security_key(security_key_from_params)
-        set_flash_message! :notice, :security_key_created
+        respond_with_notice :security_key_created, location: after_create_path, status: :created
       else
-        set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
+        respond_with_alert :webauthn_credential_verification_failed, location: after_create_path
       end
-      redirect_to after_create_path
     rescue WebAuthn::Error
-      set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
-      redirect_to after_create_path
+      respond_with_alert :webauthn_credential_verification_failed, location: after_create_path
     ensure
       challenge_store.consume(:registration, public_key_credential_param)
     end
 
     def update
       if resource.second_factor_webauthn_credentials.find(params[:id]).update(authentication_factor: 0)
-        set_flash_message! :notice, :security_key_promoted
+        respond_with_notice :security_key_promoted, location: after_update_path, status: :no_content
       else
-        set_flash_message! :alert, :security_key_promotion_failed, scope: :"devise.failure"
+        respond_with_alert :security_key_promotion_failed, location: after_update_path
       end
-
-      redirect_to after_update_path
     end
 
     def destroy
       if resource.second_factor_webauthn_credentials.destroy(params[:id])
-        set_flash_message! :notice, :security_key_deleted
+        respond_with_notice :security_key_deleted, location: after_destroy_path, status: :no_content
       else
-        set_flash_message! :alert, :security_key_deletion_failed, scope: :"devise.failure"
+        respond_with_alert :security_key_deletion_failed, location: after_destroy_path
       end
-
-      redirect_to after_destroy_path
     end
 
     private

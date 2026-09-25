@@ -30,6 +30,11 @@ RSpec.describe "API client without a session", type: :request do
                headers: { "CONTENT_TYPE" => "application/json", "ACCEPT" => "application/json" }
   end
 
+  def api_delete(path)
+    reset!
+    delete path, headers: { "ACCEPT" => "application/json" }
+  end
+
   def create_credential_for(account, factor)
     credential = WebAuthn::Credential.from_create(
       client.create(challenge: WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32)))
@@ -80,6 +85,46 @@ RSpec.describe "API client without a session", type: :request do
       api_post account_session_path, public_key_credential: "not json"
 
       expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
+  describe "passkey registration" do
+    def request_registration_challenge
+      sign_in user, scope: :account
+      api_post account_passkey_registration_options_path
+      response.parsed_body["challenge"]
+    end
+
+    it "creates a passkey and responds with 201" do
+      credential = client.create(challenge: request_registration_challenge, user_verified: true)
+
+      sign_in user, scope: :account
+      expect do
+        api_post account_passkeys_path, name: "My phone", public_key_credential: credential
+      end.to change(user.passkeys, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+    end
+
+    it "responds with 422 and an error message when verification fails" do
+      request_registration_challenge
+      credential = client.create(challenge: WebAuthn.configuration.encoder.encode("wrong"), user_verified: true)
+
+      sign_in user, scope: :account
+      api_post account_passkeys_path, name: "My phone", public_key_credential: credential
+
+      expect(response).to have_http_status(422)
+      expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
+    end
+
+    it "deletes a passkey and responds with 204" do
+      passkey = create_credential_for(user, :first_factor)
+
+      sign_in user, scope: :account
+      api_delete account_passkey_path(passkey)
+
+      expect(response).to have_http_status(:no_content)
+      expect(user.passkeys).to be_empty
     end
   end
 end

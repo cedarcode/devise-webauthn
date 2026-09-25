@@ -157,6 +157,7 @@ Mobile apps and other API clients can use passkeys without a cookie session, for
      respond_to :json
    end
    ```
+   With `:registerable`, also override `sign_up` in your registrations controller to call `sign_in(resource_name, resource, store: false)`. Devise's default writes to the session.
 4. Tell WebAuthn which relying party and origins to accept. Native apps do not have a browser origin:
    ```ruby
    WebAuthn.configure do |config|
@@ -177,6 +178,9 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 |---|---|---|
 | Sign-in options | `POST /users/passkey_authentication_options` | WebAuthn request options |
 | Sign in | `POST /users/sign_in` with `public_key_credential` | `201`, and a JWT when you use devise-jwt |
+| Registration options | `POST /users/passkey_registration_options` (authenticated) | WebAuthn creation options |
+| Add passkey | `POST /users/passkeys` with `name` and `public_key_credential` (authenticated) | `201`, or `422` with `error` |
+| Delete passkey | `DELETE /users/passkeys/:id` (authenticated) | `204` |
 
 ## Customization
 
