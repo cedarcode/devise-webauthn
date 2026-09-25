@@ -3,13 +3,14 @@
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::PublicKeyCredentialParam
 
     before_action :authenticate_scope!
 
     def new; end
 
     def create
-      security_key_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
+      security_key_from_params = WebAuthn::Credential.from_create(public_key_credential_param)
 
       if verify_and_save_security_key(security_key_from_params)
         set_flash_message! :notice, :security_key_created
@@ -21,7 +22,7 @@ module Devise
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_create_path
     ensure
-      challenge_store.consume(:registration, params[:public_key_credential])
+      challenge_store.consume(:registration, public_key_credential_param)
     end
 
     def update
@@ -53,7 +54,7 @@ module Devise
 
     def verify_and_save_security_key(security_key_from_params)
       security_key_from_params.verify(
-        challenge_store.consume(:registration, params[:public_key_credential])
+        challenge_store.consume(:registration, public_key_credential_param)
       )
 
       resource.second_factor_webauthn_credentials.create(

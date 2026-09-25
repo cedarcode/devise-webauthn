@@ -4,17 +4,22 @@ module Devise
   module Strategies
     class WebauthnTwoFactorAuthenticatable < Devise::Strategies::Base
       include Devise::Webauthn::ChallengeStoreAccess
+      include Devise::Webauthn::PublicKeyCredentialParam
 
       def valid?
-        credential_param.present? &&
+        public_key_credential_param.present? &&
           session[:current_authentication_resource_id].present? &&
-          challenge_store.pending?(:two_factor_authentication, credential_param)
+          challenge_store.pending?(:two_factor_authentication, public_key_credential_param)
+      end
+
+      def store?
+        super && mapping.to.skip_session_storage.exclude?(:params_auth)
       end
 
       # rubocop:disable Metrics/AbcSize
       def authenticate!
-        challenge = challenge_store.consume(:two_factor_authentication, credential_param)
-        credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
+        challenge = challenge_store.consume(:two_factor_authentication, public_key_credential_param)
+        credential_from_params = WebAuthn::Credential.from_get(public_key_credential_param)
         resource = resource_class.find_by(id: session[:current_authentication_resource_id])
         stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)
 
@@ -36,10 +41,6 @@ module Devise
       # rubocop:enable Metrics/AbcSize
 
       private
-
-      def credential_param
-        params[:public_key_credential]
-      end
 
       def verify_credential(credential_from_params, stored_credential, challenge)
         credential_from_params.verify(
