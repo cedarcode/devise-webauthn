@@ -5,6 +5,13 @@
 ### Added
 
 - Add `Devise::Webauthn.challenge_store` to configure where WebAuthn challenges are kept between the options request and the verification request. The default, `Devise::Webauthn::ChallengeStores::Session`, keeps them in the session as before. [#150](https://github.com/cedarcode/devise-webauthn/pull/150) [@RenzoMinelli]
+- Add `Devise::Webauthn::ChallengeStores::Cache`, which keeps challenges in `Rails.cache` so API clients without a session can use passkeys. [@RenzoMinelli]
+- Accept `public_key_credential` as a JSON object as well as a JSON string. [@RenzoMinelli]
+
+### Changed
+
+- Passkey and two-factor sign-in no longer store the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [@RenzoMinelli]
+- The WebAuthn options controllers only call `skip_forgery_protection` when it is defined, so they load under an `ActionController::API` parent. [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
