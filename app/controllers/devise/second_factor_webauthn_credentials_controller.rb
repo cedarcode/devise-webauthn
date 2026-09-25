@@ -18,8 +18,6 @@ module Devise
     rescue WebAuthn::Error
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_create_path
-    ensure
-      session.delete(:webauthn_challenge)
     end
 
     def update
@@ -51,7 +49,7 @@ module Devise
 
     def verify_and_save_security_key(security_key_from_params)
       security_key_from_params.verify(
-        session[:webauthn_challenge]
+        Devise::Webauthn.challenge_store_for(request).consume(:registration, params[:public_key_credential])
       )
 
       resource.second_factor_webauthn_credentials.create(

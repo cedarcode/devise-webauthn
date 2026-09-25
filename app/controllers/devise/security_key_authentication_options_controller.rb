@@ -13,8 +13,8 @@ module Devise
           user_verification: "discouraged"
         )
 
-      # Store challenge in session for later verification
-      session[:two_factor_authentication_challenge] = security_key_authentication_options.challenge
+      Devise::Webauthn.challenge_store_for(request)
+                      .write(:two_factor_authentication, security_key_authentication_options.challenge)
 
       render json: security_key_authentication_options
     end

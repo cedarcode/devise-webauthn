@@ -6,11 +6,12 @@ module Devise
       def valid?
         credential_param.present? &&
           session[:current_authentication_resource_id].present? &&
-          session[:two_factor_authentication_challenge].present?
+          challenge_store.pending?(:two_factor_authentication, credential_param)
       end
 
       # rubocop:disable Metrics/AbcSize
       def authenticate!
+        challenge = challenge_store.consume(:two_factor_authentication, credential_param)
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
         resource = resource_class.find_by(id: session[:current_authentication_resource_id])
         stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)
@@ -20,7 +21,7 @@ module Devise
           return fail!(:webauthn_credential_verification_failed)
         end
 
-        verify_credential(credential_from_params, stored_credential)
+        verify_credential(credential_from_params, stored_credential, challenge)
 
         resource.remember_me = session[:current_authentication_remember_me] if resource.respond_to?(:remember_me=)
         success!(resource)
@@ -29,8 +30,6 @@ module Devise
         session.delete(:current_authentication_remember_me)
       rescue WebAuthn::Error
         fail!(:webauthn_credential_verification_failed)
-      ensure
-        session.delete(:two_factor_authentication_challenge)
       end
       # rubocop:enable Metrics/AbcSize
 
@@ -40,9 +39,13 @@ module Devise
         params[:public_key_credential]
       end
 
-      def verify_credential(credential_from_params, stored_credential)
+      def challenge_store
+        @challenge_store ||= Devise::Webauthn.challenge_store_for(request)
+      end
+
+      def verify_credential(credential_from_params, stored_credential, challenge)
         credential_from_params.verify(
-          session[:two_factor_authentication_challenge],
+          challenge,
           public_key: stored_credential.public_key,
           sign_count: stored_credential.sign_count
         )

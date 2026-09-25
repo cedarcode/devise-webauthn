@@ -21,8 +21,7 @@ module Devise
           }
         )
 
-      # Store challenge in session for later verification
-      session[:webauthn_challenge] = passkey_options.challenge
+      Devise::Webauthn.challenge_store_for(request).write(:registration, passkey_options.challenge)
 
       render json: passkey_options
     end

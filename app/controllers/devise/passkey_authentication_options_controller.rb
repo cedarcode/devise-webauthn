@@ -10,8 +10,7 @@ module Devise
           user_verification: "required"
         )
 
-      # Store challenge in session for later verification
-      session[:authentication_challenge] = passkey_options.challenge
+      Devise::Webauthn.challenge_store_for(request).write(:passkey_authentication, passkey_options.challenge)
 
       render json: passkey_options
     end

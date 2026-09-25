@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+- Add `Devise::Webauthn.challenge_store` to configure where WebAuthn challenges are kept between the options request and the verification request. The default, `Devise::Webauthn::ChallengeStores::Session`, keeps them in the session as before. [@RenzoMinelli]
+
+### Changed
+
+- If you override `verify_and_save_passkey` or `verify_and_save_security_key`, read the challenge with `Devise::Webauthn.challenge_store_for(request).consume(:registration, params[:public_key_credential])` instead of `session[:webauthn_challenge]`. Otherwise the challenge is no longer cleared after use. [@RenzoMinelli]
+
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
 ### Added

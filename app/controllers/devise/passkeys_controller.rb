@@ -18,8 +18,6 @@ module Devise
     rescue WebAuthn::Error
       set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
       redirect_to after_update_path
-    ensure
-      session.delete(:webauthn_challenge)
     end
 
     def destroy
@@ -41,7 +39,7 @@ module Devise
 
     def verify_and_save_passkey(passkey_from_params)
       passkey_from_params.verify(
-        session[:webauthn_challenge],
+        Devise::Webauthn.challenge_store_for(request).consume(:registration, params[:public_key_credential]),
         user_verification: true
       )
 
