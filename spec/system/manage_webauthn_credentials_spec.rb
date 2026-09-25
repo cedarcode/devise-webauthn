@@ -24,7 +24,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_passkey_path
 
         fill_in "Passkey name", with: "My Passkey"
-        click_button "Create Passkey"
+        click_button_and_wait_for_page_load "Create Passkey"
 
         expect(page).to have_current_path(new_account_passkey_path)
         expect(page).to have_content("Passkey created successfully.")
@@ -41,7 +41,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_passkey_path
 
         fill_in "Passkey name", with: "My Passkey"
-        click_button "Create Passkey"
+        click_button_and_wait_for_page_load "Create Passkey"
 
         expect(page).to have_current_path(new_account_passkey_path)
         expect(page).to have_content("Passkey verification failed.")
@@ -55,7 +55,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_second_factor_webauthn_credential_path
 
         fill_in "Security Key name", with: "My Security Key"
-        click_button "Create Security Key"
+        click_button_and_wait_for_page_load "Create Security Key"
 
         expect(page).to have_current_path(new_account_second_factor_webauthn_credential_path)
         expect(page).to have_content("Security Key created successfully.")
@@ -72,7 +72,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         visit new_account_second_factor_webauthn_credential_path
 
         fill_in "Security Key name", with: "My Security Key"
-        click_button "Create Security Key"
+        click_button_and_wait_for_page_load "Create Security Key"
 
         expect(page).to have_current_path(new_account_second_factor_webauthn_credential_path)
         expect(page).to have_content("Webauthn credential verification failed.")
@@ -94,7 +94,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
 
         within security_keys_section do
           expect(page).to have_content("Existing Key")
-          click_button "Upgrade to Passkey"
+          click_button_and_wait_for_page_load "Upgrade to Passkey"
         end
 
         expect(page).to have_current_path(root_path)
