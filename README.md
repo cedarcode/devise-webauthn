@@ -182,6 +182,17 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 | Add passkey | `POST /users/passkeys` with `name` and `public_key_credential` (authenticated) | `201`, or `422` with `error` |
 | Delete passkey | `DELETE /users/passkeys/:id` (authenticated) | `204` |
 
+### Two-factor authentication
+
+When a user with security keys signs in with a password, the response is `401` with a `two_factor_token`. Send that token to `POST /users/security_key_authentication_options` and to `POST /users/two_factor_authentication` together with `public_key_credential`. The token expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
+
+devise-jwt only issues a token on `POST /users/sign_in` by default. Add the 2FA path:
+```ruby
+config.jwt do |jwt|
+  jwt.dispatch_requests = [["POST", %r{^/users/two_factor_authentication$}]]
+end
+```
+
 ## Customization
 
 ### Customizing Views

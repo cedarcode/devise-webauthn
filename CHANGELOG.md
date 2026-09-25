@@ -8,6 +8,7 @@
 - Add `Devise::Webauthn::ChallengeStores::Cache`, which keeps challenges in `Rails.cache` so API clients without a session can use passkeys. [#152](https://github.com/cedarcode/devise-webauthn/pull/152) [@RenzoMinelli]
 - Accept `public_key_credential` as a JSON object as well as a JSON string. [#152](https://github.com/cedarcode/devise-webauthn/pull/152) [@RenzoMinelli]
 - Respond with JSON from the passkey and security key controllers when the request is not navigational. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
+- Return a `two_factor_token` to API clients when a password sign-in needs a second factor, and accept it instead of the session to finish two-factor sign-in. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
 
 ### Changed
 

@@ -3,6 +3,7 @@
 module Devise
   class SecurityKeyAuthenticationOptionsController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::PendingTwoFactorSignIn
 
     skip_forgery_protection if respond_to?(:skip_forgery_protection)
 
@@ -23,7 +24,7 @@ module Devise
     private
 
     def set_resource
-      @resource = resource_class.find(session[:current_authentication_resource_id])
+      @resource = resource_class.find(pending_two_factor_sign_in(resource_name)&.fetch("id"))
     end
   end
 end

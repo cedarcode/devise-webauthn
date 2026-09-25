@@ -11,12 +11,14 @@ module Devise
         hashed = false
 
         if validate(resource){ hashed = true; resource.valid_password?(password) }
-          if second_factor_enabled?(resource)
+          if second_factor_enabled?(resource) && navigational_request?
             session[:current_authentication_resource_id] = resource.id
             session[:current_authentication_remember_me] = remember_me?
             request.flash[:notice] = two_factor_required_message
             request.commit_flash
             redirect!(two_factor_authentication_path, {}, message: two_factor_required_message)
+          elsif second_factor_enabled?(resource)
+            custom!(two_factor_required_response(resource))
           else
             remember_me(resource)
             resource.after_database_authentication
@@ -37,6 +39,17 @@ module Devise
 
       def two_factor_authentication_path
         Rails.application.routes.url_helpers.send(:"new_#{scope}_two_factor_authentication_path")
+      end
+
+      def navigational_request?
+        Devise.navigational_formats.include?(request.format.try(:ref))
+      end
+
+      def two_factor_required_response(resource)
+        token = Devise::Webauthn::TwoFactorToken.generate(resource, scope: scope, remember_me: remember_me?)
+        body = { error: two_factor_required_message, two_factor_token: token }.to_json
+
+        [401, { "Content-Type" => "application/json" }, [body]]
       end
 
       def two_factor_required_message
