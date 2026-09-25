@@ -8,7 +8,7 @@
 
 ### Changed
 
-- If you override `verify_and_save_passkey` or `verify_and_save_security_key`, read the challenge with `Devise::Webauthn.challenge_store_for(request).consume(:registration, params[:public_key_credential])` instead of `session[:webauthn_challenge]`. Otherwise the challenge is no longer cleared after use. [#150](https://github.com/cedarcode/devise-webauthn/pull/150) [@RenzoMinelli]
+- If you override `verify_and_save_passkey` or `verify_and_save_security_key`, read the challenge with `challenge_store.consume(:registration, params[:public_key_credential])` instead of `session[:webauthn_challenge]`. Otherwise the challenge is no longer cleared after use. [#150](https://github.com/cedarcode/devise-webauthn/pull/150) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 

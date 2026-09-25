@@ -3,6 +3,8 @@
 module Devise
   module Strategies
     class PasskeyAuthenticatable < Devise::Strategies::Base
+      include Devise::Webauthn::ChallengeStoreAccess
+
       def valid?
         passkey_param.present? && challenge_store.pending?(:passkey_authentication, passkey_param)
       end
@@ -30,10 +32,6 @@ module Devise
 
       def passkey_param
         params[:public_key_credential]
-      end
-
-      def challenge_store
-        @challenge_store ||= Devise::Webauthn.challenge_store_for(request)
       end
 
       def verify_passkeys(passkey_from_params, stored_passkey, challenge)

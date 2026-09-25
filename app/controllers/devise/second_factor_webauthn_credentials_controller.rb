@@ -2,6 +2,8 @@
 
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
+    include Devise::Webauthn::ChallengeStoreAccess
+
     before_action :authenticate_scope!
 
     def new; end
@@ -49,7 +51,7 @@ module Devise
 
     def verify_and_save_security_key(security_key_from_params)
       security_key_from_params.verify(
-        Devise::Webauthn.challenge_store_for(request).consume(:registration, params[:public_key_credential])
+        challenge_store.consume(:registration, params[:public_key_credential])
       )
 
       resource.second_factor_webauthn_credentials.create(

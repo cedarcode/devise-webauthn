@@ -3,6 +3,8 @@
 module Devise
   module Strategies
     class WebauthnTwoFactorAuthenticatable < Devise::Strategies::Base
+      include Devise::Webauthn::ChallengeStoreAccess
+
       def valid?
         credential_param.present? &&
           session[:current_authentication_resource_id].present? &&
@@ -37,10 +39,6 @@ module Devise
 
       def credential_param
         params[:public_key_credential]
-      end
-
-      def challenge_store
-        @challenge_store ||= Devise::Webauthn.challenge_store_for(request)
       end
 
       def verify_credential(credential_from_params, stored_credential, challenge)
