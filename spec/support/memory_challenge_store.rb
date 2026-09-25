@@ -15,11 +15,11 @@ class MemoryChallengeStore
     self.class.challenges[purpose] = challenge
   end
 
-  def pending?(purpose)
+  def pending?(purpose, _credential)
     self.class.challenges.key?(purpose)
   end
 
-  def consume(purpose)
+  def consume(purpose, _credential)
     self.class.challenges.delete(purpose)
   end
 end

@@ -21,13 +21,13 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Session do
   it "reports a challenge as pending until it is consumed" do
     store.write(:passkey_authentication, "challenge")
 
-    expect(store.pending?(:passkey_authentication)).to be(true)
-    expect(store.consume(:passkey_authentication)).to eq("challenge")
-    expect(store.pending?(:passkey_authentication)).to be(false)
+    expect(store.pending?(:passkey_authentication, "{}")).to be(true)
+    expect(store.consume(:passkey_authentication, "{}")).to eq("challenge")
+    expect(store.pending?(:passkey_authentication, "{}")).to be(false)
   end
 
   it "returns nil when consuming a challenge that was never written" do
-    expect(store.consume(:registration)).to be_nil
+    expect(store.consume(:registration, "{}")).to be_nil
   end
 
   it "raises on an unknown purpose" do

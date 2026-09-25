@@ -4,7 +4,7 @@ module Devise
   class PasskeyAuthenticationOptionsController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
 
-    skip_forgery_protection
+    skip_forgery_protection if respond_to?(:skip_forgery_protection)
 
     def create
       passkey_options =
