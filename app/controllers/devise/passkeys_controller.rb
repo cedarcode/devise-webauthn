@@ -4,6 +4,7 @@ module Devise
   class PasskeysController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
     include Devise::Webauthn::PublicKeyCredentialParam
+    include Devise::Webauthn::CredentialResponses
 
     before_action :authenticate_scope!
 
@@ -13,26 +14,22 @@ module Devise
       passkey_from_params = WebAuthn::Credential.from_create(public_key_credential_param)
 
       if verify_and_save_passkey(passkey_from_params)
-        set_flash_message! :notice, :passkey_created
+        respond_with_notice :passkey_created, location: after_update_path, status: :created
       else
-        set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
+        respond_with_alert :passkey_verification_failed, location: after_update_path
       end
-      redirect_to after_update_path
     rescue WebAuthn::Error
-      set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
-      redirect_to after_update_path
+      respond_with_alert :passkey_verification_failed, location: after_update_path
     ensure
       challenge_store.consume(:registration, public_key_credential_param)
     end
 
     def destroy
       if resource.passkeys.destroy(params[:id])
-        set_flash_message! :notice, :passkey_deleted
+        respond_with_notice :passkey_deleted, location: after_update_path, status: :no_content
       else
-        set_flash_message! :alert, :passkey_deletion_failed, scope: :"devise.failure"
+        respond_with_alert :passkey_deletion_failed, location: after_update_path
       end
-
-      redirect_to after_update_path
     end
 
     private
