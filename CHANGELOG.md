@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Add `Devise::Webauthn.challenge_store` to configure where WebAuthn challenges are kept between the options request and the verification request. The default, `Devise::Webauthn::ChallengeStores::Session`, keeps them in the session as before. [#150](https://github.com/cedarcode/devise-webauthn/pull/150) [@RenzoMinelli]
+
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
 ### Added

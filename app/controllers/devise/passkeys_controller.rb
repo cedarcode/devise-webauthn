@@ -2,6 +2,8 @@
 
 module Devise
   class PasskeysController < DeviseController
+    include Devise::Webauthn::ChallengeStoreAccess
+
     before_action :authenticate_scope!
 
     def new; end
@@ -19,7 +21,7 @@ module Devise
       set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
       redirect_to after_update_path
     ensure
-      session.delete(:webauthn_challenge)
+      challenge_store.consume(:registration, params[:public_key_credential])
     end
 
     def destroy
@@ -41,7 +43,7 @@ module Devise
 
     def verify_and_save_passkey(passkey_from_params)
       passkey_from_params.verify(
-        session[:webauthn_challenge],
+        challenge_store.consume(:registration, params[:public_key_credential]),
         user_verification: true
       )
 

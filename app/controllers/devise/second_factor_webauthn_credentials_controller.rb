@@ -2,6 +2,8 @@
 
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
+    include Devise::Webauthn::ChallengeStoreAccess
+
     before_action :authenticate_scope!
 
     def new; end
@@ -19,7 +21,7 @@ module Devise
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_create_path
     ensure
-      session.delete(:webauthn_challenge)
+      challenge_store.consume(:registration, params[:public_key_credential])
     end
 
     def update
@@ -51,7 +53,7 @@ module Devise
 
     def verify_and_save_security_key(security_key_from_params)
       security_key_from_params.verify(
-        session[:webauthn_challenge]
+        challenge_store.consume(:registration, params[:public_key_credential])
       )
 
       resource.second_factor_webauthn_credentials.create(
