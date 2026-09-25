@@ -15,6 +15,7 @@ end
 require "rspec/rails"
 require "rspec/retry"
 require "capybara/rspec"
+require "support/page_load_helpers"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -49,6 +50,7 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :system
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Webauthn::Test::AuthenticatorHelpers, type: :system
+  config.include PageLoadHelpers, type: :system
 
   config.verbose_retry = true
   config.display_try_failure_messages = true

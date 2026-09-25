@@ -91,7 +91,7 @@ RSpec.describe "SignInWithWebauthn", type: :system do
           .and_return(["http://localhost:5000"])
       end
 
-      it "redirects to new two factor authentication page" do
+      it "renders the two factor authentication page again" do
         visit new_account_session_path
 
         fill_in "Email", with: user.email
@@ -102,9 +102,9 @@ RSpec.describe "SignInWithWebauthn", type: :system do
         expect(page).to have_current_path(new_account_two_factor_authentication_path)
         expect(page).to have_content("Two-factor authentication is required to sign in.")
 
-        click_button "Use security key"
+        click_button_and_wait_for_page_load "Use security key"
 
-        expect(page).to have_current_path(new_account_two_factor_authentication_path)
+        expect(page).to have_current_path(account_two_factor_authentication_path)
         expect(page).to have_content("Webauthn credential verification failed.")
         expect(page).to have_button("Use security key")
       end
