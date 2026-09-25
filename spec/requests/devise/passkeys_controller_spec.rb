@@ -77,6 +77,19 @@ RSpec.describe Devise::PasskeysController, type: :request do
           expect(session[:webauthn_challenge]).to be_nil
         end
       end
+
+      context "when the credential cannot be parsed" do
+        before do
+          allow(WebAuthn::Credential).to receive(:from_create).and_raise(WebAuthn::Error)
+        end
+
+        it "clears the challenge and redirects" do
+          post account_passkeys_path, params: { public_key_credential: "{}", name: "My Passkey" }
+
+          expect(response).to redirect_to(new_account_passkey_path)
+          expect(session[:webauthn_challenge]).to be_nil
+        end
+      end
     end
 
     context "when user is not authenticated" do

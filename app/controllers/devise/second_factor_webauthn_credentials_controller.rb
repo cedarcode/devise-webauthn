@@ -20,6 +20,8 @@ module Devise
     rescue WebAuthn::Error
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_create_path
+    ensure
+      challenge_store.consume(:registration, params[:public_key_credential])
     end
 
     def update
