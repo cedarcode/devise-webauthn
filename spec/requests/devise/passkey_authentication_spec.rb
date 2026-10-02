@@ -150,4 +150,52 @@ RSpec.describe "Passkey authentication flow", type: :request do
       expect(controller.current_account).to be_nil
     end
   end
+
+  describe "sign-in with passkeys through a custom challenge store" do
+    let!(:passkey) { create_passkey_for(user, client) }
+
+    around do |example|
+      original_store = Devise::Webauthn.challenge_store
+      Devise::Webauthn.challenge_store = MemoryChallengeStore
+      example.run
+    ensure
+      Devise::Webauthn.challenge_store = original_store
+      MemoryChallengeStore.reset
+    end
+
+    def sign_in_with_passkey(challenge)
+      assertion = generate_assertion(
+        client,
+        challenge: challenge,
+        credential: passkey,
+        user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
+      )
+
+      post account_session_path, params: { public_key_credential: assertion.to_json }
+    end
+
+    it "signs in without keeping the challenge in the session" do
+      post account_passkey_authentication_options_path
+      challenge = response.parsed_body["challenge"]
+
+      expect(MemoryChallengeStore.challenges).to eq(passkey_authentication: challenge)
+      expect(session[:authentication_challenge]).to be_nil
+
+      sign_in_with_passkey(challenge)
+
+      expect(controller.current_account).to eq(user)
+    end
+
+    it "consumes the challenge so it cannot be used twice" do
+      post account_passkey_authentication_options_path
+      challenge = response.parsed_body["challenge"]
+      sign_in_with_passkey(challenge)
+      expect(MemoryChallengeStore.challenges).to be_empty
+      delete destroy_account_session_path
+
+      sign_in_with_passkey(challenge)
+
+      expect(controller.current_account).to be_nil
+    end
+  end
 end

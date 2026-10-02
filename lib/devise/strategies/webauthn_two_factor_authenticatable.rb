@@ -13,7 +13,7 @@ module Devise
 
       # rubocop:disable Metrics/AbcSize
       def authenticate!
-        challenge = challenge_store.consume(:two_factor_authentication, credential_param)
+        expected_challenge = challenge_store.consume(:two_factor_authentication, credential_param)
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
         resource = resource_class.find_by(id: session[:current_authentication_resource_id])
         stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)
@@ -23,7 +23,7 @@ module Devise
           return fail!(:webauthn_credential_verification_failed)
         end
 
-        verify_credential(credential_from_params, stored_credential, challenge)
+        verify_credential(credential_from_params, stored_credential, expected_challenge)
 
         resource.remember_me = session[:current_authentication_remember_me] if resource.respond_to?(:remember_me=)
         success!(resource)
@@ -41,9 +41,9 @@ module Devise
         params[:public_key_credential]
       end
 
-      def verify_credential(credential_from_params, stored_credential, challenge)
+      def verify_credential(credential_from_params, stored_credential, expected_challenge)
         credential_from_params.verify(
-          challenge,
+          expected_challenge,
           public_key: stored_credential.public_key,
           sign_count: stored_credential.sign_count
         )

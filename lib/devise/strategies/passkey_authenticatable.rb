@@ -10,7 +10,7 @@ module Devise
       end
 
       def authenticate! # rubocop:disable Metrics/AbcSize
-        challenge = challenge_store.consume(:passkey_authentication, passkey_param)
+        expected_challenge = challenge_store.consume(:passkey_authentication, passkey_param)
         passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
 
         return fail!(:passkey_not_found) if passkey_from_params.user_handle.nil?
@@ -20,7 +20,7 @@ module Devise
 
         return fail!(:passkey_not_found) if stored_passkey.blank?
 
-        verify_passkeys(passkey_from_params, stored_passkey, challenge)
+        verify_passkeys(passkey_from_params, stored_passkey, expected_challenge)
 
         remember_me(resource)
         success!(resource)
@@ -34,9 +34,9 @@ module Devise
         params[:public_key_credential]
       end
 
-      def verify_passkeys(passkey_from_params, stored_passkey, challenge)
+      def verify_passkeys(passkey_from_params, stored_passkey, expected_challenge)
         passkey_from_params.verify(
-          challenge,
+          expected_challenge,
           public_key: stored_passkey.public_key,
           sign_count: stored_passkey.sign_count,
           user_verification: true
