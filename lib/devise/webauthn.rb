@@ -13,7 +13,7 @@ require_relative "webauthn/url_helpers"
 
 module Devise
   module Webauthn
-    mattr_accessor :challenge_store, default: ChallengeStores::Session
+    mattr_accessor :challenge_store, default: :session
 
     module Test
       autoload :AuthenticatorHelpers, "devise/webauthn/test/authenticator_helpers"

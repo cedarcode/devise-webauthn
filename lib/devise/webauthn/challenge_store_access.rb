@@ -6,7 +6,9 @@ module Devise
       private
 
       def challenge_store
-        Devise::Webauthn.challenge_store.new(request)
+        store = Devise::Webauthn.challenge_store
+        store = Devise::Webauthn::ChallengeStores.const_get(store.to_s.camelize) if store.is_a?(Symbol)
+        store.new(request)
       end
     end
   end
