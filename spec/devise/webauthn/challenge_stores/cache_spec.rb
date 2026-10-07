@@ -6,12 +6,16 @@ require "webauthn/fake_client"
 RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
   include ActiveSupport::Testing::TimeHelpers
 
-  let(:store) { described_class.new(instance_double(ActionDispatch::Request)) }
+  let(:store) { store_for(credential) }
   let(:client) { WebAuthn::FakeClient.new(WebAuthn.configuration.allowed_origins.first) }
   let(:challenge) { WebAuthn::Credential.options_for_get.challenge }
   let(:credential) do
     client.create(challenge: WebAuthn::Credential.options_for_get.challenge)
     client.get(challenge: challenge)
+  end
+
+  def store_for(credential)
+    described_class.new(instance_double(ActionDispatch::Request, params: { public_key_credential: credential }))
   end
 
   around do |example|
@@ -25,28 +29,28 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
   it "finds the challenge through the credential's client data and consumes it once" do
     store.write(:passkey_authentication, challenge)
 
-    expect(store.pending?(:passkey_authentication, credential)).to be(true)
-    expect(store.consume(:passkey_authentication, credential)).to eq(challenge)
-    expect(store.consume(:passkey_authentication, credential)).to be_nil
+    expect(store.pending?(:passkey_authentication)).to be(true)
+    expect(store.consume(:passkey_authentication)).to eq(challenge)
+    expect(store.consume(:passkey_authentication)).to be_nil
   end
 
   it "keeps challenges for different purposes apart" do
     store.write(:two_factor_authentication, challenge)
 
-    expect(store.pending?(:passkey_authentication, credential)).to be(false)
+    expect(store.pending?(:passkey_authentication)).to be(false)
   end
 
   it "expires challenges" do
     store.write(:passkey_authentication, challenge)
 
     travel_to(described_class.expires_in.from_now + 1.second) do
-      expect(store.consume(:passkey_authentication, credential)).to be_nil
+      expect(store.consume(:passkey_authentication)).to be_nil
     end
   end
 
   it "ignores malformed credentials" do
     [nil, "{}", {}, { "response" => "x" }, { "response" => { "clientDataJSON" => "%%%" } }].each do |malformed|
-      expect(store.pending?(:passkey_authentication, malformed)).to be(false)
+      expect(store_for(malformed).pending?(:passkey_authentication)).to be(false)
     end
   end
 end

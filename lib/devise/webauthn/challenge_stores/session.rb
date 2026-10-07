@@ -18,11 +18,11 @@ module Devise
           @session[KEYS.fetch(purpose)] = challenge
         end
 
-        def pending?(purpose, _credential)
+        def pending?(purpose)
           @session[KEYS.fetch(purpose)].present?
         end
 
-        def consume(purpose, _credential)
+        def consume(purpose)
           @session.delete(KEYS.fetch(purpose))
         end
       end

@@ -8,7 +8,7 @@ module Devise
 
       def valid?
         public_key_credential_param.present? &&
-          challenge_store.pending?(:passkey_authentication, public_key_credential_param)
+          challenge_store.pending?(:passkey_authentication)
       end
 
       def store?
@@ -16,7 +16,7 @@ module Devise
       end
 
       def authenticate! # rubocop:disable Metrics/AbcSize
-        expected_challenge = challenge_store.consume(:passkey_authentication, public_key_credential_param)
+        expected_challenge = challenge_store.consume(:passkey_authentication)
         passkey_from_params = WebAuthn::Credential.from_get(public_key_credential_param)
 
         return fail!(:passkey_not_found) if passkey_from_params.user_handle.nil?
