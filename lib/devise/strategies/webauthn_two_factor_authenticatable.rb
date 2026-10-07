@@ -8,12 +8,12 @@ module Devise
       def valid?
         credential_param.present? &&
           session[:current_authentication_resource_id].present? &&
-          challenge_store.pending?(:two_factor_authentication, credential_param)
+          challenge_store.pending?(:two_factor_authentication)
       end
 
       # rubocop:disable Metrics/AbcSize
       def authenticate!
-        expected_challenge = challenge_store.consume(:two_factor_authentication, credential_param)
+        expected_challenge = challenge_store.consume(:two_factor_authentication)
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
         resource = resource_class.find_by(id: session[:current_authentication_resource_id])
         stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)

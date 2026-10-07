@@ -6,11 +6,11 @@ module Devise
       include Devise::Webauthn::ChallengeStoreAccess
 
       def valid?
-        passkey_param.present? && challenge_store.pending?(:passkey_authentication, passkey_param)
+        passkey_param.present? && challenge_store.pending?(:passkey_authentication)
       end
 
       def authenticate! # rubocop:disable Metrics/AbcSize
-        expected_challenge = challenge_store.consume(:passkey_authentication, passkey_param)
+        expected_challenge = challenge_store.consume(:passkey_authentication)
         passkey_from_params = WebAuthn::Credential.from_get(JSON.parse(passkey_param))
 
         return fail!(:passkey_not_found) if passkey_from_params.user_handle.nil?

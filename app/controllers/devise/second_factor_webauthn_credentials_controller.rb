@@ -21,7 +21,7 @@ module Devise
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_create_path
     ensure
-      challenge_store.consume(:registration, params[:public_key_credential])
+      challenge_store.consume(:registration)
     end
 
     def update
@@ -53,7 +53,7 @@ module Devise
 
     def verify_and_save_security_key(security_key_from_params)
       security_key_from_params.verify(
-        challenge_store.consume(:registration, params[:public_key_credential])
+        challenge_store.consume(:registration)
       )
 
       resource.second_factor_webauthn_credentials.create(

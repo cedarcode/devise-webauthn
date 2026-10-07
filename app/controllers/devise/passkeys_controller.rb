@@ -21,7 +21,7 @@ module Devise
       set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
       redirect_to after_update_path
     ensure
-      challenge_store.consume(:registration, params[:public_key_credential])
+      challenge_store.consume(:registration)
     end
 
     def destroy
@@ -43,7 +43,7 @@ module Devise
 
     def verify_and_save_passkey(passkey_from_params)
       passkey_from_params.verify(
-        challenge_store.consume(:registration, params[:public_key_credential]),
+        challenge_store.consume(:registration),
         user_verification: true
       )
 
