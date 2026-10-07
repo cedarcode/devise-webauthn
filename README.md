@@ -145,7 +145,7 @@ Mobile apps and other API clients can use passkeys without a cookie session, for
    Devise::Webauthn::ChallengeStores::Cache.cache = Rails.cache
    Devise::Webauthn::ChallengeStores::Cache.expires_in = 5.minutes
    ```
-   Each challenge can be used once. `ActiveSupport::Cache::MemoryStore` only works with a single process.
+   Each challenge can be used once. The options request and the sign-in request can reach different servers or processes, so they must share the cache. `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
 2. Stop Devise from writing the user to the session. Passkey sign-in follows the `:params_auth` setting:
    ```ruby
    # config/initializers/devise.rb
