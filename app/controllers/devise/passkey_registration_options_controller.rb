@@ -2,6 +2,8 @@
 
 module Devise
   class PasskeyRegistrationOptionsController < DeviseController
+    include Devise::Webauthn::ChallengeStoreAccess
+
     skip_forgery_protection
 
     before_action :authenticate_scope!
@@ -21,8 +23,7 @@ module Devise
           }
         )
 
-      # Store challenge in session for later verification
-      session[:webauthn_challenge] = passkey_options.challenge
+      challenge_store.write(:registration, passkey_options.challenge)
 
       render json: passkey_options
     end

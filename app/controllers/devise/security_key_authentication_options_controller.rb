@@ -2,6 +2,8 @@
 
 module Devise
   class SecurityKeyAuthenticationOptionsController < DeviseController
+    include Devise::Webauthn::ChallengeStoreAccess
+
     skip_forgery_protection
 
     before_action :set_resource
@@ -13,8 +15,7 @@ module Devise
           user_verification: "discouraged"
         )
 
-      # Store challenge in session for later verification
-      session[:two_factor_authentication_challenge] = security_key_authentication_options.challenge
+      challenge_store.write(:two_factor_authentication, security_key_authentication_options.challenge)
 
       render json: security_key_authentication_options
     end

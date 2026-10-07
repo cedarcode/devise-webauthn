@@ -9,6 +9,19 @@ RSpec.describe "Passkey authentication flow", type: :request do
   let(:origin) { WebAuthn.configuration.allowed_origins.first }
   let(:client) { WebAuthn::FakeClient.new(origin) }
 
+  around do |example|
+    original_store = Devise::Webauthn.challenge_store
+    Devise::Webauthn.challenge_store = MemoryChallengeStore
+    example.run
+  ensure
+    Devise::Webauthn.challenge_store = original_store
+    MemoryChallengeStore.reset
+  end
+
+  def stored_challenge
+    MemoryChallengeStore.challenges[:passkey_authentication]
+  end
+
   def create_passkey_for(account, fake_client)
     account.update!(webauthn_id: WebAuthn.generate_user_id)
     challenge = WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32))
@@ -36,7 +49,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
     let!(:passkey) { create_passkey_for(user, client) }
 
     before do
-      post account_passkey_authentication_options_path # To set the challenge in session
+      post account_passkey_authentication_options_path # To store the challenge
     end
 
     it "completes authentication with valid credential" do
@@ -44,7 +57,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
 
       assertion = generate_assertion(
         client,
-        challenge: session[:authentication_challenge],
+        challenge: stored_challenge,
         credential: passkey,
         user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
       )
@@ -57,8 +70,26 @@ RSpec.describe "Passkey authentication flow", type: :request do
         expect(response).to redirect_to(root_path)
         expect(flash[:notice]).to eq(I18n.t("devise.sessions.signed_in"))
         expect(controller.current_account).to eq(user)
-        expect(session[:authentication_challenge]).to be_nil
+        expect(stored_challenge).to be_nil
       end.to change { passkey.reload.sign_count }.by(1)
+    end
+
+    it "consumes the challenge so it cannot be used twice" do
+      assertion = generate_assertion(
+        client,
+        challenge: stored_challenge,
+        credential: passkey,
+        user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
+      )
+      params = { public_key_credential: assertion.to_json }
+
+      post account_session_path, params: params
+      expect(controller.current_account).to eq(user)
+      delete destroy_account_session_path
+
+      post account_session_path, params: params
+
+      expect(controller.current_account).to be_nil
     end
 
     it "rejects sign-in with non-existent credential" do
@@ -66,7 +97,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
 
       assertion = generate_assertion(
         client,
-        challenge: session[:authentication_challenge],
+        challenge: stored_challenge,
         credential: passkey,
         user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
       )
@@ -105,7 +136,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
       get new_account_session_path
 
       assertion = client.get(
-        challenge: session[:authentication_challenge],
+        challenge: stored_challenge,
         allow_credentials: [passkey.external_id],
         user_verified: true
       )
@@ -126,7 +157,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
       get new_account_session_path
 
       assertion = client.get(
-        challenge: session[:authentication_challenge],
+        challenge: stored_challenge,
         allow_credentials: [passkey.external_id],
         user_verified: true,
         user_handle: WebAuthn.configuration.encoder.decode(other_user.webauthn_id)

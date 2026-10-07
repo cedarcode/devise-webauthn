@@ -2,6 +2,8 @@
 
 module Devise
   class PasskeyAuthenticationOptionsController < DeviseController
+    include Devise::Webauthn::ChallengeStoreAccess
+
     skip_forgery_protection
 
     def create
@@ -10,8 +12,7 @@ module Devise
           user_verification: "required"
         )
 
-      # Store challenge in session for later verification
-      session[:authentication_challenge] = passkey_options.challenge
+      challenge_store.write(:passkey_authentication, passkey_options.challenge)
 
       render json: passkey_options
     end
