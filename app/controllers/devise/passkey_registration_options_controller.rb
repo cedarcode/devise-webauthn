@@ -23,9 +23,7 @@ module Devise
           }
         )
 
-      challenge_store.write(:registration, passkey_options.challenge)
-
-      render json: passkey_options
+      render json: options_with_stored_challenge(:registration, passkey_options)
     end
 
     private

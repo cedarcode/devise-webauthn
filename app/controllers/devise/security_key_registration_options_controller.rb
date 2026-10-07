@@ -23,9 +23,7 @@ module Devise
           }
         )
 
-      challenge_store.write(:registration, create_security_key_options.challenge)
-
-      render json: create_security_key_options
+      render json: options_with_stored_challenge(:registration, create_security_key_options)
     end
 
     private

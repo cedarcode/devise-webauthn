@@ -4,6 +4,7 @@ require "devise"
 require "webauthn"
 
 require_relative "webauthn/version"
+require_relative "webauthn/challenge_stores/credential_challenge"
 require_relative "webauthn/challenge_stores/session"
 require_relative "webauthn/challenge_stores/cache"
 require_relative "webauthn/challenge_store_access"
