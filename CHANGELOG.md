@@ -6,6 +6,7 @@
 
 - Add `Devise::Webauthn.challenge_store` to configure where WebAuthn challenges are kept between the options request and the verification request. It takes a symbol such as `:session`, or a store class. The default, `:session`, keeps them in the session as before. [#150](https://github.com/cedarcode/devise-webauthn/pull/150) [@RenzoMinelli]
 - Add the `:cache` challenge store, which keeps challenges in `Rails.cache` instead of the session. [#152](https://github.com/cedarcode/devise-webauthn/pull/152) [@RenzoMinelli]
+- Add the `:signed` challenge store, which signs each challenge instead of storing it. API clients can use passkeys without a session or a shared cache. [@RenzoMinelli]
 - Accept `public_key_credential` as a JSON object as well as a JSON string. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Respond with JSON from the passkey and security key controllers when the request is not navigational, through Devise's responder. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Return a `two_factor_token` to API clients when a password sign-in needs a second factor, and accept it instead of the session to finish two-factor sign-in. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]

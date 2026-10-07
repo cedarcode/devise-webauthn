@@ -133,17 +133,25 @@ The two factor authentication flow with WebAuthn works as follows:
 
 ## Challenge store
 
-By default, WebAuthn challenges are kept in the session between the options request and the sign-in or registration request. To keep them in a cache instead:
+By default, WebAuthn challenges are kept in the session between the options request and the sign-in or registration request. To keep them outside the session, choose one store:
 
-```ruby
-# config/initializers/devise_webauthn.rb
-Devise::Webauthn.challenge_store = :cache
-# Optional. Defaults to Rails.cache and 5 minutes.
-Devise::Webauthn::ChallengeStores::Cache.cache = Rails.cache
-Devise::Webauthn::ChallengeStores::Cache.expires_in = 5.minutes
-```
-
-Each challenge can be used once. The two requests can reach different servers or processes, so use a cache shared by all your servers (Redis, Memcached or Solid Cache). `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
+- `:cache` keeps challenges in a cache:
+  ```ruby
+  # config/initializers/devise_webauthn.rb
+  Devise::Webauthn.challenge_store = :cache
+  # Optional. Defaults to Rails.cache and 5 minutes.
+  Devise::Webauthn::ChallengeStores::Cache.cache = Rails.cache
+  Devise::Webauthn::ChallengeStores::Cache.expires_in = 5.minutes
+  ```
+  Each challenge can be used once. The two requests can reach different servers or processes, so use a cache shared by all your servers (Redis, Memcached or Solid Cache). `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
+- `:signed` stores nothing. The server signs each challenge with `secret_key_base`, and checks the signature when the credential comes back:
+  ```ruby
+  # config/initializers/devise_webauthn.rb
+  Devise::Webauthn.challenge_store = :signed
+  # Optional. Defaults to 5 minutes.
+  Devise::Webauthn::ChallengeStores::Signed.expires_in = 5.minutes
+  ```
+  A signed challenge can be used more than once until it expires, like a challenge in a cookie session. Keep `expires_in` short.
 
 ## API clients and native apps
 
@@ -151,7 +159,7 @@ Mobile apps and other API clients can use passkeys without a cookie session, for
 
 ### Server setup
 
-1. Use the `:cache` [challenge store](#challenge-store) with a cache shared by all your servers.
+1. Use the `:cache` or `:signed` [challenge store](#challenge-store).
 2. Stop Devise from writing the user to the session. Passkey sign-in follows the `:params_auth` setting:
    ```ruby
    # config/initializers/devise.rb
