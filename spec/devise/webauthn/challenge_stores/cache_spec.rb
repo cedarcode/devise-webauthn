@@ -6,16 +6,12 @@ require "webauthn/fake_client"
 RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
   include ActiveSupport::Testing::TimeHelpers
 
-  let(:store) { store_for(credential) }
+  let(:store) { described_class.new(instance_double(ActionDispatch::Request, params: { public_key_credential: credential })) }
   let(:client) { WebAuthn::FakeClient.new(WebAuthn.configuration.allowed_origins.first) }
   let(:challenge) { WebAuthn::Credential.options_for_get.challenge }
   let(:credential) do
     client.create(challenge: WebAuthn::Credential.options_for_get.challenge)
-    client.get(challenge: challenge)
-  end
-
-  def store_for(credential)
-    described_class.new(instance_double(ActionDispatch::Request, params: { public_key_credential: credential }))
+    client.get(challenge: challenge).to_json
   end
 
   around do |example|
@@ -48,9 +44,19 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
     end
   end
 
-  it "ignores malformed credentials" do
-    [nil, "{}", {}, { "response" => "x" }, { "response" => { "clientDataJSON" => "%%%" } }].each do |malformed|
-      expect(store_for(malformed).pending?(:passkey_authentication)).to be(false)
+  context "when credential is malformed" do
+    let(:credential) { "{}" }
+
+    it "ignores it" do
+      expect(store.pending?(:passkey_authentication)).to be(false)
+    end
+  end
+
+  context "when the client data has no challenge" do
+    let(:credential) { { response: { clientDataJSON: WebAuthn.configuration.encoder.encode("{}") } }.to_json }
+
+    it "ignores it" do
+      expect(store.pending?(:passkey_authentication)).to be(false)
     end
   end
 end

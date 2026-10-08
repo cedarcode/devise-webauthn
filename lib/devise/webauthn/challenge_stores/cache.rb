@@ -39,18 +39,17 @@ module Devise
         end
 
         def challenge_from_credential
-          client_data_json = credential.dig("response", "clientDataJSON") if credential.is_a?(Hash)
-          return unless client_data_json.is_a?(String)
-
-          client_data = JSON.parse(encoder.decode(client_data_json))
-          challenge = client_data["challenge"] if client_data.is_a?(Hash)
-          encoder.encode(WebAuthn.standard_encoder.decode(challenge)) if challenge.is_a?(String)
-        rescue JSON::ParserError, ArgumentError, TypeError, EncodingError
-          nil
+          @challenge_from_credential ||= begin
+            client_data_json = credential.dig("response", "clientDataJSON") if credential.is_a?(Hash)
+            client_data = WebAuthn::ClientData.new(encoder.decode(client_data_json)) if client_data_json.is_a?(String)
+            encoder.encode(client_data.challenge) if client_data
+          rescue JSON::ParserError, ArgumentError, TypeError, EncodingError, NoMethodError
+            nil
+          end
         end
 
         def credential
-          PublicKeyCredentialParam.parse(@request.params[:public_key_credential])
+          @credential ||= JSON.parse(@request.params[:public_key_credential])
         end
 
         def encoder
