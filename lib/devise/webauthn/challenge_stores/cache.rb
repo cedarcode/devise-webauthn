@@ -33,7 +33,7 @@ module Devise
         end
 
         def key(purpose, challenge)
-          "devise_webauthn:challenge:#{purpose}:#{challenge}"
+          "devise_webauthn:challenge:#{purpose}:#{Digest::SHA256.hexdigest(challenge)}"
         end
 
         def challenge

@@ -30,6 +30,16 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
     expect(store.consume(:passkey_authentication)).to be_nil
   end
 
+  it "keys the cache entry by a digest of the challenge" do
+    allow(described_class.cache).to receive(:write).and_call_original
+
+    store.write(:passkey_authentication, challenge)
+
+    expect(described_class.cache).to have_received(:write)
+      .with("devise_webauthn:challenge:passkey_authentication:#{Digest::SHA256.hexdigest(challenge)}", true,
+            expires_in: described_class.expires_in)
+  end
+
   it "keeps challenges for different purposes apart" do
     store.write(:two_factor_authentication, challenge)
 
