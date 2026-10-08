@@ -104,6 +104,7 @@ RSpec.describe "API client without a session", type: :request do
       end.to change(user.passkeys, :count).by(1)
 
       expect(response).to have_http_status(:created)
+      expect(response.parsed_body["id"]).to eq(user.passkeys.last.id)
     end
 
     it "responds with 422 and an error message when verification fails" do
@@ -114,7 +115,7 @@ RSpec.describe "API client without a session", type: :request do
       api_post account_passkeys_path, name: "My phone", public_key_credential: credential
 
       expect(response).to have_http_status(422)
-      expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
+      expect(response.parsed_body["errors"]).to eq("base" => [I18n.t("devise.failure.passkey_verification_failed")])
     end
 
     it "deletes a passkey and responds with 204" do

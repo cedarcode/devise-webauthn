@@ -185,7 +185,7 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 | Sign-in options | `POST /users/passkey_authentication_options` | WebAuthn request options |
 | Sign in | `POST /users/sign_in` with `public_key_credential` | `201`, and a JWT when you use devise-jwt |
 | Registration options | `POST /users/passkey_registration_options` (authenticated) | WebAuthn creation options |
-| Add passkey | `POST /users/passkeys` with `name` and `public_key_credential` (authenticated) | `201`, or `422` with `error` |
+| Add passkey | `POST /users/passkeys` with `name` and `public_key_credential` (authenticated) | `201` with the passkey, or `422` with `errors` |
 | Delete passkey | `DELETE /users/passkeys/:id` (authenticated) | `204` |
 
 ## Customization

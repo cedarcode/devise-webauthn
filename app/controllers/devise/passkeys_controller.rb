@@ -4,32 +4,33 @@ module Devise
   class PasskeysController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
     include Devise::Webauthn::PublicKeyCredentialParam
-    include Devise::Webauthn::CredentialResponses
 
     before_action :authenticate_scope!
 
     def new; end
 
     def create
-      passkey_from_params = WebAuthn::Credential.from_create(public_key_credential_param)
+      passkey = verify_and_save_passkey(public_key_credential_param)
 
-      if verify_and_save_passkey(passkey_from_params)
-        respond_with_notice :passkey_created, location: after_update_path, status: :created
+      if passkey.persisted?
+        set_flash_message! :notice, :passkey_created
       else
-        respond_with_alert :passkey_verification_failed, location: after_update_path
+        set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
       end
-    rescue WebAuthn::Error
-      respond_with_alert :passkey_verification_failed, location: after_update_path
+      respond_with_navigational(passkey, location: after_update_path) { redirect_to after_update_path }
     ensure
       challenge_store.consume(:registration)
     end
 
     def destroy
-      if resource.passkeys.destroy(params[:id])
-        respond_with_notice :passkey_deleted, location: after_update_path, status: :no_content
+      passkey = resource.passkeys.find(params[:id])
+
+      if passkey.destroy
+        set_flash_message! :notice, :passkey_deleted
       else
-        respond_with_alert :passkey_deletion_failed, location: after_update_path
+        set_flash_message! :alert, :passkey_deletion_failed, scope: :"devise.failure"
       end
+      respond_with_navigational(passkey, location: after_update_path) { redirect_to after_update_path }
     end
 
     private
@@ -39,7 +40,8 @@ module Devise
       self.resource = send(:"current_#{resource_name}")
     end
 
-    def verify_and_save_passkey(passkey_from_params)
+    def verify_and_save_passkey(public_key_credential)
+      passkey_from_params = WebAuthn::Credential.from_create(public_key_credential)
       passkey_from_params.verify(
         challenge_store.consume(:registration),
         user_verification: true
@@ -51,6 +53,14 @@ module Devise
         public_key: passkey_from_params.public_key,
         sign_count: passkey_from_params.sign_count
       )
+    rescue WebAuthn::Error
+      unverified_passkey
+    end
+
+    def unverified_passkey
+      passkey = resource.passkeys.new
+      passkey.errors.add(:base, find_message(:passkey_verification_failed, scope: :"devise.failure"))
+      passkey
     end
 
     # The default url to be used after creating a passkey. You can overwrite
