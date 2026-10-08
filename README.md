@@ -131,52 +131,19 @@ The two factor authentication flow with WebAuthn works as follows:
 5. User selects a credential and verifies with their [authenticator](https://www.w3.org/TR/webauthn-3/#webauthn-authenticator).
 6. The server verifies the response and signs in the user.
 
-## API clients and native apps
+## Challenge store
 
-Mobile apps and other API clients can use passkeys without a cookie session, for example with [devise-jwt](https://github.com/waiting-for-dev/devise-jwt).
+By default, WebAuthn challenges are kept in the session between the options request and the sign-in or registration request. To keep them in a cache instead:
 
-### Server setup
+```ruby
+# config/initializers/devise_webauthn.rb
+Devise::Webauthn.challenge_store = :cache
+# Optional. Defaults to Rails.cache and 5 minutes.
+Devise::Webauthn::ChallengeStores::Cache.cache = Rails.cache
+Devise::Webauthn::ChallengeStores::Cache.expires_in = 5.minutes
+```
 
-1. Keep challenges in a cache shared by all your servers (Redis, Memcached or Solid Cache), not in the session:
-   ```ruby
-   # config/initializers/devise_webauthn.rb
-   Devise::Webauthn.challenge_store = :cache
-   # Optional. Defaults to Rails.cache and 5 minutes.
-   Devise::Webauthn::ChallengeStores::Cache.cache = Rails.cache
-   Devise::Webauthn::ChallengeStores::Cache.expires_in = 5.minutes
-   ```
-   Each challenge can be used once. The options request and the sign-in request can reach different servers or processes, so they must share the cache. `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
-2. Stop Devise from writing the user to the session. Passkey sign-in follows the `:params_auth` setting:
-   ```ruby
-   # config/initializers/devise.rb
-   config.skip_session_storage = [:http_auth, :params_auth]
-   ```
-3. Let Devise controllers respond with JSON, and send `Accept: application/json` from the client:
-   ```ruby
-   class ApplicationController < ActionController::API
-     respond_to :json
-   end
-   ```
-4. Tell WebAuthn which relying party and origins to accept. Native apps do not have a browser origin:
-   ```ruby
-   WebAuthn.configure do |config|
-     config.rp_id = "example.com"
-     config.allowed_origins = [
-       "https://example.com",                            # web and iOS
-       "android:apk-key-hash:<base64url SHA-256 of your signing certificate>"
-     ]
-   end
-   ```
-   Your domain must also serve `/.well-known/apple-app-site-association` (with `webcredentials`) and `/.well-known/assetlinks.json` (with `delegate_permission/common.get_login_creds`).
-
-### Endpoints
-
-Send `public_key_credential` as the JSON object your WebAuthn library returns. For a resource named `user`:
-
-| Step | Request | Response |
-|---|---|---|
-| Sign-in options | `POST /users/passkey_authentication_options` | WebAuthn request options |
-| Sign in | `POST /users/sign_in` with `public_key_credential` | `201`, and a JWT when you use devise-jwt |
+Each challenge can be used once. The two requests can reach different servers or processes, so use a cache shared by all your servers (Redis, Memcached or Solid Cache). `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
 
 ## Customization
 

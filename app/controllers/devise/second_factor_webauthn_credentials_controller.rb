@@ -3,14 +3,13 @@
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
-    include Devise::Webauthn::PublicKeyCredentialParam
 
     before_action :authenticate_scope!
 
     def new; end
 
     def create
-      security_key_from_params = WebAuthn::Credential.from_create(public_key_credential_param)
+      security_key_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
 
       if verify_and_save_security_key(security_key_from_params)
         set_flash_message! :notice, :security_key_created
