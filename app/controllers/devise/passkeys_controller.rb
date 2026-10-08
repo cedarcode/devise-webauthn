@@ -3,13 +3,14 @@
 module Devise
   class PasskeysController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::PublicKeyCredentialParam
 
     before_action :authenticate_scope!
 
     def new; end
 
     def create
-      passkey_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
+      passkey_from_params = WebAuthn::Credential.from_create(public_key_credential_param)
 
       if verify_and_save_passkey(passkey_from_params)
         set_flash_message! :notice, :passkey_created
