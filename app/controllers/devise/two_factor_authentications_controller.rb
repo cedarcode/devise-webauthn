@@ -29,12 +29,10 @@ module Devise
     def ensure_sign_in_initiated
       return if pending_two_factor_sign_in(resource_name).present?
 
+      throw :warden, scope: resource_name, message: :sign_in_not_initiated unless is_navigational_format?
+
       set_flash_message! :alert, :sign_in_not_initiated, scope: :"devise.failure"
-      if is_navigational_format?
-        redirect_to new_session_path(resource_name)
-      else
-        render json: { error: find_message(:sign_in_not_initiated, scope: :"devise.failure") }, status: :unauthorized
-      end
+      redirect_to new_session_path(resource_name)
     end
 
     def set_resource
