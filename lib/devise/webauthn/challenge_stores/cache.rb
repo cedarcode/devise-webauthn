@@ -16,13 +16,11 @@ module Devise
         end
 
         def pending?(purpose)
-          challenge = challenge_from_credential
           challenge.present? && store.exist?(key(purpose, challenge))
         end
 
         # `exist?` honours expiry, which MemoryStore#delete does not. `delete` decides which concurrent request wins.
         def consume(purpose)
-          challenge = challenge_from_credential
           return if challenge.blank?
 
           challenge if store.exist?(key(purpose, challenge)) && store.delete(key(purpose, challenge))
@@ -38,8 +36,10 @@ module Devise
           "devise_webauthn:challenge:#{purpose}:#{challenge}"
         end
 
-        def challenge_from_credential
-          @challenge_from_credential ||= begin
+        def challenge
+          return @challenge if defined?(@challenge)
+
+          @challenge = begin
             client_data_json = credential.dig("response", "clientDataJSON") if credential.is_a?(Hash)
             client_data = WebAuthn::ClientData.new(encoder.decode(client_data_json)) if client_data_json.is_a?(String)
             encoder.encode(client_data.challenge) if client_data
