@@ -36,5 +36,5 @@ WebAuthn.configure do |config|
   # config.algorithms << "ES384"
 end
 
-# Where challenges are kept between requests: `:session` (default) or a store class.
+# Where challenges are kept between requests: `:session` (default), `:cache` or a store class.
 # Devise::Webauthn.challenge_store = :session

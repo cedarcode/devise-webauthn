@@ -1,0 +1,76 @@
+# frozen_string_literal: true
+
+require "spec_helper"
+require "webauthn/fake_client"
+
+RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
+  include ActiveSupport::Testing::TimeHelpers
+
+  let(:store) { described_class.new(instance_double(ActionDispatch::Request, params: { public_key_credential: credential })) }
+  let(:client) { WebAuthn::FakeClient.new(WebAuthn.configuration.allowed_origins.first) }
+  let(:challenge) { WebAuthn::Credential.options_for_get.challenge }
+  let(:credential) do
+    client.create(challenge: WebAuthn::Credential.options_for_get.challenge)
+    client.get(challenge: challenge).to_json
+  end
+
+  around do |example|
+    original_cache = described_class.cache
+    described_class.cache = ActiveSupport::Cache::MemoryStore.new
+    example.run
+  ensure
+    described_class.cache = original_cache
+  end
+
+  # rubocop:disable RSpec/MultipleExpectations
+  it "finds the challenge through the credential's client data and consumes it once" do
+    store.write(:passkey_authentication, challenge)
+
+    expect(store.pending?(:passkey_authentication)).to be(true)
+    expect(store.consume(:passkey_authentication)).to eq(challenge)
+    expect(store.pending?(:passkey_authentication)).to be(false)
+    expect(store.consume(:passkey_authentication)).to be_nil
+  end
+  # rubocop:enable RSpec/MultipleExpectations
+
+  it "keys the cache entry by a digest of the challenge" do
+    allow(described_class.cache).to receive(:write).and_call_original
+
+    store.write(:passkey_authentication, challenge)
+
+    expect(described_class.cache).to have_received(:write)
+      .with("devise_webauthn:challenge:passkey_authentication:#{Digest::SHA256.hexdigest(challenge)}", true,
+            expires_in: described_class.expires_in)
+  end
+
+  it "keeps challenges for different purposes apart" do
+    store.write(:two_factor_authentication, challenge)
+
+    expect(store.pending?(:passkey_authentication)).to be(false)
+  end
+
+  it "expires challenges" do
+    store.write(:passkey_authentication, challenge)
+
+    travel_to(described_class.expires_in.from_now + 1.second) do
+      expect(store.pending?(:passkey_authentication)).to be(false)
+      expect(store.consume(:passkey_authentication)).to be_nil
+    end
+  end
+
+  context "when credential is malformed" do
+    let(:credential) { "{}" }
+
+    it "ignores it" do
+      expect(store.pending?(:passkey_authentication)).to be(false)
+    end
+  end
+
+  context "when the client data has no challenge" do
+    let(:credential) { { response: { clientDataJSON: WebAuthn.configuration.encoder.encode("{}") } }.to_json }
+
+    it "ignores it" do
+      expect(store.pending?(:passkey_authentication)).to be(false)
+    end
+  end
+end

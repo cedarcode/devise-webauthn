@@ -131,6 +131,20 @@ The two factor authentication flow with WebAuthn works as follows:
 5. User selects a credential and verifies with their [authenticator](https://www.w3.org/TR/webauthn-3/#webauthn-authenticator).
 6. The server verifies the response and signs in the user.
 
+## Challenge store
+
+By default, WebAuthn challenges are kept in the session between the options request and the sign-in or registration request. To keep them in a cache instead:
+
+```ruby
+# config/initializers/devise_webauthn.rb
+Devise::Webauthn.challenge_store = :cache
+# Optional. Defaults to Rails.cache and 5 minutes.
+Devise::Webauthn::ChallengeStores::Cache.cache = Rails.cache
+Devise::Webauthn::ChallengeStores::Cache.expires_in = 5.minutes
+```
+
+Each challenge can be used once. The two requests can reach different servers or processes, so use a cache shared by all your servers (Redis, Memcached or Solid Cache). `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
+
 ## Customization
 
 ### Customizing Views

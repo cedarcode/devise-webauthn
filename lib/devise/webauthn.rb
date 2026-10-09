@@ -5,6 +5,7 @@ require "webauthn"
 
 require_relative "webauthn/version"
 require_relative "webauthn/challenge_stores/session"
+require_relative "webauthn/challenge_stores/cache"
 require_relative "webauthn/challenge_store_access"
 require_relative "webauthn/engine"
 require_relative "webauthn/helpers/credentials_helper"
