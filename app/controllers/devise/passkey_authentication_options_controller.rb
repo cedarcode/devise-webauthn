@@ -12,9 +12,7 @@ module Devise
           user_verification: "required"
         )
 
-      challenge_store.write(:passkey_authentication, passkey_options.challenge)
-
-      render json: passkey_options
+      render json: options_with_stored_challenge(:passkey_authentication, passkey_options)
     end
   end
 end

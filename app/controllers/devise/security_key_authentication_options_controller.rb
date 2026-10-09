@@ -16,9 +16,7 @@ module Devise
           user_verification: "discouraged"
         )
 
-      challenge_store.write(:two_factor_authentication, security_key_authentication_options.challenge)
-
-      render json: security_key_authentication_options
+      render json: options_with_stored_challenge(:two_factor_authentication, security_key_authentication_options)
     end
 
     private
