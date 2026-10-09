@@ -22,13 +22,16 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
     described_class.cache = original_cache
   end
 
+  # rubocop:disable RSpec/MultipleExpectations
   it "finds the challenge through the credential's client data and consumes it once" do
     store.write(:passkey_authentication, challenge)
 
     expect(store.pending?(:passkey_authentication)).to be(true)
     expect(store.consume(:passkey_authentication)).to eq(challenge)
+    expect(store.pending?(:passkey_authentication)).to be(false)
     expect(store.consume(:passkey_authentication)).to be_nil
   end
+  # rubocop:enable RSpec/MultipleExpectations
 
   it "keys the cache entry by a digest of the challenge" do
     allow(described_class.cache).to receive(:write).and_call_original
@@ -50,6 +53,7 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
     store.write(:passkey_authentication, challenge)
 
     travel_to(described_class.expires_in.from_now + 1.second) do
+      expect(store.pending?(:passkey_authentication)).to be(false)
       expect(store.consume(:passkey_authentication)).to be_nil
     end
   end
