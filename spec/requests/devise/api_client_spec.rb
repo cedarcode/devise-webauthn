@@ -197,8 +197,9 @@ RSpec.describe "API client without a session", type: :request do
       SecurityKeyRegistrationOptionsController
     ].each do |controller|
       it "loads Devise::#{controller}" do
-        stub_const("DeviseController", Class.new(ActionController::API))
+        # Hiding autoloads the real controller, so it must happen before DeviseController is stubbed.
         hide_const("Devise::#{controller}")
+        stub_const("DeviseController", Class.new(ActionController::API))
         path = Devise::Webauthn::Engine.root.join("app/controllers/devise/#{controller.underscore}.rb")
 
         expect { load path.to_s }.not_to raise_error
