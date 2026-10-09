@@ -4,6 +4,8 @@ require "spec_helper"
 require "webauthn/fake_client"
 
 RSpec.describe "API client without a session", type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:password) { "password123" }
   let(:user) { Account.create!(email: "test@example.com", password: password, webauthn_id: WebAuthn.generate_user_id) }
   let(:client) { WebAuthn::FakeClient.new(WebAuthn.configuration.allowed_origins.first) }
@@ -255,9 +257,9 @@ RSpec.describe "API client without a session", type: :request do
 
     before { Devise::Webauthn.challenge_store = :signed }
 
-    def passkey_assertion(challenge)
+    def passkey_assertion(challenge, sign_count: nil)
       client.get(challenge: challenge, allow_credentials: [passkey.external_id], user_verified: true,
-                 user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
+                 sign_count: sign_count, user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
     end
 
     it "signs in with a challenge the server signed, without keeping any state" do
@@ -276,6 +278,20 @@ RSpec.describe "API client without a session", type: :request do
       api_post account_session_path, public_key_credential: passkey_assertion(challenge)
 
       expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "accepts a replayed assertion until the challenge expires when the sign count stays at 0" do
+      api_post account_passkey_authentication_options_path
+      assertion = passkey_assertion(response.parsed_body["challenge"], sign_count: 0)
+      api_post account_session_path, public_key_credential: assertion
+
+      api_post account_session_path, public_key_credential: assertion
+      expect(response).to have_http_status(:created)
+
+      travel_to(Devise::Webauthn::ChallengeStores::Signed.expires_in.from_now + 1.second) do
+        api_post account_session_path, public_key_credential: assertion
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 end
