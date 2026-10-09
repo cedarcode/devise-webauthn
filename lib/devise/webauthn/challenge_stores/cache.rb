@@ -22,8 +22,10 @@ module Devise
         # `exist?` honours expiry, which MemoryStore#delete does not. `delete` decides which concurrent request wins.
         def consume(purpose)
           return if challenge.blank?
+          return unless store.exist?(key(purpose, challenge))
+          return unless store.delete(key(purpose, challenge))
 
-          challenge if store.exist?(key(purpose, challenge)) && store.delete(key(purpose, challenge))
+          challenge
         end
 
         private
