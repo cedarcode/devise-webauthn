@@ -27,6 +27,10 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
     )
   end
 
+  def pending_sign_in_id
+    Devise::Webauthn::TwoFactorToken.read(session[:two_factor_token], scope: :account)&.fetch("id")
+  end
+
   def generate_assertion(fake_client, challenge:, credential:)
     fake_client.get(
       challenge: challenge,
@@ -47,7 +51,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to eq(I18n.t("devise.failure.two_factor_required"))
       post account_security_key_authentication_options_path # To set the challenge in session
-      expect(session[:current_authentication_resource_id]).to eq(user.id)
+      expect(pending_sign_in_id).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
       assertion = generate_assertion(
@@ -65,7 +69,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         expect(flash[:notice]).to eq(I18n.t("devise.sessions.signed_in"))
         expect(controller.current_account).to eq(user)
         expect(session[:two_factor_authentication_challenge]).to be_nil
-        expect(session[:current_authentication_resource_id]).to be_nil
+        expect(session[:two_factor_token]).to be_nil
       end.to change { security_key.reload.sign_count }.by(1)
     end
 
@@ -73,7 +77,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       post account_session_path, params: { account: { email: user.email, password: "wrong password" } }
 
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(session[:current_authentication_resource_id]).to be_nil
+      expect(session[:two_factor_token]).to be_nil
       expect(session[:two_factor_authentication_challenge]).to be_nil
     end
 
@@ -87,7 +91,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
       post account_security_key_authentication_options_path # To set the challenge in session
-      expect(session[:current_authentication_resource_id]).to eq(user.id)
+      expect(pending_sign_in_id).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
       assertion = generate_assertion(
@@ -117,7 +121,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
       post account_security_key_authentication_options_path # To set the challenge in session
-      expect(session[:current_authentication_resource_id]).to eq(user.id)
+      expect(pending_sign_in_id).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
       assertion = client.get(
@@ -148,7 +152,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
       post account_security_key_authentication_options_path # To set the challenge in session
-      expect(session[:current_authentication_resource_id]).to eq(user.id)
+      expect(pending_sign_in_id).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
       assertion = client.get(
@@ -231,7 +235,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(response).to have_http_status(:ok)
       expect(flash[:notice]).to include(I18n.t("devise.failure.two_factor_required"))
       post account_security_key_authentication_options_path # To set the challenge in session
-      expect(session[:current_authentication_resource_id]).to eq(user.id)
+      expect(pending_sign_in_id).to eq(user.id)
       expect(session[:two_factor_authentication_challenge]).not_to be_nil
 
       post account_two_factor_authentication_path, params: {}
@@ -260,7 +264,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
     it "does not set 2FA session state" do
       post account_session_path, params: { account: { email: user.email, password: password } }
 
-      expect(session[:current_authentication_resource_id]).to be_nil
+      expect(session[:two_factor_token]).to be_nil
     end
   end
 
