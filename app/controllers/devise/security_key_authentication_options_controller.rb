@@ -3,6 +3,7 @@
 module Devise
   class SecurityKeyAuthenticationOptionsController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::PendingTwoFactorSignIn
 
     skip_forgery_protection
 
@@ -23,7 +24,10 @@ module Devise
     private
 
     def set_resource
-      @resource = resource_class.find(session[:current_authentication_resource_id])
+      sign_in_attempt = two_factor_sign_in_attempt_for(resource_name)
+      throw :warden, scope: resource_name, message: :sign_in_not_initiated if sign_in_attempt.blank?
+
+      @resource = resource_class.find(sign_in_attempt["id"])
     end
   end
 end

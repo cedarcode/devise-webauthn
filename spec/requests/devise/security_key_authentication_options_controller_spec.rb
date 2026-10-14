@@ -3,6 +3,8 @@
 require "spec_helper"
 
 RSpec.describe Devise::SecurityKeyAuthenticationOptionsController, type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:user) { Account.create!(email: "test@example.com", password: "password123") }
 
   describe "POST #create" do
@@ -31,6 +33,15 @@ RSpec.describe Devise::SecurityKeyAuthenticationOptionsController, type: :reques
       expect(body).to include("challenge")
 
       expect(session[:two_factor_authentication_challenge]).to eq(body["challenge"])
+    end
+
+    it "responds with 401 when the pending sign-in has expired" do
+      travel_to(Devise::Webauthn::TwoFactorToken.expires_in.from_now + 1.second) do
+        post account_security_key_authentication_options_path, headers: { "ACCEPT" => "application/json" }
+      end
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
     end
   end
 end

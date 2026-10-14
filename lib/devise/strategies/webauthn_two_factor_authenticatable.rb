@@ -4,10 +4,11 @@ module Devise
   module Strategies
     class WebauthnTwoFactorAuthenticatable < Devise::Strategies::Base
       include Devise::Webauthn::ChallengeStoreAccess
+      include Devise::Webauthn::PendingTwoFactorSignIn
 
       def valid?
         credential_param.present? &&
-          session[:current_authentication_resource_id].present? &&
+          two_factor_sign_in_attempt_for(scope).present? &&
           challenge_store.pending?(:two_factor_authentication)
       end
 
@@ -15,7 +16,8 @@ module Devise
       def authenticate!
         expected_challenge = challenge_store.consume(:two_factor_authentication)
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
-        resource = resource_class.find_by(id: session[:current_authentication_resource_id])
+        sign_in_attempt = two_factor_sign_in_attempt_for(scope)
+        resource = resource_class.find_by(id: sign_in_attempt["id"])
         stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)
 
         return fail!(:webauthn_credential_not_found) if stored_credential.blank?
@@ -25,11 +27,10 @@ module Devise
 
         verify_credential(credential_from_params, stored_credential, expected_challenge)
 
-        resource.remember_me = session[:current_authentication_remember_me] if resource.respond_to?(:remember_me=)
+        resource.remember_me = sign_in_attempt["remember_me"] if resource.respond_to?(:remember_me=)
         success!(resource)
 
-        session.delete(:current_authentication_resource_id)
-        session.delete(:current_authentication_remember_me)
+        clear_two_factor_sign_in_attempt
       rescue WebAuthn::Error
         fail!(:webauthn_credential_verification_failed)
       end
