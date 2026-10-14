@@ -24,10 +24,10 @@ module Devise
     private
 
     def set_resource
-      pending_sign_in = pending_two_factor_sign_in(resource_name)
-      throw :warden, scope: resource_name, message: :sign_in_not_initiated if pending_sign_in.blank?
+      sign_in_attempt = two_factor_sign_in_attempt_for(resource_name)
+      throw :warden, scope: resource_name, message: :sign_in_not_initiated if sign_in_attempt.blank?
 
-      @resource = resource_class.find(pending_sign_in["id"])
+      @resource = resource_class.find(sign_in_attempt["id"])
     end
   end
 end

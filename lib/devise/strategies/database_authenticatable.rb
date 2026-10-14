@@ -6,6 +6,8 @@ module Devise
   module Strategies
     # Default strategy for signing in a user, based on their email and password in the database.
     class DatabaseAuthenticatable < Authenticatable
+      include Devise::Webauthn::PendingTwoFactorSignIn
+
       def authenticate!
         resource  = password.present? && mapping.to.find_for_database_authentication(authentication_hash)
         hashed = false
@@ -36,14 +38,10 @@ module Devise
       end
 
       def redirect_to_two_factor_authentication(resource)
-        session[:two_factor_token] = two_factor_token(resource)
+        start_two_factor_sign_in_attempt_for(resource, scope: scope, remember_me: remember_me?)
         request.flash[:notice] = two_factor_required_message
         request.commit_flash
         redirect!(two_factor_authentication_path, {}, message: two_factor_required_message)
-      end
-
-      def two_factor_token(resource)
-        Devise::Webauthn::TwoFactorToken.generate(resource, scope: scope, remember_me: remember_me?)
       end
 
       def two_factor_required_message

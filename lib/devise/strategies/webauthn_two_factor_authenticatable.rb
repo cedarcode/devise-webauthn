@@ -8,7 +8,7 @@ module Devise
 
       def valid?
         credential_param.present? &&
-          pending_two_factor_sign_in(scope).present? &&
+          two_factor_sign_in_attempt_for(scope).present? &&
           challenge_store.pending?(:two_factor_authentication)
       end
 
@@ -16,8 +16,8 @@ module Devise
       def authenticate!
         expected_challenge = challenge_store.consume(:two_factor_authentication)
         credential_from_params = WebAuthn::Credential.from_get(JSON.parse(credential_param))
-        pending_sign_in = pending_two_factor_sign_in(scope)
-        resource = resource_class.find_by(id: pending_sign_in["id"])
+        sign_in_attempt = two_factor_sign_in_attempt_for(scope)
+        resource = resource_class.find_by(id: sign_in_attempt["id"])
         stored_credential = resource&.webauthn_credentials&.find_by(external_id: credential_from_params.id)
 
         return fail!(:webauthn_credential_not_found) if stored_credential.blank?
@@ -27,10 +27,10 @@ module Devise
 
         verify_credential(credential_from_params, stored_credential, expected_challenge)
 
-        resource.remember_me = pending_sign_in["remember_me"] if resource.respond_to?(:remember_me=)
+        resource.remember_me = sign_in_attempt["remember_me"] if resource.respond_to?(:remember_me=)
         success!(resource)
 
-        clear_pending_two_factor_sign_in
+        clear_two_factor_sign_in_attempt
       rescue WebAuthn::Error
         fail!(:webauthn_credential_verification_failed)
       end

@@ -27,14 +27,14 @@ module Devise
     private
 
     def ensure_sign_in_initiated
-      return if pending_two_factor_sign_in(resource_name).present?
+      return if two_factor_sign_in_attempt_for(resource_name).present?
 
       set_flash_message! :alert, :sign_in_not_initiated, scope: :"devise.failure"
       redirect_to new_session_path(resource_name)
     end
 
     def set_resource
-      @resource = resource_class.find(pending_two_factor_sign_in(resource_name)["id"])
+      @resource = resource_class.find(two_factor_sign_in_attempt_for(resource_name)["id"])
     end
   end
 end
