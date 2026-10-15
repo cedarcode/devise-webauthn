@@ -175,7 +175,7 @@ Mobile apps and other API clients can use passkeys without a cookie session, for
      respond_to :html, :json
    end
    ```
-   An API-only app can inherit from `ActionController::API` and use `respond_to :json`.
+   An API-only app can inherit from `ActionController::API` and use `respond_to :json`. It has no session, so also set `config.navigational_formats = []` in the Devise initializer. Otherwise a request without an `Accept` header counts as a browser request and raises when Devise writes to the session.
    With `:registerable`, also override `sign_up` in your registrations controller to call `sign_in(resource_name, resource, store: false)`. Devise's default writes to the session.
 4. Tell WebAuthn which relying party and origins to accept. Native apps do not have a browser origin:
    ```ruby

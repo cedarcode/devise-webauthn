@@ -46,7 +46,7 @@ module Devise
       end
 
       def redirect_to_two_factor_authentication(resource)
-        start_two_factor_sign_in_attempt_for(resource, scope: scope, remember_me: remember_me?)
+        store_two_factor_sign_in_attempt_in_session(resource, scope: scope, remember_me: remember_me?)
         request.flash[:notice] = two_factor_required_message
         request.commit_flash
         redirect!(two_factor_authentication_path, {}, message: two_factor_required_message)

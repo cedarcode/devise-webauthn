@@ -5,7 +5,7 @@ module Devise
     module PendingTwoFactorSignIn
       private
 
-      def start_two_factor_sign_in_attempt_for(resource, scope:, remember_me:)
+      def store_two_factor_sign_in_attempt_in_session(resource, scope:, remember_me:)
         request.session[:two_factor_token] =
           two_factor_sign_in_attempt_token_for(resource, scope: scope, remember_me: remember_me)
       end
