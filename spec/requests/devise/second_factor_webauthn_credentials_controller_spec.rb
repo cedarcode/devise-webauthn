@@ -89,10 +89,6 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
 
       context "when the credential cannot be parsed" do
-        before do
-          allow(WebAuthn::Credential).to receive(:from_create).and_raise(WebAuthn::Error)
-        end
-
         it "clears the challenge and redirects" do
           post account_second_factor_webauthn_credentials_path, params: { public_key_credential: "{}", name: "Key" }
 
