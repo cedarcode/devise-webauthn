@@ -17,7 +17,7 @@ module Devise
         super && mapping.to.skip_session_storage.exclude?(:params_auth)
       end
 
-      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       def authenticate!
         expected_challenge = challenge_store.consume(:two_factor_authentication)
         credential_from_params = WebAuthn::Credential.from_get(public_key_credential_param)
@@ -31,15 +31,14 @@ module Devise
         end
 
         verify_credential(credential_from_params, stored_credential, expected_challenge)
+        return fail!(:sign_in_not_initiated) unless consume_two_factor_sign_in_attempt(sign_in_attempt)
 
         resource.remember_me = sign_in_attempt["remember_me"] if resource.respond_to?(:remember_me=)
         success!(resource)
-
-        clear_two_factor_sign_in_attempt
       rescue WebAuthn::Error
         fail!(:webauthn_credential_verification_failed)
       end
-      # rubocop:enable Metrics/AbcSize
+      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
       private
 

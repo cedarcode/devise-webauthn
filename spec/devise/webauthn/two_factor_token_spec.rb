@@ -31,4 +31,43 @@ RSpec.describe Devise::Webauthn::TwoFactorToken do
   it "returns nil when the token is missing" do
     expect(described_class.read(nil, scope: :account)).to be_nil
   end
+
+  it "can be consumed more than once without the cache challenge store" do
+    payload = described_class.read(token, scope: :account)
+
+    expect([described_class.consume(payload), described_class.consume(payload)]).to eq([true, true])
+    expect(described_class.read(token, scope: :account)).to be_present
+  end
+
+  context "with the cache challenge store" do
+    around do |example|
+      original_store = Devise::Webauthn.challenge_store
+      original_cache = Devise::Webauthn::ChallengeStores::Cache.cache
+      Devise::Webauthn.challenge_store = :cache
+      Devise::Webauthn::ChallengeStores::Cache.cache = ActiveSupport::Cache::MemoryStore.new
+      example.run
+    ensure
+      Devise::Webauthn.challenge_store = original_store
+      Devise::Webauthn::ChallengeStores::Cache.cache = original_cache
+    end
+
+    it "is consumed once" do
+      payload = described_class.read(token, scope: :account)
+
+      expect([described_class.consume(payload), described_class.consume(payload)]).to eq([true, false])
+    end
+
+    it "returns nil after it is consumed" do
+      described_class.consume(described_class.read(token, scope: :account))
+
+      expect(described_class.read(token, scope: :account)).to be_nil
+    end
+
+    it "returns nil when the cache entry is missing" do
+      token
+      Devise::Webauthn::ChallengeStores::Cache.cache.clear
+
+      expect(described_class.read(token, scope: :account)).to be_nil
+    end
+  end
 end

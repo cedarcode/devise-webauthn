@@ -261,6 +261,17 @@ RSpec.describe "API client without a session", type: :request do
       expect(session["warden.user.account.key"]).to be_nil
     end
 
+    it "rejects a two-factor token that already finished a sign-in" do
+      token = request_two_factor_token
+      api_post account_two_factor_authentication_path, two_factor_token: token,
+                                                       public_key_credential: security_key_assertion(token).to_json
+
+      api_post account_security_key_authentication_options_path, two_factor_token: token
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+    end
+
     it "responds to the options step with 401 when the two-factor token is invalid" do
       token = request_two_factor_token
 

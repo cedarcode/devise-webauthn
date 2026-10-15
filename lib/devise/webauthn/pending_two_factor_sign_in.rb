@@ -20,8 +20,9 @@ module Devise
           TwoFactorToken.read(params[:two_factor_token], scope: scope)
       end
 
-      def clear_two_factor_sign_in_attempt
+      def consume_two_factor_sign_in_attempt(sign_in_attempt)
         request.session.delete(:two_factor_token)
+        TwoFactorToken.consume(sign_in_attempt)
       end
     end
   end
