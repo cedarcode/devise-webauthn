@@ -6,13 +6,13 @@
 
 - Add `Devise::Webauthn.challenge_store` to configure where WebAuthn challenges are kept between the options request and the verification request. It takes a symbol such as `:session`, or a store class. The default, `:session`, keeps them in the session as before. [#150](https://github.com/cedarcode/devise-webauthn/pull/150) [@RenzoMinelli]
 - Add the `:cache` challenge store, which keeps challenges in `Rails.cache` instead of the session. [#152](https://github.com/cedarcode/devise-webauthn/pull/152) [@RenzoMinelli]
-- Return a `two_factor_token` to API clients when a password sign-in needs a second factor, and accept it instead of the session to finish two-factor sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
+- Return a `two_factor_token` to API clients when a password sign-in needs a second factor, and accept it in the request body instead of the session to finish two-factor sign-in. The gem adds `two_factor_token` to `filter_parameters`. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Accept `public_key_credential` as a JSON object as well as a JSON string. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Respond with `201` or `204`, or `422` with JSON `errors`, from the passkey and security key controllers when the request is not navigational. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 
 ### Changed
 
-- The pending two-factor sign-in is kept in the session as a signed `two_factor_token` instead of the user id. It expires after 5 minutes and only works for the Devise scope that issued it. Sign-ins pending during the upgrade must start again. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
+- The pending two-factor sign-in is kept in the session as an encrypted `two_factor_token` instead of the user id. It expires after 5 minutes and only works for the Devise scope that issued it. Sign-ins pending during the upgrade must start again. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
 - Passkey sign-in and two-factor sign-in with a security key no longer store the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - The WebAuthn options controllers only call `skip_forgery_protection` when it is defined, so they load under an `ActionController::API` parent. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 
