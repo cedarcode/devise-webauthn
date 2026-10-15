@@ -33,4 +33,12 @@ RSpec.describe Devise::Webauthn::StateStores::Session do
   it "raises on an unknown purpose" do
     expect { store.write(:unknown, "challenge") }.to raise_error(KeyError)
   end
+
+  it "accepts every two-factor token, since it does not record them" do
+    store.issue_two_factor_token("abc")
+
+    expect(store.two_factor_token_issued?("other")).to be(true)
+    expect([store.consume_two_factor_token("abc"), store.consume_two_factor_token("abc")]).to eq(%w[abc abc])
+    expect(session).to be_empty
+  end
 end

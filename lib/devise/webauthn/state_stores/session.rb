@@ -25,6 +25,18 @@ module Devise
         def consume(purpose)
           @session.delete(KEYS.fetch(purpose))
         end
+
+        # Tokens are not recorded: browser sign-ins clear theirs from the session,
+        # and API tokens work until they expire.
+        def issue_two_factor_token(_jti); end
+
+        def two_factor_token_issued?(_jti)
+          true
+        end
+
+        def consume_two_factor_token(jti)
+          jti
+        end
       end
     end
   end

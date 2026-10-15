@@ -28,6 +28,19 @@ module Devise
           challenge
         end
 
+        def issue_two_factor_token(jti)
+          store.write(two_factor_token_key(jti), true, expires_in: TwoFactorToken.expires_in)
+        end
+
+        def two_factor_token_issued?(jti)
+          store.exist?(two_factor_token_key(jti))
+        end
+
+        # `delete` returns true for one caller only, so a token finishes one sign-in.
+        def consume_two_factor_token(jti)
+          jti if store.delete(two_factor_token_key(jti))
+        end
+
         private
 
         def store
@@ -36,6 +49,10 @@ module Devise
 
         def key(purpose, challenge)
           "devise_webauthn:challenge:#{purpose}:#{Digest::SHA256.hexdigest(challenge)}"
+        end
+
+        def two_factor_token_key(jti)
+          "devise_webauthn:two_factor_token:#{jti}"
         end
 
         def challenge

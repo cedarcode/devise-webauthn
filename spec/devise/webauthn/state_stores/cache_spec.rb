@@ -73,4 +73,26 @@ RSpec.describe Devise::Webauthn::StateStores::Cache do
       expect(store.pending?(:passkey_authentication)).to be(false)
     end
   end
+
+  describe "two-factor tokens" do
+    it "reports a token as issued until it is consumed, and consumes it once" do
+      store.issue_two_factor_token("abc")
+
+      expect(store.two_factor_token_issued?("abc")).to be(true)
+      expect([store.consume_two_factor_token("abc"), store.consume_two_factor_token("abc")]).to eq(["abc", nil])
+      expect(store.two_factor_token_issued?("abc")).to be(false)
+    end
+
+    it "does not report a token that was never issued" do
+      expect(store.two_factor_token_issued?("abc")).to be(false)
+    end
+
+    it "expires tokens with the two-factor token lifetime" do
+      store.issue_two_factor_token("abc")
+
+      travel_to(Devise::Webauthn::TwoFactorToken.expires_in.from_now + 1.second) do
+        expect(store.two_factor_token_issued?("abc")).to be(false)
+      end
+    end
+  end
 end

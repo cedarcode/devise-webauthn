@@ -22,4 +22,14 @@ class MemoryStateStore
   def consume(purpose)
     self.class.challenges.delete(purpose)
   end
+
+  def issue_two_factor_token(_jti); end
+
+  def two_factor_token_issued?(_jti)
+    true
+  end
+
+  def consume_two_factor_token(jti)
+    jti
+  end
 end
