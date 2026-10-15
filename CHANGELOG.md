@@ -11,6 +11,7 @@
 ### Changed
 
 - The pending two-factor sign-in is kept in the session as a signed `two_factor_token` instead of the user id. It expires after 5 minutes and only works for the Devise scope that issued it. Sign-ins pending during the upgrade must start again. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
+- Passkey sign-in and two-factor sign-in with a security key no longer store the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 

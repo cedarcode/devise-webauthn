@@ -11,6 +11,10 @@ module Devise
           challenge_store.pending?(:passkey_authentication)
       end
 
+      def store?
+        super && mapping.to.skip_session_storage.exclude?(:params_auth)
+      end
+
       def authenticate! # rubocop:disable Metrics/AbcSize
         expected_challenge = challenge_store.consume(:passkey_authentication)
         passkey_from_params = WebAuthn::Credential.from_get(public_key_credential_param)

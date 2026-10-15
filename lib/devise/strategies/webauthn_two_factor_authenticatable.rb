@@ -13,6 +13,10 @@ module Devise
           challenge_store.pending?(:two_factor_authentication)
       end
 
+      def store?
+        super && mapping.to.skip_session_storage.exclude?(:params_auth)
+      end
+
       # rubocop:disable Metrics/AbcSize
       def authenticate!
         expected_challenge = challenge_store.consume(:two_factor_authentication)
