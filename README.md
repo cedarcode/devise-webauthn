@@ -132,7 +132,7 @@ The two factor authentication flow with WebAuthn works as follows:
 6. The server verifies the response and signs in the user.
 
 #### 2FA Sign In for API clients
-When a request is not navigational (for example, it accepts JSON), a password sign-in that needs a second factor responds `401` with a `two_factor_token` instead of redirecting. Send that token to `POST /users/security_key_authentication_options` and to `POST /users/two_factor_authentication` together with `public_key_credential`. The token expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
+When a request is not navigational (for example, it accepts JSON), a password sign-in that needs a second factor responds `401` with a `two_factor_token` instead of redirecting. Send that token in the request body to `POST /users/security_key_authentication_options` and to `POST /users/two_factor_authentication` together with `public_key_credential`. The token in the query string is ignored, and the gem adds `two_factor_token` to `filter_parameters` so Rails does not log it. The token expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
 
 Use the `:cache` [challenge store](#challenge-store) when the client does not keep a session cookie.
 

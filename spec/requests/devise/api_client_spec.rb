@@ -270,6 +270,23 @@ RSpec.describe "API client without a session", type: :request do
       expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
     end
 
+    it "ignores a two-factor token in the query string" do
+      token = request_two_factor_token
+
+      reset!
+      post "#{account_security_key_authentication_options_path}?two_factor_token=#{CGI.escape(token)}",
+           headers: { "ACCEPT" => "application/json" }
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+    end
+
+    it "filters the two-factor token from the logged parameters" do
+      api_post account_security_key_authentication_options_path, two_factor_token: request_two_factor_token
+
+      expect(request.filtered_parameters["two_factor_token"]).to eq("[FILTERED]")
+    end
+
     it "rejects a tampered two-factor token" do
       token = request_two_factor_token
       assertion = security_key_assertion(token)

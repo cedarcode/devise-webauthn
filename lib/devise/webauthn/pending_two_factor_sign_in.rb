@@ -14,10 +14,11 @@ module Devise
         TwoFactorToken.generate(resource, scope: scope, remember_me: remember_me)
       end
 
-      # Browsers keep the `two_factor_token` in the session; API clients send it back as a param.
+      # Browsers keep the `two_factor_token` in the session; API clients send it in the request body.
+      # The query string is ignored because servers and proxies log URLs.
       def two_factor_sign_in_attempt_for(scope)
         TwoFactorToken.read(request.session[:two_factor_token], scope: scope) ||
-          TwoFactorToken.read(params[:two_factor_token], scope: scope)
+          TwoFactorToken.read(request.request_parameters["two_factor_token"], scope: scope)
       end
 
       def clear_two_factor_sign_in_attempt
