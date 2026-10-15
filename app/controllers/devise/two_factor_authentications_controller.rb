@@ -29,6 +29,8 @@ module Devise
     def ensure_sign_in_initiated
       return if two_factor_sign_in_attempt_for(resource_name).present?
 
+      throw :warden, scope: resource_name, message: :sign_in_not_initiated unless is_navigational_format?
+
       set_flash_message! :alert, :sign_in_not_initiated, scope: :"devise.failure"
       redirect_to new_session_path(resource_name)
     end
