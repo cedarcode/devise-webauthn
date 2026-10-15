@@ -3,12 +3,12 @@
 module Devise
   module Strategies
     class PasskeyAuthenticatable < Devise::Strategies::Base
-      include Devise::Webauthn::ChallengeStoreAccess
+      include Devise::Webauthn::StateStoreAccess
       include Devise::Webauthn::PublicKeyCredentialParam
 
       def valid?
         public_key_credential_param.present? &&
-          challenge_store.pending?(:passkey_authentication)
+          state_store.pending?(:passkey_authentication)
       end
 
       def store?
@@ -16,7 +16,7 @@ module Devise
       end
 
       def authenticate! # rubocop:disable Metrics/AbcSize
-        expected_challenge = challenge_store.consume(:passkey_authentication)
+        expected_challenge = state_store.consume(:passkey_authentication)
         passkey_from_params = WebAuthn::Credential.from_get(public_key_credential_param)
 
         return fail!(:passkey_not_found) if passkey_from_params.user_handle.nil?

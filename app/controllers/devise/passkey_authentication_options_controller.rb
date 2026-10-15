@@ -2,7 +2,7 @@
 
 module Devise
   class PasskeyAuthenticationOptionsController < DeviseController
-    include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::StateStoreAccess
 
     skip_forgery_protection if respond_to?(:skip_forgery_protection)
 
@@ -12,7 +12,7 @@ module Devise
           user_verification: "required"
         )
 
-      challenge_store.write(:passkey_authentication, passkey_options.challenge)
+      state_store.write(:passkey_authentication, passkey_options.challenge)
 
       render json: passkey_options
     end

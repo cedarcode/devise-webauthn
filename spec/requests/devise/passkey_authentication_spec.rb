@@ -10,16 +10,16 @@ RSpec.describe "Passkey authentication flow", type: :request do
   let(:client) { WebAuthn::FakeClient.new(origin) }
 
   around do |example|
-    original_store = Devise::Webauthn.challenge_store
-    Devise::Webauthn.challenge_store = MemoryChallengeStore
+    original_store = Devise::Webauthn.state_store
+    Devise::Webauthn.state_store = MemoryStateStore
     example.run
   ensure
-    Devise::Webauthn.challenge_store = original_store
-    MemoryChallengeStore.reset
+    Devise::Webauthn.state_store = original_store
+    MemoryStateStore.reset
   end
 
   def stored_challenge
-    MemoryChallengeStore.challenges[:passkey_authentication]
+    MemoryStateStore.challenges[:passkey_authentication]
   end
 
   def create_passkey_for(account, fake_client)

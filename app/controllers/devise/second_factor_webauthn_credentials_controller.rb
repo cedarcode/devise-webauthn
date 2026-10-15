@@ -2,7 +2,7 @@
 
 module Devise
   class SecondFactorWebauthnCredentialsController < DeviseController
-    include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::StateStoreAccess
     include Devise::Webauthn::PublicKeyCredentialParam
 
     before_action :authenticate_scope!
@@ -23,7 +23,7 @@ module Devise
         respond_with_navigational(security_key, location: after_create_path) { redirect_to after_create_path }
       end
     ensure
-      challenge_store.consume(:registration)
+      state_store.consume(:registration)
     end
 
     def update
@@ -60,7 +60,7 @@ module Devise
 
       security_key_from_params = WebAuthn::Credential.from_create(public_key_credential)
       security_key_from_params.verify(
-        challenge_store.consume(:registration)
+        state_store.consume(:registration)
       )
 
       resource.second_factor_webauthn_credentials.create(

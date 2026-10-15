@@ -134,7 +134,7 @@ The two factor authentication flow with WebAuthn works as follows:
 #### 2FA Sign In for API clients
 When a request is not navigational (for example, it accepts JSON), a password sign-in that needs a second factor responds `401` with a `two_factor_token` instead of redirecting. Send that token to `POST /users/security_key_authentication_options` and to `POST /users/two_factor_authentication` together with `public_key_credential`. The token expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
 
-Use the `:cache` [challenge store](#challenge-store) when the client does not keep a session cookie. With it, each `two_factor_token` is also kept in the cache and finishes one sign-in. Without it, the token works until it expires.
+Use the `:cache` [state store](#state-store) when the client does not keep a session cookie. With it, each `two_factor_token` is also kept in the cache and finishes one sign-in. Without it, the token works until it expires.
 
 devise-jwt only issues a token on `POST /users/sign_in` by default. Add the 2FA path:
 ```ruby
@@ -143,19 +143,19 @@ config.jwt do |jwt|
 end
 ```
 
-## Challenge store
+## State store
 
 By default, WebAuthn challenges are kept in the session between the options request and the sign-in or registration request. To keep them in a cache instead:
 
 ```ruby
 # config/initializers/devise_webauthn.rb
-Devise::Webauthn.challenge_store = :cache
+Devise::Webauthn.state_store = :cache
 # Optional. Defaults to Rails.cache and 5 minutes.
-Devise::Webauthn::ChallengeStores::Cache.cache = Rails.cache
-Devise::Webauthn::ChallengeStores::Cache.expires_in = 5.minutes
+Devise::Webauthn::StateStores::Cache.cache = Rails.cache
+Devise::Webauthn::StateStores::Cache.expires_in = 5.minutes
 ```
 
-Each challenge can be used once. The two requests can reach different servers or processes, so use a cache shared by all your servers (Redis, Memcached or Solid Cache). `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
+Each challenge can be used once. With `:cache`, the [two-factor token for API clients](#2fa-sign-in-for-api-clients) is kept there too and also works once. The two requests can reach different servers or processes, so use a cache shared by all your servers (Redis, Memcached or Solid Cache). `ActiveSupport::Cache::MemoryStore` and `FileStore` are local to one process or host.
 
 ## API clients and native apps
 
@@ -163,7 +163,7 @@ Mobile apps and other API clients can use passkeys without a cookie session, for
 
 ### Server setup
 
-1. Use the `:cache` [challenge store](#challenge-store) with a cache shared by all your servers.
+1. Use the `:cache` [state store](#state-store) with a cache shared by all your servers.
 2. Stop Devise from writing the user to the session. Passkey sign-in follows the `:params_auth` setting:
    ```ruby
    # config/initializers/devise.rb

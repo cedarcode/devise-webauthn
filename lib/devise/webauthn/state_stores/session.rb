@@ -2,7 +2,7 @@
 
 module Devise
   module Webauthn
-    module ChallengeStores
+    module StateStores
       class Session
         KEYS = {
           passkey_authentication: :authentication_challenge,

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MemoryChallengeStore
+class MemoryStateStore
   def self.challenges
     @challenges ||= {}
   end

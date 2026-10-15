@@ -2,7 +2,7 @@
 
 module Devise
   class SecurityKeyRegistrationOptionsController < DeviseController
-    include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::StateStoreAccess
 
     skip_forgery_protection if respond_to?(:skip_forgery_protection)
 
@@ -23,7 +23,7 @@ module Devise
           }
         )
 
-      challenge_store.write(:registration, create_security_key_options.challenge)
+      state_store.write(:registration, create_security_key_options.challenge)
 
       render json: create_security_key_options
     end

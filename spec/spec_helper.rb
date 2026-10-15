@@ -16,7 +16,7 @@ require "rspec/rails"
 require "rspec/retry"
 require "capybara/rspec"
 require "support/page_load_helpers"
-require "support/memory_challenge_store"
+require "support/memory_state_store"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

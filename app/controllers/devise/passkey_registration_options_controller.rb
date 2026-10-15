@@ -2,7 +2,7 @@
 
 module Devise
   class PasskeyRegistrationOptionsController < DeviseController
-    include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::StateStoreAccess
 
     skip_forgery_protection if respond_to?(:skip_forgery_protection)
 
@@ -23,7 +23,7 @@ module Devise
           }
         )
 
-      challenge_store.write(:registration, passkey_options.challenge)
+      state_store.write(:registration, passkey_options.challenge)
 
       render json: passkey_options
     end

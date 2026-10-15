@@ -2,7 +2,7 @@
 
 module Devise
   class SecurityKeyAuthenticationOptionsController < DeviseController
-    include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::StateStoreAccess
     include Devise::Webauthn::PendingTwoFactorSignIn
 
     skip_forgery_protection if respond_to?(:skip_forgery_protection)
@@ -16,7 +16,7 @@ module Devise
           user_verification: "discouraged"
         )
 
-      challenge_store.write(:two_factor_authentication, security_key_authentication_options.challenge)
+      state_store.write(:two_factor_authentication, security_key_authentication_options.challenge)
 
       render json: security_key_authentication_options
     end

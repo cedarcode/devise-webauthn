@@ -3,14 +3,14 @@
 module Devise
   module Strategies
     class WebauthnTwoFactorAuthenticatable < Devise::Strategies::Base
-      include Devise::Webauthn::ChallengeStoreAccess
+      include Devise::Webauthn::StateStoreAccess
       include Devise::Webauthn::PublicKeyCredentialParam
       include Devise::Webauthn::PendingTwoFactorSignIn
 
       def valid?
         public_key_credential_param.present? &&
           two_factor_sign_in_attempt_for(scope).present? &&
-          challenge_store.pending?(:two_factor_authentication)
+          state_store.pending?(:two_factor_authentication)
       end
 
       def store?
@@ -19,7 +19,7 @@ module Devise
 
       # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       def authenticate!
-        expected_challenge = challenge_store.consume(:two_factor_authentication)
+        expected_challenge = state_store.consume(:two_factor_authentication)
         credential_from_params = WebAuthn::Credential.from_get(public_key_credential_param)
         sign_in_attempt = two_factor_sign_in_attempt_for(scope)
         resource = resource_class.find_by(id: sign_in_attempt["id"])

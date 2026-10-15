@@ -3,7 +3,7 @@
 require "spec_helper"
 require "webauthn/fake_client"
 
-RSpec.describe Devise::Webauthn::ChallengeStores::Cache do
+RSpec.describe Devise::Webauthn::StateStores::Cache do
   include ActiveSupport::Testing::TimeHelpers
 
   let(:store) { described_class.new(instance_double(ActionDispatch::Request, params: { public_key_credential: credential })) }

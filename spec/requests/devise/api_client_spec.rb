@@ -9,17 +9,17 @@ RSpec.describe "API client without a session", type: :request do
   let(:client) { WebAuthn::FakeClient.new(WebAuthn.configuration.allowed_origins.first) }
 
   around do |example|
-    original_store = Devise::Webauthn.challenge_store
-    original_cache = Devise::Webauthn::ChallengeStores::Cache.cache
+    original_store = Devise::Webauthn.state_store
+    original_cache = Devise::Webauthn::StateStores::Cache.cache
     original_skip_session_storage = Account.skip_session_storage
 
-    Devise::Webauthn.challenge_store = :cache
-    Devise::Webauthn::ChallengeStores::Cache.cache = ActiveSupport::Cache::MemoryStore.new
+    Devise::Webauthn.state_store = :cache
+    Devise::Webauthn::StateStores::Cache.cache = ActiveSupport::Cache::MemoryStore.new
     Account.skip_session_storage = %i[http_auth params_auth]
     example.run
   ensure
-    Devise::Webauthn.challenge_store = original_store
-    Devise::Webauthn::ChallengeStores::Cache.cache = original_cache
+    Devise::Webauthn.state_store = original_store
+    Devise::Webauthn::StateStores::Cache.cache = original_cache
     Account.skip_session_storage = original_skip_session_storage
   end
 

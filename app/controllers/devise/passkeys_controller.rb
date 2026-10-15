@@ -2,7 +2,7 @@
 
 module Devise
   class PasskeysController < DeviseController
-    include Devise::Webauthn::ChallengeStoreAccess
+    include Devise::Webauthn::StateStoreAccess
     include Devise::Webauthn::PublicKeyCredentialParam
 
     before_action :authenticate_scope!
@@ -23,7 +23,7 @@ module Devise
         respond_with_navigational(passkey, location: after_update_path) { redirect_to after_update_path }
       end
     ensure
-      challenge_store.consume(:registration)
+      state_store.consume(:registration)
     end
 
     def destroy
@@ -49,7 +49,7 @@ module Devise
 
       passkey_from_params = WebAuthn::Credential.from_create(public_key_credential)
       passkey_from_params.verify(
-        challenge_store.consume(:registration),
+        state_store.consume(:registration),
         user_verification: true
       )
 

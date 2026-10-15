@@ -36,12 +36,12 @@ module Devise
       end
 
       def self.cached?
-        store = Devise::Webauthn.challenge_store
-        store == :cache || (store.is_a?(Class) && store <= ChallengeStores::Cache)
+        store = Devise::Webauthn.state_store
+        store == :cache || (store.is_a?(Class) && store <= StateStores::Cache)
       end
 
       def self.cache
-        ChallengeStores::Cache.cache || Rails.cache
+        StateStores::Cache.cache || Rails.cache
       end
 
       def self.cache_key(payload)

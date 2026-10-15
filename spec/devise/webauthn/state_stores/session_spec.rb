@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Devise::Webauthn::ChallengeStores::Session do
+RSpec.describe Devise::Webauthn::StateStores::Session do
   let(:session) { {} }
   let(:store) { described_class.new(instance_double(ActionDispatch::Request, session: session)) }
 

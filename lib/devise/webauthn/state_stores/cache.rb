@@ -2,7 +2,7 @@
 
 module Devise
   module Webauthn
-    module ChallengeStores
+    module StateStores
       class Cache
         cattr_accessor :cache
         cattr_accessor :expires_in, default: 5.minutes
