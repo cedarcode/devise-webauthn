@@ -17,7 +17,9 @@ module Devise
       private
 
       def public_key_credential_param
-        PublicKeyCredentialParam.parse(params[:public_key_credential])
+        return @public_key_credential_param if defined?(@public_key_credential_param)
+
+        @public_key_credential_param = PublicKeyCredentialParam.parse(params[:public_key_credential])
       end
     end
   end
