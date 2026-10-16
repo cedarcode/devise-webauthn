@@ -51,7 +51,7 @@ module Devise
         end
 
         def credential
-          @credential ||= JSON.parse(@request.params[:public_key_credential])
+          @credential ||= PublicKeyCredentialParam.parse(@request.params[:public_key_credential])
         end
 
         def encoder

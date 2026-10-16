@@ -25,4 +25,6 @@ RSpec.describe Devise::PasskeyAuthenticationOptionsController, type: :request do
       expect(second_challenge).not_to eq(first_challenge)
     end
   end
+
+  it_behaves_like "a controller that loads under an ActionController::API parent"
 end

@@ -12,6 +12,12 @@ RSpec.describe Devise::Webauthn::TwoFactorToken do
     expect(described_class.read(token, scope: :account)).to include("id" => 1, "remember_me" => true)
   end
 
+  it "does not expose the payload" do
+    decoded = token.split("--").map { |part| Base64.strict_decode64(part) }.join
+
+    expect(decoded).not_to include("remember_me")
+  end
+
   it "returns nil for another scope" do
     expect(described_class.read(token, scope: :admin)).to be_nil
   end

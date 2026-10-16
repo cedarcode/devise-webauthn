@@ -181,4 +181,51 @@ RSpec.describe "Passkey authentication flow", type: :request do
       expect(controller.current_account).to be_nil
     end
   end
+
+  context "with a JSON request from a client without a session" do
+    include_context "with a JSON client without a session"
+
+    let!(:passkey) { create_passkey_for(user, client) }
+
+    def request_challenge
+      json_post account_passkey_authentication_options_path
+      response.parsed_body["challenge"]
+    end
+
+    def assertion_for(challenge)
+      generate_assertion(client, challenge: challenge, credential: passkey,
+                                 user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
+    end
+
+    it "signs in with the credential sent as a JSON object and does not store the user in the session" do
+      json_post account_session_path, public_key_credential: assertion_for(request_challenge)
+
+      expect(response).to have_http_status(:created)
+      expect(response.parsed_body["email"]).to eq(user.email)
+      expect(session["warden.user.account.key"]).to be_nil
+    end
+
+    it "rejects a challenge that was already used" do
+      challenge = request_challenge
+      json_post account_session_path, public_key_credential: assertion_for(challenge)
+
+      json_post account_session_path, public_key_credential: assertion_for(challenge)
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "rejects a challenge the server never issued" do
+      challenge = WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32))
+
+      json_post account_session_path, public_key_credential: assertion_for(challenge)
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "rejects a malformed credential" do
+      json_post account_session_path, public_key_credential: "not json"
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
 end
