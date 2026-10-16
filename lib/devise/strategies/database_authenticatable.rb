@@ -38,15 +38,16 @@ module Devise
       end
 
       def require_second_factor(resource)
+        token = start_two_factor_sign_in_attempt_for(resource, scope: scope, remember_me: remember_me?)
+
         if navigational_request?
-          redirect_to_two_factor_authentication(resource)
+          redirect_to_two_factor_authentication
         else
-          custom!(two_factor_required_response(resource))
+          custom!(two_factor_required_response(token))
         end
       end
 
-      def redirect_to_two_factor_authentication(resource)
-        store_two_factor_sign_in_attempt_in_session(resource, scope: scope, remember_me: remember_me?)
+      def redirect_to_two_factor_authentication
         request.flash[:notice] = two_factor_required_message
         request.commit_flash
         redirect!(two_factor_authentication_path, {}, message: two_factor_required_message)
@@ -56,9 +57,8 @@ module Devise
         Devise.navigational_formats.include?(request.format.try(:ref))
       end
 
-      def two_factor_required_response(resource)
-        token = two_factor_sign_in_attempt_token_for(resource, scope: scope, remember_me: remember_me?)
-        body = { error: two_factor_required_message, two_factor_token: token }
+      def two_factor_required_response(token)
+        body = { error: two_factor_required_message, two_factor_token: token }.compact
         Rack::Response.new(body.to_json, 401, "content-type" => "application/json").finish
       end
 

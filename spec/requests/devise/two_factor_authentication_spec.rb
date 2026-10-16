@@ -245,6 +245,38 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(flash[:alert]).to match(/Invalid email or password/i) # TODO: CHANGE THIS
       expect(controller.current_account).to be_nil
     end
+
+    context "with a JSON request" do
+      it "keeps the two-factor token in the session and completes authentication" do
+        post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body).to eq("error" => I18n.t("devise.failure.two_factor_required"))
+        expect(pending_sign_in_id).to eq(user.id)
+
+        post account_security_key_authentication_options_path, as: :json
+        assertion = generate_assertion(
+          client,
+          challenge: response.parsed_body["challenge"],
+          credential: security_key
+        )
+
+        post account_two_factor_authentication_path, params: { public_key_credential: assertion }, as: :json
+
+        expect(response).to have_http_status(:created)
+        expect(controller.current_account).to eq(user)
+        expect(session[:two_factor_token]).to be_nil
+      end
+
+      it "ignores a two-factor token in the request body" do
+        token = Devise::Webauthn::TwoFactorToken.generate(user, scope: :account, remember_me: false)
+
+        post account_security_key_authentication_options_path, params: { two_factor_token: token }, as: :json
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+      end
+    end
   end
 
   describe "sign-in with 2FA disabled" do

@@ -35,7 +35,7 @@ module Devise
         resource.remember_me = sign_in_attempt["remember_me"] if resource.respond_to?(:remember_me=)
         success!(resource)
 
-        clear_two_factor_sign_in_attempt
+        clear_two_factor_sign_in_attempt(scope)
       rescue WebAuthn::Error
         fail!(:webauthn_credential_verification_failed)
       end
