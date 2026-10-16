@@ -56,7 +56,7 @@ module Devise
     end
 
     def verify_and_save_security_key(public_key_credential)
-      return unverified_security_key if public_key_credential.nil?
+      return security_key_with_verification_error if public_key_credential.nil?
 
       security_key_from_params = WebAuthn::Credential.from_create(public_key_credential)
       security_key_from_params.verify(
@@ -70,11 +70,11 @@ module Devise
         sign_count: security_key_from_params.sign_count
       )
     rescue WebAuthn::Error
-      unverified_security_key
+      security_key_with_verification_error
     end
 
-    def unverified_security_key
-      security_key = resource.second_factor_webauthn_credentials.new
+    def security_key_with_verification_error
+      security_key = WebauthnCredential.new
       security_key.errors.add(:base, find_message(:webauthn_credential_verification_failed, scope: :"devise.failure"))
       security_key
     end

@@ -45,7 +45,7 @@ module Devise
     end
 
     def verify_and_save_passkey(public_key_credential)
-      return unverified_passkey if public_key_credential.nil?
+      return passkey_with_verification_error if public_key_credential.nil?
 
       passkey_from_params = WebAuthn::Credential.from_create(public_key_credential)
       passkey_from_params.verify(
@@ -60,11 +60,11 @@ module Devise
         sign_count: passkey_from_params.sign_count
       )
     rescue WebAuthn::Error
-      unverified_passkey
+      passkey_with_verification_error
     end
 
-    def unverified_passkey
-      passkey = resource.passkeys.new
+    def passkey_with_verification_error
+      passkey = WebauthnCredential.new
       passkey.errors.add(:base, find_message(:passkey_verification_failed, scope: :"devise.failure"))
       passkey
     end
