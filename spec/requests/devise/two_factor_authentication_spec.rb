@@ -276,6 +276,76 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         expect(response).to have_http_status(:unauthorized)
         expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
       end
+
+      context "without a session" do
+        include_context "with a JSON client without a session"
+
+        def request_two_factor_token
+          json_post account_session_path, account: { email: user.email, password: password }
+          response.parsed_body["two_factor_token"]
+        end
+
+        def security_key_assertion(token)
+          json_post account_security_key_authentication_options_path, two_factor_token: token
+          generate_assertion(client, challenge: response.parsed_body["challenge"], credential: security_key)
+        end
+
+        it "responds to the password step with 401 and a two-factor token" do
+          json_post account_session_path, account: { email: user.email, password: password }
+
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.parsed_body).to include("error" => I18n.t("devise.failure.two_factor_required"),
+                                                  "two_factor_token" => be_present)
+        end
+
+        it "signs in with the two-factor token and a security key and does not store the user in the session" do
+          token = request_two_factor_token
+          assertion = security_key_assertion(token)
+
+          json_post account_two_factor_authentication_path, two_factor_token: token,
+                                                            public_key_credential: assertion.to_json
+
+          expect(response).to have_http_status(:created)
+          expect(response.parsed_body["email"]).to eq(user.email)
+          expect(session["warden.user.account.key"]).to be_nil
+        end
+
+        it "responds to the options step with 401 when the two-factor token is invalid" do
+          token = request_two_factor_token
+
+          json_post account_security_key_authentication_options_path, two_factor_token: "#{token}x"
+
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+        end
+
+        it "ignores a two-factor token in the query string" do
+          token = request_two_factor_token
+
+          reset!
+          post "#{account_security_key_authentication_options_path}?two_factor_token=#{CGI.escape(token)}", as: :json
+
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+        end
+
+        it "filters the two-factor token from the logged parameters" do
+          json_post account_security_key_authentication_options_path, two_factor_token: request_two_factor_token
+
+          expect(request.filtered_parameters["two_factor_token"]).to eq("[FILTERED]")
+        end
+
+        it "rejects a tampered two-factor token" do
+          token = request_two_factor_token
+          assertion = security_key_assertion(token)
+
+          json_post account_two_factor_authentication_path, two_factor_token: "#{token}x",
+                                                            public_key_credential: assertion.to_json
+
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+        end
+      end
     end
   end
 
