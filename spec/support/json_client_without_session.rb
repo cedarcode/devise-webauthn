@@ -17,17 +17,17 @@ RSpec.shared_context "with a JSON client without a session" do
   end
 
   # Every request starts a new integration session, so no cookie carries state between requests.
-  def json_post(path, params = {})
+  def without_session_json_post(path, params = {})
     reset!
     post path, params: params, as: :json
   end
 
-  def json_patch(path)
+  def without_session_json_patch(path)
     reset!
     patch path, as: :json
   end
 
-  def json_delete(path)
+  def without_session_json_delete(path)
     reset!
     delete path, as: :json
   end

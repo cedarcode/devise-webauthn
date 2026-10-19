@@ -281,17 +281,17 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         include_context "with a JSON client without a session"
 
         def request_two_factor_token
-          json_post account_session_path, account: { email: user.email, password: password }
+          without_session_json_post account_session_path, account: { email: user.email, password: password }
           response.parsed_body["two_factor_token"]
         end
 
         def security_key_assertion(token)
-          json_post account_security_key_authentication_options_path, two_factor_token: token
+          without_session_json_post account_security_key_authentication_options_path, two_factor_token: token
           generate_assertion(client, challenge: response.parsed_body["challenge"], credential: security_key)
         end
 
         it "responds to the password step with 401 and a two-factor token" do
-          json_post account_session_path, account: { email: user.email, password: password }
+          without_session_json_post account_session_path, account: { email: user.email, password: password }
 
           expect(response).to have_http_status(:unauthorized)
           expect(response.parsed_body).to include("error" => I18n.t("devise.failure.two_factor_required"),
@@ -302,8 +302,8 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
           token = request_two_factor_token
           assertion = security_key_assertion(token)
 
-          json_post account_two_factor_authentication_path, two_factor_token: token,
-                                                            public_key_credential: assertion.to_json
+          without_session_json_post account_two_factor_authentication_path, two_factor_token: token,
+                                                                            public_key_credential: assertion.to_json
 
           expect(response).to have_http_status(:created)
           expect(response.parsed_body["email"]).to eq(user.email)
@@ -313,7 +313,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         it "responds to the options step with 401 when the two-factor token is invalid" do
           token = request_two_factor_token
 
-          json_post account_security_key_authentication_options_path, two_factor_token: "#{token}x"
+          without_session_json_post account_security_key_authentication_options_path, two_factor_token: "#{token}x"
 
           expect(response).to have_http_status(:unauthorized)
           expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
@@ -330,7 +330,8 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         end
 
         it "filters the two-factor token from the logged parameters" do
-          json_post account_security_key_authentication_options_path, two_factor_token: request_two_factor_token
+          without_session_json_post account_security_key_authentication_options_path,
+                                    two_factor_token: request_two_factor_token
 
           expect(request.filtered_parameters["two_factor_token"]).to eq("[FILTERED]")
         end
@@ -339,8 +340,8 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
           token = request_two_factor_token
           assertion = security_key_assertion(token)
 
-          json_post account_two_factor_authentication_path, two_factor_token: "#{token}x",
-                                                            public_key_credential: assertion.to_json
+          without_session_json_post account_two_factor_authentication_path, two_factor_token: "#{token}x",
+                                                                            public_key_credential: assertion.to_json
 
           expect(response).to have_http_status(:unauthorized)
           expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
