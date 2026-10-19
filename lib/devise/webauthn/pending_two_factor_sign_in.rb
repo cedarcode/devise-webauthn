@@ -8,10 +8,13 @@ module Devise
       # Returns the token the client must send back, or nil when the session keeps it.
       def start_two_factor_sign_in_attempt_for(resource, scope:, remember_me:)
         token = TwoFactorToken.generate(resource, scope: scope, remember_me: remember_me)
-        return token unless two_factor_token_in_session?(scope)
 
-        request.session[:two_factor_token] = token
-        nil
+        if two_factor_token_stored_in_session?(scope)
+          request.session[:two_factor_token] = token
+          nil
+        else
+          token
+        end
       end
 
       def two_factor_sign_in_attempt_for(scope)
@@ -23,20 +26,20 @@ module Devise
 
       def clear_two_factor_sign_in_attempt(scope)
         @two_factor_sign_in_attempts = nil
-        request.session.delete(:two_factor_token) if two_factor_token_in_session?(scope)
+        request.session.delete(:two_factor_token) if two_factor_token_stored_in_session?(scope)
       end
 
       # Without session storage, clients send the `two_factor_token` in the request body.
       # The query string is ignored because servers and proxies log URLs.
       def received_two_factor_token(scope)
-        if two_factor_token_in_session?(scope)
+        if two_factor_token_stored_in_session?(scope)
           request.session[:two_factor_token]
         else
           request.request_parameters["two_factor_token"]
         end
       end
 
-      def two_factor_token_in_session?(scope)
+      def two_factor_token_stored_in_session?(scope)
         Devise.mappings[scope].to.skip_session_storage.exclude?(:params_auth)
       end
     end
