@@ -5,16 +5,10 @@ module Devise
     module PendingTwoFactorSignIn
       private
 
-      # Returns the token the client must send back, or nil when the session keeps it.
       def start_two_factor_sign_in_attempt_for(resource, scope:, remember_me:)
         token = TwoFactorToken.generate(resource, scope: scope, remember_me: remember_me)
-
-        if two_factor_token_stored_in_session?(scope)
-          request.session[:two_factor_token] = token
-          nil
-        else
-          token
-        end
+        request.session[:two_factor_token] = token if two_factor_token_stored_in_session?(scope)
+        token
       end
 
       def two_factor_sign_in_attempt_for(scope)

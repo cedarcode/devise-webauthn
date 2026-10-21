@@ -58,7 +58,8 @@ module Devise
       end
 
       def two_factor_required_response(token)
-        body = { error: two_factor_required_message, two_factor_token: token }.compact
+        body = { error: two_factor_required_message }
+        body[:two_factor_token] = token unless two_factor_token_stored_in_session?(scope)
         Rack::Response.new(body.to_json, 401, "content-type" => "application/json").finish
       end
 
