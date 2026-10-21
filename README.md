@@ -123,7 +123,7 @@ Signed-in users can add security keys by visiting `/users/second_factor_webauthn
 #### 2FA Sign In with Security Keys
 When a user that has 2FA enabled (i.e., has registered passkeys or security keys) visits `/users/sign_in`, after entering their primary credentials (e.g., email and password), they will be prompted to complete the second factor authentication using WebAuthn. The authentication flow is handled by `WebauthnTwoFactorAuthenticatable` strategy.
 
-The two factor authentication flow with WebAuthn works as follows:
+In a browser, the two factor authentication flow with WebAuthn works as follows:
 1. User enters their primary credentials (e.g., email and password) and submits the form.
 2. If the user has 2FA enabled, they are redirected to a second factor authentication page.
 3. User clicks "Use security key", starting a WebAuthn authentication ceremony.
@@ -131,17 +131,7 @@ The two factor authentication flow with WebAuthn works as follows:
 5. User selects a credential and verifies with their [authenticator](https://www.w3.org/TR/webauthn-3/#webauthn-authenticator).
 6. The server verifies the response and signs in the user.
 
-#### 2FA Sign In for API clients
-When a request is not navigational (for example, it accepts JSON), a password sign-in that needs a second factor responds `401` instead of redirecting. The session keeps the pending sign-in unless `skip_session_storage` includes `:params_auth`. In that case the response includes a `two_factor_token`. Send that token in the request body to `POST /users/security_key_authentication_options` and to `POST /users/two_factor_authentication` together with `public_key_credential`. The token in the query string is ignored, and the gem adds `two_factor_token` to `filter_parameters` so Rails does not log it. The token expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
-
-Use the `:cache` [challenge store](#challenge-store) when the client does not keep a session cookie.
-
-devise-jwt only issues a token on `POST /users/sign_in` by default. Add the 2FA path:
-```ruby
-config.jwt do |jwt|
-  jwt.dispatch_requests = [["POST", %r{^/users/two_factor_authentication$}]]
-end
-```
+API clients are not redirected. Their password sign-in responds `401`, and they complete the second factor with JSON requests. See [Two-factor sign-in for API clients](#two-factor-sign-in-for-api-clients).
 
 ## Challenge store
 
@@ -159,25 +149,29 @@ Each challenge can be used once. The two requests can reach different servers or
 
 ## API clients and native apps
 
-Mobile apps and other API clients can use passkeys without a cookie session, for example with [devise-jwt](https://github.com/waiting-for-dev/devise-jwt).
+Mobile apps and other API clients can use passkeys and security keys without a session cookie. They authenticate each request with a token instead, for example with [devise-jwt](https://github.com/waiting-for-dev/devise-jwt).
 
 ### Server setup
 
-1. Use the `:cache` [challenge store](#challenge-store) with a cache shared by all your servers.
-2. Stop Devise from writing the user to the session. Passkey sign-in follows the `:params_auth` setting:
+1. **Keep challenges on the server.** The default challenge store keeps each challenge in the session. A client without a session cookie loses it between the options request and the next request. Use the `:cache` [challenge store](#challenge-store) with a cache shared by all your servers:
+   ```ruby
+   # config/initializers/devise_webauthn.rb
+   Devise::Webauthn.challenge_store = :cache
+   ```
+2. **Stop Devise from writing the user to the session.** Password, passkey and security key sign-in follow this setting:
    ```ruby
    # config/initializers/devise.rb
    config.skip_session_storage = [:http_auth, :params_auth]
    ```
-3. Let Devise controllers respond with JSON, and send `Accept: application/json` from the client. Add the format to the controller Devise inherits from (`config.parent_controller`, `ApplicationController` by default):
+3. **Respond with JSON.** Add the format to the controller Devise inherits from (`config.parent_controller`, `ApplicationController` by default). Send `Accept: application/json` from the client.
    ```ruby
    class ApplicationController < ActionController::Base
      respond_to :html, :json
    end
    ```
-   An API-only app can inherit from `ActionController::API` and use `respond_to :json`. It has no session, so also set `config.navigational_formats = []` in the Devise initializer. Otherwise a request without an `Accept` header counts as a browser request and raises when Devise writes to the session.
-   With `:registerable`, also override `sign_up` in your registrations controller to call `sign_in(resource_name, resource, store: false)`. Devise's default writes to the session.
-4. Tell WebAuthn which relying party and origins to accept. Native apps do not have a browser origin:
+   - In an API-only app, inherit from `ActionController::API`, use `respond_to :json`, and set `config.navigational_formats = []` in the Devise initializer. Otherwise a request without an `Accept` header counts as a browser request, and Devise raises when it writes to the session.
+   - With `:registerable`, override `sign_up` in your registrations controller to call `sign_in(resource_name, resource, store: false)`. Devise's default writes to the session.
+4. **Accept your native apps.** Native apps do not have a browser origin. Tell WebAuthn which relying party and origins to accept:
    ```ruby
    WebAuthn.configure do |config|
      config.rp_id = "example.com"
@@ -188,6 +182,12 @@ Mobile apps and other API clients can use passkeys without a cookie session, for
    end
    ```
    Your domain must also serve `/.well-known/apple-app-site-association` (with `webcredentials`) and `/.well-known/assetlinks.json` (with `delegate_permission/common.get_login_creds`).
+5. **With devise-jwt, issue a token after two-factor sign-in.** devise-jwt only issues a token on `POST /users/sign_in` by default. Add the two-factor path:
+   ```ruby
+   config.jwt do |jwt|
+     jwt.dispatch_requests = [["POST", %r{^/users/two_factor_authentication$}]]
+   end
+   ```
 
 ### Endpoints
 
@@ -205,7 +205,18 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 | Promote security key to passkey | `PATCH /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
 | Delete security key | `DELETE /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
 
-For two-factor sign-in, see [2FA Sign In for API clients](#2fa-sign-in-for-api-clients).
+### Two-factor sign-in for API clients
+
+When a user has 2FA enabled, password sign-in takes three requests:
+
+1. `POST /users/sign_in` with the email and password. The response is `401` with `error` and `two_factor_token`.
+2. `POST /users/security_key_authentication_options` with `two_factor_token`. The response has the WebAuthn request options.
+3. `POST /users/two_factor_authentication` with `two_factor_token` and `public_key_credential`. The response is `201`, and a JWT when you use devise-jwt.
+
+About the `two_factor_token`:
+- Send it in the request body. The gem ignores it in the query string, and adds it to `filter_parameters` so Rails does not log it.
+- It expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
+- The response includes it only when `skip_session_storage` includes `:params_auth`. Otherwise the session keeps the pending sign-in, and the client sends no token.
 
 ## Customization
 
