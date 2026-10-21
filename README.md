@@ -131,7 +131,8 @@ In a browser, the two factor authentication flow with WebAuthn works as follows:
 5. User selects a credential and verifies with their [authenticator](https://www.w3.org/TR/webauthn-3/#webauthn-authenticator).
 6. The server verifies the response and signs in the user.
 
-API clients are not redirected. Their password sign-in responds `401`, and they complete the second factor with JSON requests. See [Two-factor sign-in for API clients](#two-factor-sign-in-for-api-clients).
+> [!NOTE]
+> API clients are not redirected. Their password sign-in responds `401`, and they complete the second factor with JSON requests. See [Two-factor sign-in for API clients](#two-factor-sign-in-for-api-clients).
 
 ## Challenge store
 
