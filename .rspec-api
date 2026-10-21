@@ -1,0 +1,4 @@
+--color
+--require api_spec_helper
+--default-path spec/api
+-I spec
