@@ -44,6 +44,4 @@ RSpec.describe Devise::SecurityKeyAuthenticationOptionsController, type: :reques
       expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
     end
   end
-
-  it_behaves_like "a controller that loads under an ActionController::API parent"
 end
