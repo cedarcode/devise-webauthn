@@ -95,59 +95,68 @@ RSpec.describe Devise::PasskeysController, type: :request do
       end
     end
 
-    context "with a JSON request from a client without a session" do
-      include_context "with a JSON client without a session"
-
+    context "with a JSON request" do
       let(:challenge) do
-        sign_in user, scope: :account
-        without_session_json_post account_passkey_registration_options_path
+        post account_passkey_registration_options_path, as: :json
         response.parsed_body["challenge"]
       end
 
-      let!(:public_key_credential) { client.create(challenge: challenge, user_verified: true) }
-
-      # Each request starts a new session, so the create request signs in again.
-      before { sign_in user, scope: :account }
+      let(:public_key_credential) { client.create(challenge: challenge, user_verified: true) }
 
       it "creates a passkey and responds with 201 and no body" do
+        sign_in user, scope: :account
+
         expect do
-          without_session_json_post account_passkeys_path, name: "My phone",
-                                                           public_key_credential: public_key_credential
+          post account_passkeys_path, params: { name: "My phone", public_key_credential: public_key_credential },
+                                      as: :json
         end.to change(user.passkeys, :count).by(1)
 
         expect(response).to have_http_status(:created)
         expect(response.body).to be_empty
       end
 
-      context "when verification fails" do
-        let(:challenge) { WebAuthn.configuration.encoder.encode("wrong") }
+      context "without a session" do
+        include_context "with a JSON client without a session"
 
-        it "responds with 422 and an error message" do
-          without_session_json_post account_passkeys_path, name: "My phone",
-                                                           public_key_credential: public_key_credential
+        let(:challenge) do
+          without_session_json_post account_passkey_registration_options_path, authenticated_as: user
+          response.parsed_body["challenge"]
+        end
+
+        it "creates a passkey and responds with 201 and no body" do
+          expect do
+            without_session_json_post account_passkeys_path, name: "My phone",
+                                                             public_key_credential: public_key_credential,
+                                                             authenticated_as: user
+          end.to change(user.passkeys, :count).by(1)
+
+          expect(response).to have_http_status(:created)
+          expect(response.body).to be_empty
+        end
+
+        it "responds with 422 and an error message when verification fails" do
+          credential = client.create(challenge: WebAuthn.configuration.encoder.encode("wrong"), user_verified: true)
+
+          without_session_json_post account_passkeys_path, name: "My phone", public_key_credential: credential,
+                                                           authenticated_as: user
 
           expect(response).to have_http_status(422)
           expect(response.parsed_body["errors"])
             .to eq("base" => [I18n.t("devise.failure.passkey_verification_failed")])
         end
-      end
 
-      context "when the credential has no response" do
-        let(:public_key_credential) { { type: "public-key" } }
-
-        it "responds with 422 and an error message" do
+        it "responds with 422 and an error message when the credential has no response" do
           without_session_json_post account_passkeys_path, name: "My phone",
-                                                           public_key_credential: public_key_credential
+                                                           public_key_credential: { type: "public-key" },
+                                                           authenticated_as: user
 
           expect(response).to have_http_status(422)
           expect(response.parsed_body["errors"])
             .to eq("base" => [I18n.t("devise.failure.passkey_verification_failed")])
         end
-      end
 
-      context "when the credential is missing" do
-        it "responds with 422" do
-          without_session_json_post account_passkeys_path, name: "My phone"
+        it "responds with 422 when the credential is missing" do
+          without_session_json_post account_passkeys_path, name: "My phone", authenticated_as: user
 
           expect(response).to have_http_status(422)
         end
@@ -186,18 +195,28 @@ RSpec.describe Devise::PasskeysController, type: :request do
       end
     end
 
-    context "with a JSON request from a client without a session" do
-      include_context "with a JSON client without a session"
+    context "with a JSON request" do
+      let!(:passkey) do
+        user.passkeys.create!(external_id: "external-id", name: "My Passkey", public_key: "public-key", sign_count: 0)
+      end
 
       it "deletes the passkey and responds with 204" do
-        passkey = user.passkeys.create!(external_id: "external-id", name: "My Passkey", public_key: "public-key",
-                                        sign_count: 0)
-
         sign_in user, scope: :account
-        without_session_json_delete account_passkey_path(passkey)
+        delete account_passkey_path(passkey), as: :json
 
         expect(response).to have_http_status(:no_content)
         expect(user.passkeys.reload).to be_empty
+      end
+
+      context "without a session" do
+        include_context "with a JSON client without a session"
+
+        it "deletes the passkey and responds with 204" do
+          without_session_json_delete account_passkey_path(passkey), authenticated_as: user
+
+          expect(response).to have_http_status(:no_content)
+          expect(user.passkeys.reload).to be_empty
+        end
       end
     end
   end

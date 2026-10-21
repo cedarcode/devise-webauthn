@@ -17,19 +17,25 @@ RSpec.shared_context "with a JSON client without a session" do
   end
 
   # Every request starts a new integration session, so no cookie carries state between requests.
-  def without_session_json_post(path, params = {})
-    reset!
+  # `authenticated_as` signs in for that request only, like the token an API client sends.
+  def without_session_json_post(path, authenticated_as: nil, **params)
+    start_request_without_session(authenticated_as)
     post path, params: params, as: :json
   end
 
-  def without_session_json_patch(path)
-    reset!
+  def without_session_json_patch(path, authenticated_as: nil)
+    start_request_without_session(authenticated_as)
     patch path, as: :json
   end
 
-  def without_session_json_delete(path)
-    reset!
+  def without_session_json_delete(path, authenticated_as: nil)
+    start_request_without_session(authenticated_as)
     delete path, as: :json
+  end
+
+  def start_request_without_session(user)
+    reset!
+    sign_in user, scope: :account if user
   end
 end
 
