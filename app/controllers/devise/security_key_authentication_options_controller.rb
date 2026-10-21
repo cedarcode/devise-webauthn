@@ -5,7 +5,7 @@ module Devise
     include Devise::Webauthn::ChallengeStoreAccess
     include Devise::Webauthn::PendingTwoFactorSignIn
 
-    skip_forgery_protection
+    skip_forgery_protection if respond_to?(:skip_forgery_protection)
 
     before_action :set_resource
 

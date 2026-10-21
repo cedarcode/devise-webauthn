@@ -35,6 +35,10 @@ module Devise
         Devise.include_helpers(Devise::Webauthn)
       end
 
+      initializer "devise.webauthn.filter_parameters" do |app|
+        app.config.filter_parameters += [:two_factor_token]
+      end
+
       initializer "devise.webauthn.assets" do
         if ::Rails.application.config.respond_to?(:assets)
           ::Rails.application.config.assets.precompile += %w[devise/webauthn.js]

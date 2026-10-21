@@ -89,15 +89,71 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
 
       context "when the credential cannot be parsed" do
-        before do
-          allow(WebAuthn::Credential).to receive(:from_create).and_raise(WebAuthn::Error)
-        end
-
         it "clears the challenge and redirects" do
           post account_second_factor_webauthn_credentials_path, params: { public_key_credential: "{}", name: "Key" }
 
           expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
           expect(session[:webauthn_challenge]).to be_nil
+        end
+      end
+    end
+
+    context "with a JSON request" do
+      let(:challenge) do
+        post account_security_key_registration_options_path, as: :json
+        response.parsed_body["challenge"]
+      end
+
+      let(:public_key_credential) { client.create(challenge: challenge) }
+
+      it "creates a security key and responds with 201 and no body" do
+        sign_in user, scope: :account
+
+        expect do
+          post account_second_factor_webauthn_credentials_path,
+               params: { name: "My key", public_key_credential: public_key_credential }, as: :json
+        end.to change(user.second_factor_webauthn_credentials, :count).by(1)
+
+        expect(response).to have_http_status(:created)
+        expect(response.body).to be_empty
+      end
+
+      context "without a session" do
+        include_context "with a JSON client without a session"
+
+        let(:challenge) do
+          without_session_json_post account_security_key_registration_options_path, authenticated_as: user
+          response.parsed_body["challenge"]
+        end
+
+        it "creates a security key and responds with 201 and no body" do
+          expect do
+            without_session_json_post account_second_factor_webauthn_credentials_path,
+                                      name: "My key", public_key_credential: public_key_credential,
+                                      authenticated_as: user
+          end.to change(user.second_factor_webauthn_credentials, :count).by(1)
+
+          expect(response).to have_http_status(:created)
+          expect(response.body).to be_empty
+        end
+
+        it "responds with 422 and an error message when verification fails" do
+          credential = client.create(challenge: WebAuthn.configuration.encoder.encode("wrong"))
+
+          without_session_json_post account_second_factor_webauthn_credentials_path,
+                                    name: "My key", public_key_credential: credential, authenticated_as: user
+
+          expect(response).to have_http_status(422)
+          expect(response.parsed_body["errors"])
+            .to eq("base" => [I18n.t("devise.failure.webauthn_credential_verification_failed")])
+        end
+
+        it "responds with 422 when the credential has no response" do
+          without_session_json_post account_second_factor_webauthn_credentials_path,
+                                    name: "My key", public_key_credential: { type: "public-key" },
+                                    authenticated_as: user
+
+          expect(response).to have_http_status(422)
         end
       end
     end
@@ -136,6 +192,28 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         expect(security_key.reload.authentication_factor).to eq("first_factor")
       end
     end
+
+    context "with a JSON request" do
+      it "promotes the security key and responds with 204" do
+        sign_in user, scope: :account
+        patch account_second_factor_webauthn_credential_path(security_key), as: :json
+
+        expect(response).to have_http_status(:no_content)
+        expect(security_key.reload).to be_first_factor
+      end
+
+      context "without a session" do
+        include_context "with a JSON client without a session"
+
+        it "promotes the security key and responds with 204" do
+          without_session_json_patch account_second_factor_webauthn_credential_path(security_key),
+                                     authenticated_as: user
+
+          expect(response).to have_http_status(:no_content)
+          expect(security_key.reload).to be_first_factor
+        end
+      end
+    end
   end
 
   describe "DELETE #destroy" do
@@ -166,6 +244,33 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
           delete account_second_factor_webauthn_credential_path(security_key)
           expect(flash[:notice]).to eq I18n.t("devise.second_factor_webauthn_credentials.security_key_deleted")
           expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
+        end
+      end
+    end
+
+    context "with a JSON request" do
+      let!(:security_key) do
+        user.second_factor_webauthn_credentials.create!(external_id: "external-id", name: "My Key",
+                                                        public_key: "public-key", sign_count: 0)
+      end
+
+      it "deletes the security key and responds with 204" do
+        sign_in user, scope: :account
+        delete account_second_factor_webauthn_credential_path(security_key), as: :json
+
+        expect(response).to have_http_status(:no_content)
+        expect(user.second_factor_webauthn_credentials.reload).to be_empty
+      end
+
+      context "without a session" do
+        include_context "with a JSON client without a session"
+
+        it "deletes the security key and responds with 204" do
+          without_session_json_delete account_second_factor_webauthn_credential_path(security_key),
+                                      authenticated_as: user
+
+          expect(response).to have_http_status(:no_content)
+          expect(user.second_factor_webauthn_credentials.reload).to be_empty
         end
       end
     end

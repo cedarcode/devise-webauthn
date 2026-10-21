@@ -14,7 +14,7 @@ module Devise
 
         if validate(resource){ hashed = true; resource.valid_password?(password) }
           if second_factor_enabled?(resource)
-            redirect_to_two_factor_authentication(resource)
+            require_second_factor(resource)
           else
             remember_me(resource)
             resource.after_database_authentication
@@ -37,11 +37,30 @@ module Devise
         Rails.application.routes.url_helpers.send(:"new_#{scope}_two_factor_authentication_path")
       end
 
-      def redirect_to_two_factor_authentication(resource)
-        start_two_factor_sign_in_attempt_for(resource, scope: scope, remember_me: remember_me?)
+      def require_second_factor(resource)
+        token = start_two_factor_sign_in_attempt_for(resource, scope: scope, remember_me: remember_me?)
+
+        if navigational_request?
+          redirect_to_two_factor_authentication
+        else
+          custom!(two_factor_required_response(token))
+        end
+      end
+
+      def redirect_to_two_factor_authentication
         request.flash[:notice] = two_factor_required_message
         request.commit_flash
         redirect!(two_factor_authentication_path, {}, message: two_factor_required_message)
+      end
+
+      def navigational_request?
+        Devise.navigational_formats.include?(request.format.try(:ref))
+      end
+
+      def two_factor_required_response(token)
+        body = { error: two_factor_required_message }
+        body[:two_factor_token] = token unless two_factor_token_stored_in_session?(scope)
+        Rack::Response.new(body.to_json, 401, "content-type" => "application/json").finish
       end
 
       def two_factor_required_message
