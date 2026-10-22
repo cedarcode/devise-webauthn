@@ -170,7 +170,7 @@ Mobile apps and other API clients can use passkeys and security keys without a s
      respond_to :html, :json
    end
    ```
-   - In an API-only app, inherit from `ActionController::API`, use `respond_to :json`, and set `config.navigational_formats = []` in the Devise initializer. Otherwise a request without an `Accept` header counts as a browser request, and Devise raises when it writes to the session.
+   - In an API-only app, inherit from `ActionController::API`, use `respond_to :json`, and set `config.navigational_formats = []` in the Devise initializer. Otherwise a request without an `Accept` header counts as a browser request, and Devise raises when it writes to the session. Clients must still send `Accept: application/json`, because the passkey and security key controllers redirect a request without an `Accept` header to their HTML pages.
    - With `:registerable`, override `sign_up` in your registrations controller to call `sign_in(resource_name, resource, store: false)`. Devise's default writes to the session.
 4. **Accept your native apps.** Native apps do not have a browser origin. Tell WebAuthn which relying party and origins to accept:
    ```ruby

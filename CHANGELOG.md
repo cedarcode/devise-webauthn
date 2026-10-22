@@ -19,7 +19,7 @@
 ### Fixed
 
 - The controllers from `devise:webauthn:controllers` show `POST #create` in the comments of the options controllers instead of `GET #index`, which the options endpoints stopped using in v0.5.0. [#165](https://github.com/cedarcode/devise-webauthn/pull/165) [@RenzoMinelli]
-- The passkey and security key controllers build the redirect path (`after_update_path` and the others) only for navigational requests. An app that routes only their JSON actions no longer raises `NoMethodError` when a credential is deleted or promoted, or fails to be added. [#162](https://github.com/cedarcode/devise-webauthn/pull/162) [@RenzoMinelli]
+- The passkey and security key controllers build the redirect path (`after_update_path` and the others) only for navigational requests. In an app that routes only their JSON actions, a request with `Accept: application/json` no longer raises `NoMethodError` when it deletes or promotes a credential, or fails to add one. [#162](https://github.com/cedarcode/devise-webauthn/pull/162) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
