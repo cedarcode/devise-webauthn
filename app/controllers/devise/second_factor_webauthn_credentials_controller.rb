@@ -20,7 +20,7 @@ module Devise
       if security_key.persisted? && !is_navigational_format?
         head :created
       else
-        respond_with_navigational(security_key, location: after_create_path) { redirect_to after_create_path }
+        respond_with_navigational(security_key) { redirect_to after_create_path }
       end
     ensure
       challenge_store.consume(:registration)
@@ -34,7 +34,7 @@ module Devise
       else
         set_flash_message! :alert, :security_key_promotion_failed, scope: :"devise.failure"
       end
-      respond_with_navigational(security_key, location: after_update_path) { redirect_to after_update_path }
+      respond_with_navigational(security_key) { redirect_to after_update_path }
     end
 
     def destroy
@@ -45,7 +45,7 @@ module Devise
       else
         set_flash_message! :alert, :security_key_deletion_failed, scope: :"devise.failure"
       end
-      respond_with_navigational(security_key, location: after_destroy_path) { redirect_to after_destroy_path }
+      respond_with_navigational(security_key) { redirect_to after_destroy_path }
     end
 
     private
