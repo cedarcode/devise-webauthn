@@ -16,6 +16,7 @@ require "rspec/rails"
 require "rspec/retry"
 require "capybara/rspec"
 require "support/page_load_helpers"
+require "support/routes_without_html_pages"
 require "support/memory_challenge_store"
 require "support/json_client_without_session"
 
