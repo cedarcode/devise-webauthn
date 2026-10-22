@@ -16,6 +16,10 @@
 - Passkey sign-in and two-factor sign-in with a security key no longer store the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - The WebAuthn options controllers only call `skip_forgery_protection` when it is defined, so they load under an `ActionController::API` parent. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 
+### Fixed
+
+- The passkey and security key controllers build the redirect path (`after_update_path` and the others) only for navigational requests. An app that routes only their JSON actions no longer raises `NoMethodError` when a credential is deleted or promoted, or fails to be added. [#162](https://github.com/cedarcode/devise-webauthn/pull/162) [@RenzoMinelli]
+
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
 ### Added

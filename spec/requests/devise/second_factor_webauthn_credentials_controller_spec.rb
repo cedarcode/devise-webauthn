@@ -275,4 +275,35 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
     end
   end
+
+  context "when the app routes the JSON actions but not the security keys page" do
+    include_context "with routes for the JSON actions only"
+
+    let!(:security_key) do
+      user.second_factor_webauthn_credentials.create!(external_id: "external-id", name: "My Key",
+                                                      public_key: "public-key", sign_count: 0)
+    end
+
+    before { sign_in user, scope: :account }
+
+    it "responds to POST #create with 422 when the credential is missing" do
+      post account_second_factor_webauthn_credentials_path, params: { name: "My key" }, as: :json
+
+      expect(response).to have_http_status(422)
+    end
+
+    it "responds to PATCH #update with 204" do
+      patch account_second_factor_webauthn_credential_path(security_key), as: :json
+
+      expect(response).to have_http_status(:no_content)
+      expect(security_key.reload).to be_first_factor
+    end
+
+    it "responds to DELETE #destroy with 204" do
+      delete account_second_factor_webauthn_credential_path(security_key), as: :json
+
+      expect(response).to have_http_status(:no_content)
+      expect(user.second_factor_webauthn_credentials.reload).to be_empty
+    end
+  end
 end
