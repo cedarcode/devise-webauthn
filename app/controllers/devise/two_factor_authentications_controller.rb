@@ -7,6 +7,7 @@ module Devise
     prepend_before_action :set_resource, only: :new
     prepend_before_action :ensure_sign_in_initiated
     prepend_before_action :require_no_authentication
+    prepend_before_action :allow_params_authentication!, only: :create
 
     def new; end
 
