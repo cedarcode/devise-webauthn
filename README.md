@@ -361,6 +361,8 @@ devise_for :users, controllers: {
 
 3. Change or extend the generated controllers as needed.
 
+A two-factor controller that does not inherit from `Devise::TwoFactorAuthenticationsController` must call `prepend_before_action :allow_params_authentication!, only: :create`, or the two-factor strategy does not run and sign-in fails. Generated controllers inherit this callback.
+
 ### Customizing the WebAuthn user name
 When a passkey or a security key is added, the registration options send `webauthn_user_name` as both the WebAuthn `user.name` and `user.displayName`. A passkey keeps this name, and the browser or operating system shows it when the user picks a passkey to sign in.
 
