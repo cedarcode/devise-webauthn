@@ -220,4 +220,27 @@ RSpec.describe Devise::PasskeysController, type: :request do
       end
     end
   end
+
+  context "when the app routes the JSON actions but not the passkeys page" do
+    include_context "with routes for the JSON actions only"
+
+    before { sign_in user, scope: :account }
+
+    it "responds to POST #create with 422 and an error message when the credential is missing" do
+      post account_passkeys_path, params: { name: "My phone" }, as: :json
+
+      expect(response).to have_http_status(422)
+      expect(response.parsed_body["errors"]).to eq("base" => [I18n.t("devise.failure.passkey_verification_failed")])
+    end
+
+    it "responds to DELETE #destroy with 204" do
+      passkey = user.passkeys.create!(external_id: "external-id", name: "My Passkey", public_key: "public-key",
+                                      sign_count: 0)
+
+      delete account_passkey_path(passkey), as: :json
+
+      expect(response).to have_http_status(:no_content)
+      expect(user.passkeys.reload).to be_empty
+    end
+  end
 end
