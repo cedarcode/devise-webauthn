@@ -164,6 +164,7 @@ Mobile apps and other API clients can use passkeys and security keys without a s
    # config/initializers/devise.rb
    config.skip_session_storage = [:http_auth, :params_auth]
    ```
+   If the same Devise scope also signs in browsers with a cookie session, leave `:params_auth` out and set `request.env["devise.skip_storage"] = true` on your API requests instead, for example from a Rack middleware that matches your API paths. Devise and this gem read it as the same setting, for that request only.
 3. **Respond with JSON.** Add the format to the controller Devise inherits from (`config.parent_controller`, `ApplicationController` by default). Send `Accept: application/json` from the client.
    ```ruby
    class ApplicationController < ActionController::Base
@@ -217,7 +218,7 @@ When a user has 2FA enabled, password sign-in takes three requests:
 About the `two_factor_token`:
 - Send it in the request body. The gem ignores it in the query string, and adds it to `filter_parameters` so Rails does not log it.
 - It expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
-- The response includes it only when `skip_session_storage` includes `:params_auth`. Otherwise the session keeps the pending sign-in, and the client sends no token.
+- The response includes it only when `skip_session_storage` includes `:params_auth`, or the request sets `devise.skip_storage`. Otherwise the session keeps the pending sign-in, and the client sends no token.
 
 ## Customization
 
