@@ -52,6 +52,14 @@ RSpec.describe Devise::SecurityKeyRegistrationOptionsController, type: :request 
         expect { post account_security_key_registration_options_path }
           .not_to(change { user.reload.webauthn_id })
       end
+
+      it "does not require a discoverable credential" do
+        post account_security_key_registration_options_path
+
+        authenticator_selection = response.parsed_body["authenticatorSelection"]
+        expect(authenticator_selection).to include("residentKey" => "discouraged")
+        expect(authenticator_selection).not_to include("requireResidentKey" => true)
+      end
     end
   end
 
