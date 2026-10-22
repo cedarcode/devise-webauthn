@@ -14,7 +14,7 @@ module Devise
         WebAuthn::Credential.options_for_create(
           user: {
             id: resource.webauthn_id,
-            name: resource_human_palatable_identifier
+            name: resource.webauthn_user_name
           },
           exclude: resource.passkeys.pluck(:external_id),
           authenticator_selection: {
@@ -37,10 +37,6 @@ module Devise
 
     def ensure_webauthn_id!
       resource.ensure_webauthn_id!
-    end
-
-    def resource_human_palatable_identifier
-      resource.webauthn_user_name
     end
   end
 end

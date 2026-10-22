@@ -16,6 +16,7 @@
 - The pending two-factor sign-in is kept in the session as an encrypted `two_factor_token` instead of the user id. It expires after 5 minutes and only works for the Devise scope that issued it. Sign-ins pending during the upgrade must start again. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
 - Passkey sign-in and two-factor sign-in with a security key no longer store the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - The WebAuthn options controllers only call `skip_forgery_protection` when it is defined, so they load under an `ActionController::API` parent. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
+- BREAKING!: The registration options controllers no longer have the private `resource_human_palatable_identifier` method. If you overrode it in your own controller, override `webauthn_user_name` in your model instead. [#163](https://github.com/cedarcode/devise-webauthn/pull/163) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
