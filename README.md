@@ -361,6 +361,20 @@ devise_for :users, controllers: {
 
 3. Change or extend the generated controllers as needed.
 
+### Customizing the WebAuthn user name
+When a passkey or a security key is added, the authenticator stores a user name with it and shows it when the user picks a credential to sign in. By default it is the first authentication key with a value, such as the email. If that key is virtual, such as a `login` attribute that accepts a username or an email, override `webauthn_user_name` in your model:
+```ruby
+class User < ApplicationRecord
+  devise :database_authenticatable, :passkey_authenticatable, authentication_keys: [:login]
+
+  attr_accessor :login
+
+  def webauthn_user_name
+    username
+  end
+end
+```
+
 ### Manually implementing WebAuthn forms
 
 The gem provides two custom HTML elements for WebAuthn operations. While the [form helpers](#helper-methods) handle this automatically, you can use these elements directly for custom implementations.

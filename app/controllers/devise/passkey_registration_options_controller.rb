@@ -40,10 +40,7 @@ module Devise
     end
 
     def resource_human_palatable_identifier
-      authentication_keys = resource.class.authentication_keys
-      authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
-
-      authentication_keys.filter_map { |authentication_key| resource.public_send(authentication_key) }.first
+      resource.webauthn_user_name
     end
   end
 end
