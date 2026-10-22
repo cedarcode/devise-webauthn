@@ -20,7 +20,8 @@ module Devise
       if passkey.persisted? && !is_navigational_format?
         head :created
       else
-        respond_with_navigational(passkey) { redirect_to after_update_path }
+        # The responder calls the location lambda only when the passkey has no errors.
+        respond_with_navigational(passkey, location: -> { after_update_path }) { redirect_to after_update_path }
       end
     ensure
       challenge_store.consume(:registration)

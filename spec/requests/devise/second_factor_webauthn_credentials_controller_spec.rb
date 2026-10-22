@@ -306,4 +306,24 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       expect(user.second_factor_webauthn_credentials.reload).to be_empty
     end
   end
+
+  context "when the app lists JSON before HTML and the client accepts any format" do
+    before do
+      allow(described_class).to receive(:mimes_for_respond_to).and_return(json: {}, html: {})
+      sign_in user, scope: :account
+    end
+
+    it "responds to POST #create with 201 and the security keys page as the location" do
+      post account_security_key_registration_options_path, as: :json
+      credential = client.create(challenge: response.parsed_body["challenge"])
+
+      expect do
+        post account_second_factor_webauthn_credentials_path,
+             params: { name: "My key", public_key_credential: credential.to_json }, headers: { "Accept" => "*/*" }
+      end.to change(user.second_factor_webauthn_credentials, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      expect(response.location).to eq(new_account_second_factor_webauthn_credential_path)
+    end
+  end
 end
