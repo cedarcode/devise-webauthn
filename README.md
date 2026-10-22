@@ -164,6 +164,25 @@ Mobile apps and other API clients can use passkeys and security keys without a s
    # config/initializers/devise.rb
    config.skip_session_storage = [:http_auth, :params_auth]
    ```
+   If the same Devise scope also signs in browsers with a cookie session (an admin panel next to a mobile API, for example), `:params_auth` in this global setting would stop those sign-ins from being remembered. Leave it out, and set `request.env["devise.skip_storage"]` on API requests instead. It is Devise's per-request switch for the same thing, and Devise's strategies, the passkey and two-factor strategies and the pending two-factor sign-in all read it:
+   ```ruby
+   # lib/api_skips_session_storage.rb
+   class ApiSkipsSessionStorage
+     def initialize(app)
+       @app = app
+     end
+
+     def call(env)
+       env["devise.skip_storage"] = true if env["PATH_INFO"].start_with?("/api/")
+       @app.call(env)
+     end
+   end
+
+   # config/application.rb
+   require_relative "../lib/api_skips_session_storage"
+   # ...
+   config.middleware.use ApiSkipsSessionStorage
+   ```
 3. **Respond with JSON.** Add the format to the controller Devise inherits from (`config.parent_controller`, `ApplicationController` by default). Send `Accept: application/json` from the client.
    ```ruby
    class ApplicationController < ActionController::Base
@@ -197,7 +216,7 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 | Step | Request | Response |
 |---|---|---|
 | Sign-in options | `POST /users/passkey_authentication_options` | WebAuthn request options |
-| Sign in | `POST /users/sign_in` with `public_key_credential` | `201`, and a JWT when you use devise-jwt |
+| Sign in | `POST /users/sign_in` with `public_key_credential` | `201`, and a JWT when you use devise-jwt. `401` with `error` when the passkey is unknown (`passkey_not_found`) or fails verification (`passkey_verification_failed`, also when its challenge expired, was already used or was never issued) |
 | Registration options | `POST /users/passkey_registration_options` (authenticated) | WebAuthn creation options |
 | Add passkey | `POST /users/passkeys` with `name` and `public_key_credential` (authenticated) | `201`, or `422` with `errors` |
 | Delete passkey | `DELETE /users/passkeys/:id` (authenticated) | `204` |
@@ -217,7 +236,43 @@ When a user has 2FA enabled, password sign-in takes three requests:
 About the `two_factor_token`:
 - Send it in the request body. The gem ignores it in the query string, and adds it to `filter_parameters` so Rails does not log it.
 - It expires after 5 minutes (`Devise::Webauthn::TwoFactorToken.expires_in`).
-- The response includes it only when `skip_session_storage` includes `:params_auth`. Otherwise the session keeps the pending sign-in, and the client sends no token.
+- The response includes it only when `skip_session_storage` includes `:params_auth`, or the request sets `devise.skip_storage`. Otherwise the session keeps the pending sign-in, and the client sends no token.
+
+### Sign-in response body
+
+Devise's `SessionsController#create` ends with `respond_with resource`, so a JSON sign-in renders the model's `to_json`. That serializes every column of the model except the few Devise hides (`encrypted_password`, `reset_password_token` and the like), including any your app adds. To choose the body, override `create` and render from its block:
+
+```ruby
+# config/routes.rb: devise_for :users, controllers: { sessions: "users/sessions" }
+class Users::SessionsController < Devise::SessionsController
+  def create
+    super do |user|
+      return render json: { id: user.id, email: user.email }, status: :created if request.format.json?
+    end
+  end
+end
+```
+
+`Devise::TwoFactorAuthenticationsController#create` yields the user the same way.
+
+### Rate limiting the options endpoints
+
+`POST /users/passkey_authentication_options` needs no authentication, and every request writes a new challenge to the challenge store. `POST /users/security_key_authentication_options` only needs a pending two-factor sign-in. Limit how often a client can call them. With Rails 7.2 or later, generate the controller and use `rate_limit`, which keeps its counters in `Rails.cache` and answers `429 Too Many Requests`:
+
+```bash
+$ bin/rails generate devise:webauthn:controllers users -c passkey_authentication_options
+```
+
+```ruby
+class Users::PasskeyAuthenticationOptionsController < Devise::PasskeyAuthenticationOptionsController
+  rate_limit to: 30, within: 15.minutes, only: :create
+end
+
+# config/routes.rb
+devise_for :users, controllers: { passkey_authentication_options: "users/passkey_authentication_options" }
+```
+
+On older Rails versions, [Rack::Attack](https://github.com/rack/rack-attack) can throttle the same paths.
 
 ## Customization
 
@@ -343,6 +398,29 @@ document.addEventListener('webauthn:prompt:error', (event) => {
 ```
 
 **Note:** If you don't call `event.preventDefault()`, the default `alert()` will still be shown.
+
+### Naming the WebAuthn user
+
+When a user registers a passkey or a security key, the authenticator stores an account name (`user.name`) and a friendly name (`user.displayName`) with it, and shows them when the user picks a passkey. They come from two methods on your Devise model:
+
+- `webauthn_user_name`: the first authentication key that has a value, then `email`, then the record id.
+- `webauthn_display_name`: `webauthn_user_name`.
+
+A virtual authentication key, such as a `login` attribute that accepts a username or an email, has no value on a saved record, so the default skips it. Override the methods to choose other names:
+
+```ruby
+class User < ApplicationRecord
+  devise :database_authenticatable, :passkey_authenticatable, authentication_keys: [:login]
+
+  def webauthn_user_name
+    username
+  end
+
+  def webauthn_display_name
+    full_name.presence || username
+  end
+end
+```
 
 ### Customizing Controllers
 Similar to [controllers customization on Devise](https://github.com/heartcombo/devise?tab=readme-ov-file#configuring-controllers), you can customize the Devise::Webauthn controllers.
