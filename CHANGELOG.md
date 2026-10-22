@@ -9,12 +9,21 @@
 - Respond `401` to a non-navigational password sign-in that needs a second factor. When `skip_session_storage` includes `:params_auth`, the response includes a `two_factor_token`, and two-factor sign-in reads it from the request body instead of the session. The gem adds `two_factor_token` to `filter_parameters`. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Accept `public_key_credential` as a JSON object as well as a JSON string. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Respond with `201` or `204`, or `422` with JSON `errors`, from the passkey and security key controllers when the request is not navigational. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
+- Add `webauthn_user_name` and `webauthn_display_name` to the Devise model, which name the user in the passkey and security key registration options (`user.name` and `user.displayName`). `webauthn_user_name` is the first authentication key that has a value, then `email`, then the record id, so a virtual authentication key such as `login` no longer leaves the name blank. Override them in your model to choose other names. [#161](https://github.com/cedarcode/devise-webauthn/pull/161) [@RenzoMinelli]
+- The pending two-factor sign-in follows a per-request `request.env["devise.skip_storage"]` as well as `skip_session_storage`, so an app that serves cookie sessions and an API on the same scope gets the `two_factor_token` in API responses. [#161](https://github.com/cedarcode/devise-webauthn/pull/161) [@RenzoMinelli]
 
 ### Changed
 
 - The pending two-factor sign-in is kept in the session as an encrypted `two_factor_token` instead of the user id. It expires after 5 minutes and only works for the Devise scope that issued it. Sign-ins pending during the upgrade must start again. [#154](https://github.com/cedarcode/devise-webauthn/pull/154) [@RenzoMinelli]
 - Passkey sign-in and two-factor sign-in with a security key no longer store the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - The WebAuthn options controllers only call `skip_forgery_protection` when it is defined, so they load under an `ActionController::API` parent. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
+- A passkey sign-in whose challenge is no longer pending (expired, already used or never issued), or whose credential cannot be parsed, fails with `passkey_verification_failed` instead of Devise's generic `unauthenticated` message. Any request with `public_key_credential` is now handled by the passkey strategy. [#161](https://github.com/cedarcode/devise-webauthn/pull/161) [@RenzoMinelli]
+- `Devise::TwoFactorAuthenticationsController#create` authenticates with the WebAuthn two-factor strategy only, so a pending passkey challenge in the session no longer lets the passkey strategy answer a two-factor request. [#161](https://github.com/cedarcode/devise-webauthn/pull/161) [@RenzoMinelli]
+- Passkey registration options send `requireResidentKey: true` next to `residentKey: "required"`, for WebAuthn Level 1 clients that only read the former. [#161](https://github.com/cedarcode/devise-webauthn/pull/161) [@RenzoMinelli]
+
+### Fixed
+
+- The passkey and security key controllers build their redirect path only for navigational requests. An app that does not route the HTML pages (`new_passkey_path` and the like) no longer raises `NoMethodError` when an API client deletes a credential, promotes a security key or fails to add one. [#161](https://github.com/cedarcode/devise-webauthn/pull/161) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
