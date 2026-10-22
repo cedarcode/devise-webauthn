@@ -16,6 +16,10 @@
 - Passkey sign-in and two-factor sign-in with a security key no longer store the user in the session when `skip_session_storage` includes `:params_auth`, the same as password sign-in. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - The WebAuthn options controllers only call `skip_forgery_protection` when it is defined, so they load under an `ActionController::API` parent. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 
+### Fixed
+
+- Passkey sign-in runs only where Devise allows params authentication, as password sign-in does: `Devise::SessionsController#create`, or a controller that calls `allow_params_authentication!`. Before, the passkey strategy ran on any request that authenticated the scope (`authenticate_user!`, `current_user`), so an answer to a pending challenge signed the user in from any page or API endpoint, skipping the checks of the app's `sessions#create`. A controller of your own that calls `warden.authenticate(:passkey_authenticatable, ...)` must now call `allow_params_authentication!` first. [#168](https://github.com/cedarcode/devise-webauthn/pull/168) [@RenzoMinelli]
+
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
 ### Added
