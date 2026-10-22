@@ -6,9 +6,10 @@ module Devise
       include Devise::Webauthn::ChallengeStoreAccess
       include Devise::Webauthn::PublicKeyCredentialParam
 
+      # A request that sends a credential is a passkey sign-in, so it fails as one when the challenge is no
+      # longer pending (expired, already used or never issued) instead of falling through to `unauthenticated`.
       def valid?
-        public_key_credential_param.present? &&
-          challenge_store.pending?(:passkey_authentication)
+        params[:public_key_credential].present?
       end
 
       def store?
@@ -17,11 +18,10 @@ module Devise
 
       def authenticate! # rubocop:disable Metrics/AbcSize
         expected_challenge = challenge_store.consume(:passkey_authentication)
+        return fail!(:passkey_verification_failed) if expected_challenge.nil? || public_key_credential_param.nil?
+
         passkey_from_params = WebAuthn::Credential.from_get(public_key_credential_param)
-
-        return fail!(:passkey_not_found) if passkey_from_params.user_handle.nil?
-
-        resource = resource_class.find_by(webauthn_id: passkey_from_params.user_handle)
+        resource = resource_for(passkey_from_params)
         stored_passkey = resource&.passkeys&.find_by(external_id: passkey_from_params.id)
 
         return fail!(:passkey_not_found) if stored_passkey.blank?
@@ -35,6 +35,12 @@ module Devise
       end
 
       private
+
+      def resource_for(passkey_from_params)
+        return if passkey_from_params.user_handle.nil?
+
+        resource_class.find_by(webauthn_id: passkey_from_params.user_handle)
+      end
 
       def verify_passkeys(passkey_from_params, stored_passkey, expected_challenge)
         passkey_from_params.verify(

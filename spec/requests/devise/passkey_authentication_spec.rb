@@ -88,7 +88,35 @@ RSpec.describe "Passkey authentication flow", type: :request do
 
       post account_session_path, params: params
 
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(flash[:alert]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
       expect(controller.current_account).to be_nil
+    end
+
+    it "fails as a passkey sign-in when no challenge was requested" do
+      MemoryChallengeStore.reset
+      assertion = generate_assertion(
+        client,
+        challenge: WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32)),
+        credential: passkey,
+        user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
+      )
+
+      post account_session_path, params: { public_key_credential: assertion.to_json }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(flash[:alert]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
+      expect(controller.current_account).to be_nil
+    end
+
+    it "leaves a request with a blank credential field to the password strategy" do
+      post account_session_path, params: {
+        public_key_credential: "", account: { email: user.email, password: password }
+      }
+
+      # The passkey also counts as a second factor, so a correct password leads to the 2FA step.
+      expect(response).to redirect_to(new_account_two_factor_authentication_path)
+      expect(stored_challenge).to be_present
     end
 
     it "rejects sign-in with non-existent credential" do
@@ -226,6 +254,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
         without_session_json_post account_session_path, public_key_credential: public_key_credential
 
         expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
       end
 
       it "rejects a challenge the server never issued" do
@@ -239,12 +268,21 @@ RSpec.describe "Passkey authentication flow", type: :request do
         without_session_json_post account_session_path, public_key_credential: assertion
 
         expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
       end
 
       it "rejects a malformed credential" do
         without_session_json_post account_session_path, public_key_credential: "not json"
 
         expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
+      end
+
+      it "leaves a request without a credential to the password strategy" do
+        without_session_json_post account_session_path, account: { email: user.email, password: password }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.two_factor_required"))
       end
     end
   end
