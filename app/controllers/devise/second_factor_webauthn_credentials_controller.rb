@@ -20,7 +20,8 @@ module Devise
       if security_key.persisted? && !is_navigational_format?
         head :created
       else
-        respond_with_navigational(security_key) { redirect_to after_create_path }
+        # The responder calls the location lambda only when the security key has no errors.
+        respond_with_navigational(security_key, location: -> { after_create_path }) { redirect_to after_create_path }
       end
     ensure
       challenge_store.consume(:registration)
