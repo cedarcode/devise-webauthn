@@ -6,8 +6,12 @@ module Devise
       include Devise::Webauthn::ChallengeStoreAccess
       include Devise::Webauthn::PublicKeyCredentialParam
 
+      # Like Devise's password strategy, only where the controller allows params authentication: `sessions#create`,
+      # or a controller that calls `allow_params_authentication!`. Otherwise any request that authenticates the scope
+      # would sign in whoever answers a pending challenge.
       def valid?
-        public_key_credential_param.present? &&
+        env["devise.allow_params_authentication"] &&
+          public_key_credential_param.present? &&
           challenge_store.pending?(:passkey_authentication)
       end
 

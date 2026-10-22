@@ -206,6 +206,20 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 | Promote security key to passkey | `PATCH /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
 | Delete security key | `DELETE /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
 
+### Passkey sign-in from your own controller
+
+Like password sign-in, passkey sign-in only runs where Devise allows params authentication: `POST /users/sign_in` (`Devise::SessionsController#create`). Any other request, such as one to an endpoint that calls `authenticate_user!`, ignores a `public_key_credential`. To sign in with a passkey from a controller of your own, call `allow_params_authentication!` first:
+
+```ruby
+class Api::PasskeySessionsController < ApplicationController
+  def create
+    allow_params_authentication!
+    user = warden.authenticate!(:passkey_authenticatable, scope: :user)
+    render json: { id: user.id }, status: :created
+  end
+end
+```
+
 ### Two-factor sign-in for API clients
 
 When a user has 2FA enabled, password sign-in takes three requests:
