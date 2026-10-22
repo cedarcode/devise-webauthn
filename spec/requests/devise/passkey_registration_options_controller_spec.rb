@@ -62,6 +62,13 @@ RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
         expect { post account_passkey_registration_options_path }
           .not_to(change { user.reload.webauthn_id })
       end
+
+      it "requires a discoverable credential from WebAuthn Level 1 and Level 2 clients" do
+        post account_passkey_registration_options_path
+
+        expect(response.parsed_body["authenticatorSelection"])
+          .to include("residentKey" => "required", "requireResidentKey" => true)
+      end
     end
   end
 
