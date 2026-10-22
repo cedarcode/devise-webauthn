@@ -285,5 +285,21 @@ RSpec.describe "Passkey authentication flow", type: :request do
         expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.two_factor_required"))
       end
     end
+
+    context "without a session, skipping storage per request" do
+      include_context "with a JSON client without a session", skip_storage: :per_request
+
+      let(:challenge) do
+        without_session_json_post account_passkey_authentication_options_path
+        response.parsed_body["challenge"]
+      end
+
+      it "signs in and does not store the user in the session" do
+        without_session_json_post account_session_path, public_key_credential: public_key_credential
+
+        expect(response).to have_http_status(:created)
+        expect(session["warden.user.account.key"]).to be_nil
+      end
+    end
   end
 end

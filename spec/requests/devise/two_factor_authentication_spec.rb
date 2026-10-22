@@ -364,6 +364,24 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
           expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
         end
       end
+
+      context "without a session, skipping storage per request" do
+        include_context "with a JSON client without a session", skip_storage: :per_request
+
+        it "signs in with the two-factor token and a security key and does not store the user in the session" do
+          without_session_json_post account_session_path, account: { email: user.email, password: password }
+          token = response.parsed_body["two_factor_token"]
+          without_session_json_post account_security_key_authentication_options_path, two_factor_token: token
+          assertion = generate_assertion(client, challenge: response.parsed_body["challenge"], credential: security_key)
+
+          without_session_json_post account_two_factor_authentication_path, two_factor_token: token,
+                                                                            public_key_credential: assertion.to_json
+
+          expect(response).to have_http_status(:created)
+          expect(response.parsed_body["email"]).to eq(user.email)
+          expect(session["warden.user.account.key"]).to be_nil
+        end
+      end
     end
   end
 

@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.shared_context "with a JSON client without a session" do
+# With `skip_storage: :per_request`, the app keeps the default `skip_session_storage` and each request sets
+# `devise.skip_storage` instead, as an app that also serves cookie sessions on the same scope does.
+RSpec.shared_context "with a JSON client without a session" do |skip_storage: :global|
+  let(:without_session_env) { skip_storage == :per_request ? { "devise.skip_storage" => true } : {} }
+
   around do |example|
     original_store = Devise::Webauthn.challenge_store
     original_cache = Devise::Webauthn::ChallengeStores::Cache.cache
@@ -8,7 +12,7 @@ RSpec.shared_context "with a JSON client without a session" do
 
     Devise::Webauthn.challenge_store = :cache
     Devise::Webauthn::ChallengeStores::Cache.cache = ActiveSupport::Cache::MemoryStore.new
-    Account.skip_session_storage = %i[http_auth params_auth]
+    Account.skip_session_storage = %i[http_auth params_auth] if skip_storage == :global
     example.run
   ensure
     Devise::Webauthn.challenge_store = original_store
@@ -20,17 +24,17 @@ RSpec.shared_context "with a JSON client without a session" do
   # `authenticated_as` signs in for that request only, like the token an API client sends.
   def without_session_json_post(path, authenticated_as: nil, **params)
     start_request_without_session(authenticated_as)
-    post path, params: params, as: :json
+    post path, params: params, as: :json, env: without_session_env
   end
 
   def without_session_json_patch(path, authenticated_as: nil)
     start_request_without_session(authenticated_as)
-    patch path, as: :json
+    patch path, as: :json, env: without_session_env
   end
 
   def without_session_json_delete(path, authenticated_as: nil)
     start_request_without_session(authenticated_as)
-    delete path, as: :json
+    delete path, as: :json, env: without_session_env
   end
 
   # An app that routes only the JSON actions has no HTML page to redirect to, so its path helpers raise.
