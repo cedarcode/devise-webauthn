@@ -258,7 +258,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       post account_two_factor_authentication_path, params: { public_key_credential: assertion.to_json }
 
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(flash[:alert]).not_to eq(I18n.t("devise.failure.passkey_not_found"))
+      expect(flash[:alert]).to match(/Invalid email or password/i)
       expect(session[:authentication_challenge]).to be_present
     end
 
