@@ -371,6 +371,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
         token = response.parsed_body["two_factor_token"]
         expect(token).to be_present
+        expect(session[:two_factor_token]).to be_nil
 
         post account_security_key_authentication_options_path, params: { two_factor_token: token }, as: :json
         assertion = generate_assertion(client, challenge: response.parsed_body["challenge"], credential: security_key)
