@@ -19,6 +19,7 @@
 ### Fixed
 
 - The controllers from `devise:webauthn:controllers` show `POST #create` in the comments of the options controllers instead of `GET #index`, which the options endpoints stopped using in v0.5.0. [#165](https://github.com/cedarcode/devise-webauthn/pull/165) [@RenzoMinelli]
+- The pending two-factor sign-in follows a per-request `request.env["devise.skip_storage"]`, as Devise's strategies do. An app that sets it on API requests, and keeps `:params_auth` out of `skip_session_storage` for its cookie sign-ins, now gets the `two_factor_token` in the response and reads it from the request body. Before, two-factor sign-in could not complete without a session cookie. [#167](https://github.com/cedarcode/devise-webauthn/pull/167) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 

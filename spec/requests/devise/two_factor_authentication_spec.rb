@@ -348,6 +348,39 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         end
       end
     end
+
+    # An app that also signs in browsers with a cookie session keeps `:params_auth` out of `skip_session_storage`,
+    # and sets `devise.skip_storage` on API requests from a middleware instead.
+    context "when a middleware sets devise.skip_storage on API requests" do
+      around do |example|
+        original_store = Devise::Webauthn.challenge_store
+        original_cache = Devise::Webauthn::ChallengeStores::Cache.cache
+        Devise::Webauthn.challenge_store = :cache
+        Devise::Webauthn::ChallengeStores::Cache.cache = ActiveSupport::Cache::MemoryStore.new
+        example.run
+      ensure
+        Devise::Webauthn.challenge_store = original_store
+        Devise::Webauthn::ChallengeStores::Cache.cache = original_cache
+      end
+
+      def app
+        ApiRequestsWithoutSession.new(Rails.application)
+      end
+
+      it "signs in with the two-factor token from the response and a security key" do
+        post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
+        token = response.parsed_body["two_factor_token"]
+        expect(token).to be_present
+
+        post account_security_key_authentication_options_path, params: { two_factor_token: token }, as: :json
+        assertion = generate_assertion(client, challenge: response.parsed_body["challenge"], credential: security_key)
+        post account_two_factor_authentication_path,
+             params: { two_factor_token: token, public_key_credential: assertion }, as: :json
+
+        expect(response).to have_http_status(:created)
+        expect(session["warden.user.account.key"]).to be_nil
+      end
+    end
   end
 
   describe "sign-in with 2FA disabled" do
