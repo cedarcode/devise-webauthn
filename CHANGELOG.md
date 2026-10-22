@@ -19,6 +19,7 @@
 ### Fixed
 
 - The controllers from `devise:webauthn:controllers` show `POST #create` in the comments of the options controllers instead of `GET #index`, which the options endpoints stopped using in v0.5.0. [#165](https://github.com/cedarcode/devise-webauthn/pull/165) [@RenzoMinelli]
+- Passkey registration options send `requireResidentKey: true` next to `residentKey: "required"`, as WebAuthn Level 2 asks, so WebAuthn Level 1 clients also create a discoverable credential. [#166](https://github.com/cedarcode/devise-webauthn/pull/166) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
