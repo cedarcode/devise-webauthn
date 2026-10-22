@@ -6,10 +6,14 @@ module Devise
       include Devise::Webauthn::ChallengeStoreAccess
       include Devise::Webauthn::PublicKeyCredentialParam
 
-      # A request that sends a credential is a passkey sign-in, so it fails as one when the challenge is no
-      # longer pending (expired, already used or never issued) instead of falling through to `unauthenticated`.
+      # A request that sends a sign-in (assertion) credential is a passkey sign-in, so it fails as one when the
+      # challenge is no longer pending instead of falling through to `unauthenticated`. A registration credential,
+      # sent while adding a passkey or a security key, is left to the strategy that authenticates that request.
       def valid?
-        params[:public_key_credential].present?
+        response = public_key_credential_param&.fetch("response")
+        return false unless response
+
+        response.key?("authenticatorData") && response.key?("signature") && !response.key?("attestationObject")
       end
 
       def store?
@@ -18,7 +22,7 @@ module Devise
 
       def authenticate! # rubocop:disable Metrics/AbcSize
         expected_challenge = challenge_store.consume(:passkey_authentication)
-        return fail!(:passkey_verification_failed) if expected_challenge.nil? || public_key_credential_param.nil?
+        return fail!(:passkey_verification_failed) if expected_challenge.nil?
 
         passkey_from_params = WebAuthn::Credential.from_get(public_key_credential_param)
         resource = resource_for(passkey_from_params)

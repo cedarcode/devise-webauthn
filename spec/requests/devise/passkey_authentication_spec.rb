@@ -275,6 +275,15 @@ RSpec.describe "Passkey authentication flow", type: :request do
         without_session_json_post account_session_path, public_key_credential: "not json"
 
         expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "rejects an assertion with a tampered signature as a failed passkey verification" do
+        tampered = public_key_credential.deep_dup
+        tampered["response"]["signature"] = WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(64))
+
+        without_session_json_post account_session_path, public_key_credential: tampered
+
+        expect(response).to have_http_status(:unauthorized)
         expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.passkey_verification_failed"))
       end
 
