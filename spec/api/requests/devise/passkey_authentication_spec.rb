@@ -35,7 +35,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
   it "rejects a challenge that was already used" do
     post account_session_path, params: { public_key_credential: public_key_credential }, as: :json
 
-    post account_session_path, params: { public_key_credential: public_key_credential }, as: :json
+    post account_session_path, params: { public_key_credential: generate_assertion(challenge) }, as: :json
 
     expect(response).to have_http_status(:unauthorized)
   end
