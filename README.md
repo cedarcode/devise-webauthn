@@ -361,6 +361,8 @@ devise_for :users, controllers: {
 
 3. Change or extend the generated controllers as needed.
 
+A two-factor controller that does not inherit from `Devise::TwoFactorAuthenticationsController` must call `prepend_before_action :allow_params_authentication!, only: :create`, or the two-factor strategy does not run and sign-in fails. Generated controllers inherit this callback.
+
 ### Manually implementing WebAuthn forms
 
 The gem provides two custom HTML elements for WebAuthn operations. While the [form helpers](#helper-methods) handle this automatically, you can use these elements directly for custom implementations.
