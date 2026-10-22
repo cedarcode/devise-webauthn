@@ -362,7 +362,9 @@ devise_for :users, controllers: {
 3. Change or extend the generated controllers as needed.
 
 ### Customizing the WebAuthn user name
-When a passkey or a security key is added, the authenticator stores a user name with it and shows it when the user picks a credential to sign in. By default it is the first authentication key with a value, such as the email. If that key is virtual, such as a `login` attribute that accepts a username or an email, override `webauthn_user_name` in your model:
+When a passkey or a security key is added, the registration options send `webauthn_user_name` as both the WebAuthn `user.name` and `user.displayName`. A passkey keeps this name, and the browser or operating system shows it when the user picks a passkey to sign in.
+
+By default it is the first authentication key with a non-nil value, such as the email. If that key is nil on a saved record, such as a plain `attr_accessor :login`, override `webauthn_user_name` in your model:
 ```ruby
 class User < ApplicationRecord
   devise :database_authenticatable, :passkey_authenticatable, authentication_keys: [:login]
@@ -370,10 +372,12 @@ class User < ApplicationRecord
   attr_accessor :login
 
   def webauthn_user_name
-    username
+    username.presence || email
   end
 end
 ```
+
+The method must return a non-blank string. If it returns nil, the registration options have no `name` or `displayName`, `PublicKeyCredential.parseCreationOptionsFromJSON` throws a `TypeError` in the browser, and the user cannot add the passkey or security key.
 
 ### Manually implementing WebAuthn forms
 

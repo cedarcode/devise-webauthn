@@ -10,6 +10,13 @@ RSpec.describe Devise::Models::WebauthnCredentialAuthenticatable, type: :model d
       expect(user.webauthn_user_name).to eq("user@example.com")
     end
 
+    it "skips an authentication key that is nil" do
+      user.singleton_class.attr_accessor :login
+      allow(Account).to receive(:authentication_keys).and_return(%i[login email])
+
+      expect(user.webauthn_user_name).to eq("user@example.com")
+    end
+
     it "reads authentication keys given as a hash" do
       allow(Account).to receive(:authentication_keys).and_return({ email: true })
 

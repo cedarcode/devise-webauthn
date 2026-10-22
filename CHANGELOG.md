@@ -9,7 +9,7 @@
 - Respond `401` to a non-navigational password sign-in that needs a second factor. When `skip_session_storage` includes `:params_auth`, the response includes a `two_factor_token`, and two-factor sign-in reads it from the request body instead of the session. The gem adds `two_factor_token` to `filter_parameters`. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Accept `public_key_credential` as a JSON object as well as a JSON string. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
 - Respond with `201` or `204`, or `422` with JSON `errors`, from the passkey and security key controllers when the request is not navigational. [#153](https://github.com/cedarcode/devise-webauthn/pull/153) [@RenzoMinelli]
-- Add `webauthn_user_name` to the Devise model. The passkey and security key registration options send it as the WebAuthn `user.name`. It defaults to the first authentication key with a value, as before; override it when that key is virtual, such as a `login` attribute. [#163](https://github.com/cedarcode/devise-webauthn/pull/163) [@RenzoMinelli]
+- Add `webauthn_user_name` to the Devise model. The passkey and security key registration options send it as the WebAuthn `user.name` and `displayName`. It defaults to the first authentication key with a non-nil value, as before; override it when that key is virtual, such as a `login` attribute. [#163](https://github.com/cedarcode/devise-webauthn/pull/163) [@RenzoMinelli]
 
 ### Changed
 
