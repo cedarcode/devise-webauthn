@@ -27,6 +27,7 @@
 - Two-factor sign-in runs only the `webauthn_two_factor_authenticatable` strategy. When a passkey challenge was pending in the session and the two-factor challenge was not, the passkey strategy took the request, consumed the passkey challenge and answered with a passkey error. [#164](https://github.com/cedarcode/devise-webauthn/pull/164) [@RenzoMinelli]
 - Passkey registration options send `requireResidentKey: true` next to `residentKey: "required"`. [#166](https://github.com/cedarcode/devise-webauthn/pull/166) [@RenzoMinelli]
 - The pending two-factor sign-in follows a per-request `request.env["devise.skip_storage"]`, as Devise's strategies do. An app that sets it on API requests, and keeps `:params_auth` out of `skip_session_storage` for its cookie sign-ins, now gets the `two_factor_token` in the response and reads it from the request body. Before, two-factor sign-in could not complete without a session cookie. [#167](https://github.com/cedarcode/devise-webauthn/pull/167) [@RenzoMinelli]
+- The passkey and security key controllers build the redirect path (`after_update_path` and the others) only for navigational requests. An app that routes only their JSON actions no longer raises `NoMethodError` when a credential is deleted or promoted, or fails to be added. [#162](https://github.com/cedarcode/devise-webauthn/pull/162) [@RenzoMinelli]
 
 ## [v0.5.1](https://github.com/cedarcode/devise-webauthn/compare/v0.5.0...v0.5.1/) - 2026-11-04
 
