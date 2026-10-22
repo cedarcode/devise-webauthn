@@ -29,6 +29,14 @@ RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
         expect(session[:webauthn_challenge]).to eq(json["challenge"])
       end
 
+      it "names the user after the model's webauthn_user_name" do
+        allow(user).to receive(:webauthn_user_name).and_return("ana")
+
+        post account_passkey_registration_options_path
+
+        expect(response.parsed_body["user"]["name"]).to eq("ana")
+      end
+
       it "generates a new challenge on each request" do
         post account_passkey_registration_options_path
         first_challenge = session[:webauthn_challenge]

@@ -21,6 +21,15 @@ module Devise
 
         webauthn_id
       end
+
+      # The name an authenticator shows for a new credential (WebAuthn `user.name`). Defaults to the first
+      # authentication key with a value. Override it when that key is virtual, such as a `login` attribute.
+      def webauthn_user_name
+        authentication_keys = self.class.authentication_keys
+        authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
+
+        authentication_keys.filter_map { |authentication_key| public_send(authentication_key) }.first
+      end
     end
   end
 end
