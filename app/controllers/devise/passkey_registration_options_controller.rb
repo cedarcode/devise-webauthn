@@ -14,11 +14,14 @@ module Devise
         WebAuthn::Credential.options_for_create(
           user: {
             id: resource.webauthn_id,
-            name: resource_human_palatable_identifier
+            name: resource_human_palatable_identifier,
+            display_name: resource.webauthn_display_name
           },
           exclude: resource.passkeys.pluck(:external_id),
           authenticator_selection: {
             resident_key: "required",
+            # WebAuthn Level 1 clients ignore `residentKey` and only read this.
+            require_resident_key: true,
             user_verification: "required"
           }
         )
@@ -40,10 +43,7 @@ module Devise
     end
 
     def resource_human_palatable_identifier
-      authentication_keys = resource.class.authentication_keys
-      authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
-
-      authentication_keys.filter_map { |authentication_key| resource.public_send(authentication_key) }.first
+      resource.webauthn_user_name
     end
   end
 end

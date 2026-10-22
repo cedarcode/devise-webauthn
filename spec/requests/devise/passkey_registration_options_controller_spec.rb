@@ -29,6 +29,21 @@ RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
         expect(session[:webauthn_challenge]).to eq(json["challenge"])
       end
 
+      it "names the user with the model's WebAuthn user name and display name" do
+        allow(user).to receive_messages(webauthn_user_name: "ana", webauthn_display_name: "Ana Pérez")
+
+        post account_passkey_registration_options_path
+
+        expect(response.parsed_body["user"]).to include("name" => "ana", "displayName" => "Ana Pérez")
+      end
+
+      it "requires a discoverable credential for WebAuthn Level 1 and Level 2 clients" do
+        post account_passkey_registration_options_path
+
+        expect(response.parsed_body["authenticatorSelection"])
+          .to include("residentKey" => "required", "requireResidentKey" => true)
+      end
+
       it "generates a new challenge on each request" do
         post account_passkey_registration_options_path
         first_challenge = session[:webauthn_challenge]

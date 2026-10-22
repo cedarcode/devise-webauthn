@@ -18,6 +18,14 @@ RSpec.describe Devise::SecurityKeyRegistrationOptionsController, type: :request 
         sign_in user, scope: :account
       end
 
+      it "names the user with the model's WebAuthn user name and display name" do
+        allow(user).to receive_messages(webauthn_user_name: "ana", webauthn_display_name: "Ana Pérez")
+
+        post account_security_key_registration_options_path
+
+        expect(response.parsed_body["user"]).to include("name" => "ana", "displayName" => "Ana Pérez")
+      end
+
       it "stores the challenge in session and returns it as json" do
         post account_security_key_registration_options_path
 
