@@ -155,6 +155,25 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
           expect(response).to have_http_status(422)
         end
+
+        it "creates a security key and responds with 201 when the app does not route the HTML pages" do
+          without_html_pages_routed :after_create_path
+
+          without_session_json_post account_second_factor_webauthn_credentials_path,
+                                    name: "My key", public_key_credential: public_key_credential,
+                                    authenticated_as: user
+
+          expect(response).to have_http_status(:created)
+        end
+
+        it "responds with 422 when the app does not route the HTML pages" do
+          without_html_pages_routed :after_create_path
+
+          without_session_json_post account_second_factor_webauthn_credentials_path,
+                                    name: "My key", authenticated_as: user
+
+          expect(response).to have_http_status(422)
+        end
       end
     end
   end
@@ -206,6 +225,16 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         include_context "with a JSON client without a session"
 
         it "promotes the security key and responds with 204" do
+          without_session_json_patch account_second_factor_webauthn_credential_path(security_key),
+                                     authenticated_as: user
+
+          expect(response).to have_http_status(:no_content)
+          expect(security_key.reload).to be_first_factor
+        end
+
+        it "promotes the security key and responds with 204 when the app does not route the HTML pages" do
+          without_html_pages_routed :after_update_path
+
           without_session_json_patch account_second_factor_webauthn_credential_path(security_key),
                                      authenticated_as: user
 
@@ -266,6 +295,16 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         include_context "with a JSON client without a session"
 
         it "deletes the security key and responds with 204" do
+          without_session_json_delete account_second_factor_webauthn_credential_path(security_key),
+                                      authenticated_as: user
+
+          expect(response).to have_http_status(:no_content)
+          expect(user.second_factor_webauthn_credentials.reload).to be_empty
+        end
+
+        it "deletes the security key and responds with 204 when the app does not route the HTML pages" do
+          without_html_pages_routed :after_destroy_path
+
           without_session_json_delete account_second_factor_webauthn_credential_path(security_key),
                                       authenticated_as: user
 

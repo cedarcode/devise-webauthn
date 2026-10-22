@@ -160,6 +160,26 @@ RSpec.describe Devise::PasskeysController, type: :request do
 
           expect(response).to have_http_status(422)
         end
+
+        it "creates a passkey and responds with 201 when the app does not route the HTML pages" do
+          without_html_pages_routed :after_update_path
+
+          without_session_json_post account_passkeys_path, name: "My phone",
+                                                           public_key_credential: public_key_credential,
+                                                           authenticated_as: user
+
+          expect(response).to have_http_status(:created)
+        end
+
+        it "responds with 422 and an error message when the app does not route the HTML pages" do
+          without_html_pages_routed :after_update_path
+
+          without_session_json_post account_passkeys_path, name: "My phone", authenticated_as: user
+
+          expect(response).to have_http_status(422)
+          expect(response.parsed_body["errors"])
+            .to eq("base" => [I18n.t("devise.failure.passkey_verification_failed")])
+        end
       end
     end
   end
@@ -212,6 +232,15 @@ RSpec.describe Devise::PasskeysController, type: :request do
         include_context "with a JSON client without a session"
 
         it "deletes the passkey and responds with 204" do
+          without_session_json_delete account_passkey_path(passkey), authenticated_as: user
+
+          expect(response).to have_http_status(:no_content)
+          expect(user.passkeys.reload).to be_empty
+        end
+
+        it "deletes the passkey and responds with 204 when the app does not route the HTML pages" do
+          without_html_pages_routed :after_update_path
+
           without_session_json_delete account_passkey_path(passkey), authenticated_as: user
 
           expect(response).to have_http_status(:no_content)

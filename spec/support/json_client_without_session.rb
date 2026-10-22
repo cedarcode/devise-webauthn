@@ -33,6 +33,17 @@ RSpec.shared_context "with a JSON client without a session" do
     delete path, as: :json
   end
 
+  # An app that routes only the JSON actions has no HTML page to redirect to, so its path helpers raise.
+  def without_html_pages_routed(*path_methods)
+    allow(described_class).to receive(:new).and_wrap_original do |original, *args|
+      original.call(*args).tap do |controller|
+        path_methods.each do |path_method|
+          allow(controller).to receive(path_method).and_raise(NoMethodError, "undefined method '#{path_method}'")
+        end
+      end
+    end
+  end
+
   def start_request_without_session(user)
     reset!
     sign_in user, scope: :account if user
