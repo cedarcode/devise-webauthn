@@ -19,6 +19,7 @@
 ### Fixed
 
 - The controllers from `devise:webauthn:controllers` show `POST #create` in the comments of the options controllers instead of `GET #index`, which the options endpoints stopped using in v0.5.0. [#165](https://github.com/cedarcode/devise-webauthn/pull/165) [@RenzoMinelli]
+- Two-factor sign-in runs only the `webauthn_two_factor_authenticatable` strategy. When a passkey challenge was pending in the session and the two-factor challenge was not, the passkey strategy took the request, consumed the passkey challenge and answered with a passkey error. [#164](https://github.com/cedarcode/devise-webauthn/pull/164) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
