@@ -164,7 +164,14 @@ Mobile apps and other API clients can use passkeys and security keys without a s
    # config/initializers/devise.rb
    config.skip_session_storage = [:http_auth, :params_auth]
    ```
-   If the same Devise scope also signs in browsers with a cookie session, leave `:params_auth` out and set `request.env["devise.skip_storage"] = true` on your API requests instead, for example from a Rack middleware that matches your API paths. Devise and this gem read it as the same setting, for that request only.
+   If the same Devise scope also signs in browsers with a cookie session, leave `:params_auth` out. Set `request.env["devise.skip_storage"] = true` on your API requests instead. Devise and this gem read it as the same setting, for that request only.
+   - Browsers and API clients use the same `/users/...` endpoints. Set the flag from a Rack middleware that matches your API requests, for example by a header. The middleware should also drop cookies for those requests, as [`spec/support/api_requests_without_session.rb`](spec/support/api_requests_without_session.rb) does.
+   - With Rails' default forgery protection, `ActionController::Base` rejects the API sign-in, because the client sends no CSRF token. Skip it for the requests your middleware marks. They carry no cookies, so they need no CSRF token:
+     ```ruby
+     class ApplicationController < ActionController::Base
+       protect_from_forgery with: :exception, unless: -> { request.env["devise.skip_storage"] }
+     end
+     ```
 3. **Respond with JSON.** Add the format to the controller Devise inherits from (`config.parent_controller`, `ApplicationController` by default). Send `Accept: application/json` from the client.
    ```ruby
    class ApplicationController < ActionController::Base
