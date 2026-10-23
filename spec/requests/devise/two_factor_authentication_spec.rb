@@ -246,6 +246,22 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(controller.current_account).to be_nil
     end
 
+    it "leaves a pending passkey sign-in alone when no 2FA challenge is pending" do
+      post account_passkey_authentication_options_path # A passkey sign-in started on the sign-in page
+      post account_session_path, params: { account: { email: user.email, password: password } }
+
+      assertion = generate_assertion(
+        client,
+        challenge: WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32)),
+        credential: security_key
+      )
+      post account_two_factor_authentication_path, params: { public_key_credential: assertion.to_json }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(flash[:alert]).to match(/Invalid email or password/i)
+      expect(session[:authentication_challenge]).to be_present
+    end
+
     context "with a JSON request" do
       it "keeps the two-factor token in the session and completes authentication" do
         post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
