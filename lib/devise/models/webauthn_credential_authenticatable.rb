@@ -21,6 +21,15 @@ module Devise
 
         webauthn_id
       end
+
+      # WebAuthn `user.name` and `displayName`, which the browser or OS shows for the credential. Defaults to
+      # the first authentication key with a non-nil value. Override it when that key is nil on a saved record.
+      def webauthn_user_name
+        authentication_keys = self.class.authentication_keys
+        authentication_keys = authentication_keys.keys if authentication_keys.is_a?(Hash)
+
+        authentication_keys.filter_map { |authentication_key| public_send(authentication_key) }.first
+      end
     end
   end
 end
