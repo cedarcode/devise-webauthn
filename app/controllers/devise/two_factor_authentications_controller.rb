@@ -11,7 +11,6 @@ module Devise
     def new; end
 
     def create
-      # Only the second factor, so a first-factor strategy cannot take the request.
       self.resource = warden.authenticate!(:webauthn_two_factor_authenticatable, auth_options)
       set_flash_message! :notice, :signed_in, scope: :"devise.sessions"
       sign_in(resource_name, resource)
