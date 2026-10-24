@@ -22,6 +22,7 @@
 
 - The controllers from `devise:webauthn:controllers` show `POST #create` in the comments of the options controllers instead of `GET #index`, which the options endpoints stopped using in v0.5.0. [#165](https://github.com/cedarcode/devise-webauthn/pull/165) [@RenzoMinelli]
 - Two-factor sign-in runs only the `webauthn_two_factor_authenticatable` strategy. When a passkey challenge was pending in the session and the two-factor challenge was not, the passkey strategy took the request, consumed the passkey challenge and answered with a passkey error. [#164](https://github.com/cedarcode/devise-webauthn/pull/164) [@RenzoMinelli]
+- The passkey and security key controllers build the redirect path (`after_update_path` and the others) only for navigational requests. In an app that routes only their JSON actions, a request with `Accept: application/json` no longer raises `NoMethodError` when it deletes or promotes a credential, or fails to add one. [#162](https://github.com/cedarcode/devise-webauthn/pull/162) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 

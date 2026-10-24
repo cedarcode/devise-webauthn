@@ -275,4 +275,55 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
     end
   end
+
+  context "when the app routes the JSON actions but not the security keys page" do
+    include_context "with routes for the JSON actions only"
+
+    let!(:security_key) do
+      user.second_factor_webauthn_credentials.create!(external_id: "external-id", name: "My Key",
+                                                      public_key: "public-key", sign_count: 0)
+    end
+
+    before { sign_in user, scope: :account }
+
+    it "responds to POST #create with 422 when the credential is missing" do
+      post account_second_factor_webauthn_credentials_path, params: { name: "My key" }, as: :json
+
+      expect(response).to have_http_status(422)
+    end
+
+    it "responds to PATCH #update with 204" do
+      patch account_second_factor_webauthn_credential_path(security_key), as: :json
+
+      expect(response).to have_http_status(:no_content)
+      expect(security_key.reload).to be_first_factor
+    end
+
+    it "responds to DELETE #destroy with 204" do
+      delete account_second_factor_webauthn_credential_path(security_key), as: :json
+
+      expect(response).to have_http_status(:no_content)
+      expect(user.second_factor_webauthn_credentials.reload).to be_empty
+    end
+  end
+
+  context "when the app lists JSON before HTML and the client accepts any format" do
+    before do
+      allow(described_class).to receive(:mimes_for_respond_to).and_return(json: {}, html: {})
+      sign_in user, scope: :account
+    end
+
+    it "responds to POST #create with 201 and the security keys page as the location" do
+      post account_security_key_registration_options_path, as: :json
+      credential = client.create(challenge: response.parsed_body["challenge"])
+
+      expect do
+        post account_second_factor_webauthn_credentials_path,
+             params: { name: "My key", public_key_credential: credential.to_json }, headers: { "Accept" => "*/*" }
+      end.to change(user.second_factor_webauthn_credentials, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      expect(response.location).to eq(new_account_second_factor_webauthn_credential_path)
+    end
+  end
 end
