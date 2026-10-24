@@ -85,3 +85,7 @@ jobs:
 
     - name: Run tests
       run: bundle exec rspec
+
+    - name: Run API app tests
+      if: ${{ !cancelled() }}
+      run: bundle exec rspec --options .rspec-api

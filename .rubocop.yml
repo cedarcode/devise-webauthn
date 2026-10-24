@@ -9,6 +9,7 @@ AllCops:
   NewCops: enable
   Exclude:
     - "spec/internal/**/*"
+    - "spec/internal_api/**/*"
     - "spec/tmp/**/*"
     - "vendor/**/*"
     - "gemfiles/**/*"
