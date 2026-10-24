@@ -22,6 +22,7 @@
 
 - The controllers from `devise:webauthn:controllers` show `POST #create` in the comments of the options controllers instead of `GET #index`, which the options endpoints stopped using in v0.5.0. [#165](https://github.com/cedarcode/devise-webauthn/pull/165) [@RenzoMinelli]
 - Two-factor sign-in runs only the `webauthn_two_factor_authenticatable` strategy. When a passkey challenge was pending in the session and the two-factor challenge was not, the passkey strategy took the request, consumed the passkey challenge and answered with a passkey error. [#164](https://github.com/cedarcode/devise-webauthn/pull/164) [@RenzoMinelli]
+- Passkey sign-in runs only in actions that call `allow_params_authentication!`, as `Devise::SessionsController#create` does. Before, the passkey strategy ran on any request that authenticated the scope (`authenticate_user!`, `current_user`), so an answer to a pending challenge signed the user in from any page or API endpoint, skipping the checks of the app's `sessions#create`. A controller of your own that calls `warden.authenticate(:passkey_authenticatable, ...)` must now call `allow_params_authentication!` first. [#168](https://github.com/cedarcode/devise-webauthn/pull/168) [@RenzoMinelli]
 
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
