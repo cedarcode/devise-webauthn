@@ -120,6 +120,11 @@ The WebAuthn passkey sign-in flow works as follows:
 #### Adding Security Keys for 2FA
 Signed-in users can add security keys by visiting `/users/second_factor_webauthn_credentials/new`.
 
+#### Upgrading Security Keys to Passkeys
+A security key can become a passkey only if it can sign in like one: it must be [discoverable](https://www.w3.org/TR/webauthn-3/#discoverable-credential) and verify the user (for example, with a PIN). Many hardware security keys create non-discoverable credentials when they are added for 2FA.
+
+The [`security_key_upgrade_form_for`](#helper-methods) form asks the user to sign in with the security key as a passkey. The key is promoted only if that sign-in succeeds. A key that cannot do it is not found by the browser, which shows an error, and the key stays a security key.
+
 #### 2FA Sign In with Security Keys
 When a user that has 2FA enabled (i.e., has registered passkeys or security keys) visits `/users/sign_in`, after entering their primary credentials (e.g., email and password), they will be prompted to complete the second factor authentication using WebAuthn. The authentication flow is handled by `WebauthnTwoFactorAuthenticatable` strategy.
 
@@ -203,7 +208,8 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 | Delete passkey | `DELETE /users/passkeys/:id` (authenticated) | `204` |
 | Security key registration options | `POST /users/security_key_registration_options` (authenticated) | WebAuthn creation options |
 | Add security key | `POST /users/second_factor_webauthn_credentials` with `name` and `public_key_credential` (authenticated) | `201`, or `422` with `errors` |
-| Promote security key to passkey | `PATCH /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
+| Security key upgrade options | `POST /users/security_key_upgrade_options` (authenticated) | WebAuthn request options |
+| Promote security key to passkey | `PATCH /users/second_factor_webauthn_credentials/:id` with `public_key_credential` (authenticated) | `204`, or `422` with `errors` |
 | Delete security key | `DELETE /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
 
 ### Two-factor sign-in for API clients
@@ -257,6 +263,13 @@ To add a passkeys creation form:
   <%= form.label :name, 'Passkey name' %>
   <%= form.text_field :name, required: true %>
   <%= form.submit 'Create Passkey' %>
+<% end %>
+```
+
+To add a form that upgrades a security key to a passkey:
+```erb
+<%= security_key_upgrade_form_for(:user, security_key) do |form| %>
+  <%= form.submit "Upgrade to passkey" %>
 <% end %>
 ```
 
@@ -426,9 +439,11 @@ Used for authenticating with existing credentials.
     - The form's action should point to the appropriate endpoint – you can use the provided url helpers:
         - For passkey sign-in: `session_path(resource_name)`
         - For 2FA with WebAuthn: `two_factor_authentication_path(resource_name)`
+        - For upgrading a security key to a passkey: `second_factor_webauthn_credential_path(resource_name, security_key)`, with `method: :patch`
 - Requires a `data-options-url` attribute pointing to the endpoint serving the WebAuthn request options – you can use the provided url helpers:
   - For passkey authentication options: `passkey_authentication_options_path(resource_name)`
   - For 2FA security key authentication options: `security_key_authentication_options_path(resource_name)`
+  - For security key upgrade options: `security_key_upgrade_options_path(resource_name)`
 - Must contain a hidden input with `data-webauthn-target="response"` to store the credential response
 - Must contain the submit button – the element intercepts form submission, fetches the options, calls the WebAuthn API, stores the credential in the hidden input, and then re-submits the form
 

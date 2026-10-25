@@ -24,6 +24,7 @@ RSpec.describe Devise::Webauthn::ControllersGenerator, type: :generator do
       assert_no_file "app/controllers/passkey_registration_options_controller.rb"
       assert_no_file "app/controllers/security_key_authentication_options_controller.rb"
       assert_no_file "app/controllers/security_key_registration_options_controller.rb"
+      assert_no_file "app/controllers/security_key_upgrade_options_controller.rb"
     end
   end
 
@@ -40,6 +41,7 @@ RSpec.describe Devise::Webauthn::ControllersGenerator, type: :generator do
       assert_file "app/controllers/users/passkey_registration_options_controller.rb", /Users::PasskeyRegistrationOptionsController/
       assert_file "app/controllers/users/security_key_authentication_options_controller.rb", /Users::SecurityKeyAuthenticationOptionsController/
       assert_file "app/controllers/users/security_key_registration_options_controller.rb", /Users::SecurityKeyRegistrationOptionsController/
+      assert_file "app/controllers/users/security_key_upgrade_options_controller.rb", /Users::SecurityKeyUpgradeOptionsController/
     end
   end
 

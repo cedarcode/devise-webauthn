@@ -10,11 +10,13 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Session do
     store.write(:passkey_authentication, "passkey-challenge")
     store.write(:two_factor_authentication, "2fa-challenge")
     store.write(:registration, "registration-challenge")
+    store.write(:security_key_upgrade, "upgrade-challenge")
 
     expect(session).to eq(
       authentication_challenge: "passkey-challenge",
       two_factor_authentication_challenge: "2fa-challenge",
-      webauthn_challenge: "registration-challenge"
+      webauthn_challenge: "registration-challenge",
+      security_key_upgrade_challenge: "upgrade-challenge"
     )
   end
 
