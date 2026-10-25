@@ -13,6 +13,7 @@ module Devise
         passkey_registration_options
         security_key_authentication_options
         security_key_registration_options
+        security_key_upgrade_options
       ].freeze
 
       desc "Create inherited Devise::Webauthn controllers in your app/controllers folder."

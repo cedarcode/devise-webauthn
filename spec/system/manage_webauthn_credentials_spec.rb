@@ -80,9 +80,10 @@ RSpec.describe "Manage webauthn credentials", type: :system do
     end
 
     # rubocop:disable RSpec/MultipleExpectations
-    context "when user has existing security keys" do
+    context "when user has a security key that can sign in as a passkey" do
       before do
-        add_security_key_to_authenticator(authenticator, user, name: "Existing Key")
+        # Authenticators may create a discoverable credential even when the security key options discourage it.
+        add_passkey_to_authenticator(authenticator, user, name: "Existing Key").second_factor!
       end
 
       it "allows upgrading security key to passkey" do
@@ -107,6 +108,41 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         within security_keys_section do
           expect(page).not_to have_content("Existing Key")
           expect(page).not_to have_button("Upgrade to Passkey")
+        end
+      end
+
+      it "allows signing in with it as a passkey after the upgrade" do
+        visit root_path
+        within(security_keys_section) { click_button_and_wait_for_page_load "Upgrade to Passkey" }
+
+        page.driver.browser.manage.delete_all_cookies
+        visit new_account_session_path
+        click_button "Log in with passkeys"
+
+        expect(page).to have_content("Signed in successfully.")
+      end
+    end
+
+    context "when user has a security key that is not discoverable" do
+      before do
+        add_security_key_to_authenticator(authenticator, user, name: "Existing Key")
+      end
+
+      it "does not upgrade it to a passkey" do
+        visit root_path
+
+        within security_keys_section do
+          accept_alert { click_button "Upgrade to Passkey" }
+        end
+
+        visit root_path
+
+        within passkeys_section do
+          expect(page).not_to have_content("Existing Key")
+        end
+
+        within security_keys_section do
+          expect(page).to have_content("Existing Key")
         end
       end
     end

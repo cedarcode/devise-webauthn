@@ -40,6 +40,19 @@ module Devise
         end
       end
 
+      def security_key_upgrade_form_for(resource_or_resource_name, security_key, **options, &block)
+        form_with(
+          **options,
+          url: second_factor_webauthn_credential_path(resource_or_resource_name, security_key),
+          method: :patch
+        ) do |f|
+          tag.webauthn_get(data: { options_url: security_key_upgrade_options_path(resource_or_resource_name) }) do
+            concat f.hidden_field(:public_key_credential, data: { webauthn_target: "response" })
+            concat capture(f, &block)
+          end
+        end
+      end
+
       def login_with_security_key_form_for(resource_or_resource_name, **options, &block)
         form_with(
           **options, url: two_factor_authentication_path(resource_or_resource_name), method: :post

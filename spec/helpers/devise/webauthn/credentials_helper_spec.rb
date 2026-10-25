@@ -181,5 +181,34 @@ RSpec.describe Devise::Webauthn::CredentialsHelper, type: :helper do
       expect(page).to have_button("Authenticate")
     end
   end
+
+  describe "#security_key_upgrade_form_for" do
+    let(:security_key) do
+      user.second_factor_webauthn_credentials.create!(
+        external_id: "external-id", name: "My Security Key", public_key: "public-key", sign_count: 0
+      )
+    end
+
+    it "renders a form that patches the security key with a webauthn_get element" do
+      html = helper.security_key_upgrade_form_for(:account, security_key) do |form|
+        form.submit "Upgrade to passkey"
+      end
+
+      page = parse(html)
+      expect(page).to have_css("form[action='/accounts/second_factor_webauthn_credentials/#{security_key.id}']")
+      expect(page).to have_css("input[type='hidden'][name='_method'][value='patch']", visible: :hidden)
+      expect(page).to have_css("webauthn-get[data-options-url='/accounts/security_key_upgrade_options']")
+      expect(page).to have_hidden_credential_field
+      expect(page).to have_button("Upgrade to passkey")
+    end
+
+    it "accepts options passed directly" do
+      html = helper.security_key_upgrade_form_for(user, security_key, class: "upgrade-form", id: "upgrade") do |form|
+        form.submit "Upgrade"
+      end
+
+      expect(parse(html)).to have_css("form.upgrade-form#upgrade")
+    end
+  end
 end
 # rubocop:enable RSpec/MultipleExpectations

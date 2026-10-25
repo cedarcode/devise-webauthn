@@ -160,13 +160,31 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
   end
 
   describe "PATCH #update" do
-    let!(:security_key) do
-      user.second_factor_webauthn_credentials.create!(
-        external_id: "external-id",
+    let(:encoder) { WebAuthn.configuration.encoder }
+    let!(:security_key) { create_credential_for(user, :second_factor) }
+
+    def create_credential_for(account, authentication_factor)
+      account.update!(webauthn_id: WebAuthn.generate_user_id) if account.webauthn_id.nil?
+      challenge = encoder.encode(SecureRandom.random_bytes(32))
+      credential = WebAuthn::Credential.from_create(client.create(challenge: challenge))
+
+      account.webauthn_credentials.create!(
+        external_id: credential.id,
         name: "My Security Key",
-        public_key: "public-key",
-        sign_count: 0,
-        authentication_factor: "second_factor"
+        public_key: credential.public_key,
+        sign_count: credential.sign_count,
+        authentication_factor: authentication_factor
+      )
+    end
+
+    # What a discoverable credential with user verification returns to the passkey sign-in options.
+    def passkey_assertion(challenge, credential: security_key, user_verified: true,
+                          user_handle: encoder.decode(user.webauthn_id))
+      client.get(
+        challenge: challenge,
+        allow_credentials: [credential.external_id],
+        user_verified: user_verified,
+        user_handle: user_handle
       )
     end
 
@@ -179,35 +197,129 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
     end
 
     context "when user is authenticated" do
+      let(:challenge) { session[:security_key_upgrade_challenge] }
+
       before do
         sign_in user, scope: :account
+        post account_security_key_upgrade_options_path # To set the challenge in session
       end
 
-      it "promotes the security key, sets a notice and redirects" do
-        patch account_second_factor_webauthn_credential_path(security_key)
+      it "promotes a security key that signs in as a passkey, sets a notice and redirects" do
+        patch account_second_factor_webauthn_credential_path(security_key), params: {
+          public_key_credential: passkey_assertion(challenge).to_json
+        }
 
+        expect(security_key.reload).to have_attributes(authentication_factor: "first_factor", sign_count: 1)
         expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
         expect(flash[:notice]).to eq I18n.t("devise.second_factor_webauthn_credentials.security_key_promoted")
+      end
 
-        expect(security_key.reload.authentication_factor).to eq("first_factor")
+      it "does not promote the security key without a credential, and clears the challenge" do
+        patch account_second_factor_webauthn_credential_path(security_key)
+
+        expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+        expect(security_key.reload).to be_second_factor
+        expect(session[:security_key_upgrade_challenge]).to be_nil
+      end
+
+      it "does not promote a security key that returns no user handle, like a non-discoverable one" do
+        patch account_second_factor_webauthn_credential_path(security_key), params: {
+          public_key_credential: passkey_assertion(challenge, user_handle: nil).to_json
+        }
+
+        expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+        expect(security_key.reload).to be_second_factor
+      end
+
+      it "does not promote a security key that returns no user handle when the user has no webauthn_id" do
+        user.update!(webauthn_id: nil)
+
+        patch account_second_factor_webauthn_credential_path(security_key), params: {
+          public_key_credential: passkey_assertion(challenge, user_handle: nil).to_json
+        }
+
+        expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+        expect(security_key.reload).to be_second_factor
+      end
+
+      it "does not promote a security key that returns another user handle" do
+        patch account_second_factor_webauthn_credential_path(security_key), params: {
+          public_key_credential: passkey_assertion(challenge, user_handle: SecureRandom.random_bytes(64)).to_json
+        }
+
+        expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+        expect(security_key.reload).to be_second_factor
+      end
+
+      it "does not promote a security key without user verification" do
+        patch account_second_factor_webauthn_credential_path(security_key), params: {
+          public_key_credential: passkey_assertion(challenge, user_verified: false).to_json
+        }
+
+        expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+        expect(security_key.reload).to be_second_factor
+      end
+
+      it "does not promote the security key when another credential answers" do
+        passkey = create_credential_for(user, :first_factor)
+
+        patch account_second_factor_webauthn_credential_path(security_key), params: {
+          public_key_credential: passkey_assertion(challenge, credential: passkey).to_json
+        }
+
+        expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+        expect(security_key.reload).to be_second_factor
+      end
+
+      it "does not promote the security key with a passkey sign-in challenge" do
+        post account_passkey_authentication_options_path
+
+        patch account_second_factor_webauthn_credential_path(security_key), params: {
+          public_key_credential: passkey_assertion(session[:authentication_challenge]).to_json
+        }
+
+        expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+        expect(security_key.reload).to be_second_factor
       end
     end
 
     context "with a JSON request" do
+      let(:challenge) do
+        post account_security_key_upgrade_options_path, as: :json
+        response.parsed_body["challenge"]
+      end
+
       it "promotes the security key and responds with 204" do
         sign_in user, scope: :account
-        patch account_second_factor_webauthn_credential_path(security_key), as: :json
+        patch account_second_factor_webauthn_credential_path(security_key),
+              params: { public_key_credential: passkey_assertion(challenge) }, as: :json
 
         expect(response).to have_http_status(:no_content)
         expect(security_key.reload).to be_first_factor
       end
 
+      it "responds with 422 and an error message when the security key cannot sign in as a passkey" do
+        sign_in user, scope: :account
+        patch account_second_factor_webauthn_credential_path(security_key),
+              params: { public_key_credential: passkey_assertion(challenge, user_handle: nil) }, as: :json
+
+        expect(response).to have_http_status(422)
+        expect(response.parsed_body["errors"])
+          .to eq("base" => [I18n.t("devise.failure.security_key_promotion_failed")])
+        expect(security_key.reload).to be_second_factor
+      end
+
       context "without a session" do
         include_context "with a JSON client without a session"
 
+        let(:challenge) do
+          without_session_json_post account_security_key_upgrade_options_path, authenticated_as: user
+          response.parsed_body["challenge"]
+        end
+
         it "promotes the security key and responds with 204" do
           without_session_json_patch account_second_factor_webauthn_credential_path(security_key),
-                                     authenticated_as: user
+                                     public_key_credential: passkey_assertion(challenge), authenticated_as: user
 
           expect(response).to have_http_status(:no_content)
           expect(security_key.reload).to be_first_factor

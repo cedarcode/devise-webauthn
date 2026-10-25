@@ -29,12 +29,15 @@ module Devise
     def update
       security_key = resource.second_factor_webauthn_credentials.find(params[:id])
 
-      if security_key.update(authentication_factor: 0)
+      if verify_and_promote_security_key(security_key, public_key_credential_param)
         set_flash_message! :notice, :security_key_promoted
       else
+        add_security_key_promotion_error(security_key)
         set_flash_message! :alert, :security_key_promotion_failed, scope: :"devise.failure"
       end
       respond_with_navigational(security_key, location: after_update_path) { redirect_to after_update_path }
+    ensure
+      challenge_store.consume(:security_key_upgrade)
     end
 
     def destroy
@@ -71,6 +74,32 @@ module Devise
       )
     rescue WebAuthn::Error
       security_key_with_verification_error
+    end
+
+    # Promotes the security key only if it answers the security key upgrade options, which are the same as
+    # the passkey sign-in options, with what passkey sign-in needs: this user's handle and user verification.
+    def verify_and_promote_security_key(security_key, public_key_credential)
+      return false if public_key_credential.nil?
+
+      credential_from_params = WebAuthn::Credential.from_get(public_key_credential)
+      # Passkey sign-in finds the user by this handle. A non-discoverable credential does not return one.
+      user_handle = credential_from_params.user_handle
+      return false if user_handle.blank? || user_handle != resource.webauthn_id
+
+      credential_from_params.verify(
+        challenge_store.consume(:security_key_upgrade),
+        public_key: security_key.public_key,
+        sign_count: security_key.sign_count,
+        user_verification: true
+      )
+
+      security_key.update(authentication_factor: 0, sign_count: credential_from_params.sign_count)
+    rescue WebAuthn::Error
+      false
+    end
+
+    def add_security_key_promotion_error(security_key)
+      security_key.errors.add(:base, find_message(:security_key_promotion_failed, scope: :"devise.failure"))
     end
 
     def security_key_with_verification_error
