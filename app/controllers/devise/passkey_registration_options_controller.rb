@@ -19,6 +19,7 @@ module Devise
           exclude: resource.passkeys.pluck(:external_id),
           authenticator_selection: {
             resident_key: "required",
+            require_resident_key: true,
             user_verification: "required"
           }
         )
