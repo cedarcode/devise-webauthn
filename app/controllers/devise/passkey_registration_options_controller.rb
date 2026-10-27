@@ -19,7 +19,6 @@ module Devise
           exclude: resource.passkeys.pluck(:external_id),
           authenticator_selection: {
             resident_key: "required",
-            # WebAuthn Level 1 clients read this instead of `resident_key`.
             require_resident_key: true,
             user_verification: "required"
           }
