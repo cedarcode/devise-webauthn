@@ -23,9 +23,9 @@ RSpec.shared_context "with a JSON client without a session" do
     post path, params: params, as: :json
   end
 
-  def without_session_json_patch(path, authenticated_as: nil, **params)
+  def without_session_json_patch(path, authenticated_as: nil)
     start_request_without_session(authenticated_as)
-    patch path, params: params, as: :json
+    patch path, as: :json
   end
 
   def without_session_json_delete(path, authenticated_as: nil)

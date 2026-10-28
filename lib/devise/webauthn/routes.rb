@@ -26,7 +26,6 @@ module ActionDispatch
                                                         controller: controllers[:security_key_authentication_options]
         resources :security_key_registration_options, only: :create,
                                                       controller: controllers[:security_key_registration_options]
-        resources :security_key_upgrade_options, only: :create, controller: controllers[:security_key_upgrade_options]
       end
     end
   end

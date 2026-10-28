@@ -60,6 +60,19 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         expect(page).to have_current_path(new_account_second_factor_webauthn_credential_path)
         expect(page).to have_content("Security Key created successfully.")
       end
+
+      it "does not offer to upgrade it when the browser does not report it as discoverable" do
+        visit new_account_second_factor_webauthn_credential_path
+
+        fill_in "Security Key name", with: "My Security Key"
+        click_button_and_wait_for_page_load "Create Security Key"
+        visit root_path
+
+        within security_keys_section do
+          expect(page).to have_content("My Security Key")
+          expect(page).not_to have_button("Upgrade to Passkey")
+        end
+      end
     end
 
     context "when verification fails in the rp" do
@@ -82,8 +95,8 @@ RSpec.describe "Manage webauthn credentials", type: :system do
     # rubocop:disable RSpec/MultipleExpectations
     context "when user has a security key that can sign in as a passkey" do
       before do
-        # Authenticators may create a discoverable credential even when the security key options discourage it.
-        add_passkey_to_authenticator(authenticator, user, name: "Existing Key").second_factor!
+        add_passkey_to_authenticator(authenticator, user, name: "Existing Key")
+          .update!(authentication_factor: :second_factor, discoverable: true)
       end
 
       it "allows upgrading security key to passkey" do
@@ -120,30 +133,6 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         click_button "Log in with passkeys"
 
         expect(page).to have_content("Signed in successfully.")
-      end
-    end
-
-    context "when user has a security key that is not discoverable" do
-      before do
-        add_security_key_to_authenticator(authenticator, user, name: "Existing Key")
-      end
-
-      it "does not upgrade it to a passkey" do
-        visit root_path
-
-        within security_keys_section do
-          accept_alert { click_button "Upgrade to Passkey" }
-        end
-
-        visit root_path
-
-        within passkeys_section do
-          expect(page).not_to have_content("Existing Key")
-        end
-
-        within security_keys_section do
-          expect(page).to have_content("Existing Key")
-        end
       end
     end
   end

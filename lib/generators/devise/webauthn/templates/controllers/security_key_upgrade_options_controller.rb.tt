@@ -1,8 +1,0 @@
-# frozen_string_literal: true
-
-class <%= @scope_prefix %>SecurityKeyUpgradeOptionsController < Devise::SecurityKeyUpgradeOptionsController
-  # POST /resource/security_key_upgrade_options
-  # def create
-  #   super
-  # end
-end

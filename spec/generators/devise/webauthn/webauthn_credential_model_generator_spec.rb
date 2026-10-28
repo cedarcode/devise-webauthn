@@ -27,6 +27,7 @@ RSpec.describe Devise::Webauthn::WebauthnCredentialModelGenerator, type: :genera
       assert_migration "db/migrate/create_webauthn_credentials.rb" do |migration|
         assert_instance_method :change, migration do |method_body|
           assert_match(/t\.references :user, null: false, foreign_key: true/, method_body)
+          assert_match(/t\.boolean :discoverable$/, method_body)
         end
       end
     end

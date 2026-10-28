@@ -7,8 +7,7 @@ module Devise
         KEYS = {
           passkey_authentication: :authentication_challenge,
           two_factor_authentication: :two_factor_authentication_challenge,
-          registration: :webauthn_challenge,
-          security_key_upgrade: :security_key_upgrade_challenge
+          registration: :webauthn_challenge
         }.freeze
 
         def initialize(request)
