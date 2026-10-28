@@ -120,6 +120,16 @@ The WebAuthn passkey sign-in flow works as follows:
 #### Adding Security Keys for 2FA
 Signed-in users can add security keys by visiting `/users/second_factor_webauthn_credentials/new`.
 
+#### Upgrading Security Keys to Passkeys
+A security key can become a passkey only if it is [discoverable](https://www.w3.org/TR/webauthn-3/#discoverable-credential). Passkey sign-in does not tell the browser which credential to use, so the browser only finds discoverable ones. Many hardware security keys create non-discoverable credentials when they are added for 2FA.
+
+When a security key is added, the browser reports in the [`credProps` extension](https://www.w3.org/TR/webauthn-3/#sctn-authenticator-credential-properties-extension) whether it is discoverable. The gem stores this in `discoverable`. It is `nil` when the browser does not report it, and for security keys added before this column existed. `PATCH /users/second_factor_webauthn_credentials/:id` promotes a security key only when `discoverable` is `true`. Show the upgrade button only for those keys:
+```erb
+<% if security_key.discoverable? %>
+  <%= button_to "Upgrade to passkey", second_factor_webauthn_credential_path(:user, security_key), method: :patch %>
+<% end %>
+```
+
 #### 2FA Sign In with Security Keys
 When a user that has 2FA enabled (i.e., has registered passkeys or security keys) visits `/users/sign_in`, after entering their primary credentials (e.g., email and password), they will be prompted to complete the second factor authentication using WebAuthn. The authentication flow is handled by `WebauthnTwoFactorAuthenticatable` strategy.
 
@@ -192,7 +202,7 @@ Mobile apps and other API clients can use passkeys and security keys without a s
 
 ### Endpoints
 
-Send `public_key_credential` as the JSON object your WebAuthn library returns. For a resource named `user`:
+Send `public_key_credential` as the JSON object your WebAuthn library returns. Keep its `clientExtensionResults`: a security key can be promoted to a passkey only if they report it as discoverable. For a resource named `user`:
 
 | Step | Request | Response |
 |---|---|---|
@@ -203,7 +213,7 @@ Send `public_key_credential` as the JSON object your WebAuthn library returns. F
 | Delete passkey | `DELETE /users/passkeys/:id` (authenticated) | `204` |
 | Security key registration options | `POST /users/security_key_registration_options` (authenticated) | WebAuthn creation options |
 | Add security key | `POST /users/second_factor_webauthn_credentials` with `name` and `public_key_credential` (authenticated) | `201`, or `422` with `errors` |
-| Promote security key to passkey | `PATCH /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
+| Promote security key to passkey | `PATCH /users/second_factor_webauthn_credentials/:id` (authenticated) | `204`, or `422` with `errors` when the key is not `discoverable` |
 | Delete security key | `DELETE /users/second_factor_webauthn_credentials/:id` (authenticated) | `204` |
 
 ### Two-factor sign-in for API clients

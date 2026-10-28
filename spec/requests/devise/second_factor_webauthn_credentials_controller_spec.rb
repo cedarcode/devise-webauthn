@@ -64,6 +64,34 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
           expect(flash[:notice]).to eq "Security Key created successfully."
           expect(session[:webauthn_challenge]).to be_nil
         end
+
+        it "stores the discoverable value that the browser reports in credProps" do
+          [true, false].each do |rk|
+            post account_security_key_registration_options_path
+            credential = client.create(challenge: session[:webauthn_challenge])
+                               .merge("clientExtensionResults" => { "credProps" => { "rk" => rk } })
+
+            post account_second_factor_webauthn_credentials_path, params: {
+              public_key_credential: credential.to_json, name: "Key #{rk}"
+            }
+
+            expect(user.second_factor_webauthn_credentials.find_by!(name: "Key #{rk}").discoverable).to be(rk)
+          end
+        end
+
+        it "leaves discoverable nil when credProps is missing or malformed" do
+          [nil, { "credProps" => "unknown" }].each_with_index do |extension_results, index|
+            post account_security_key_registration_options_path
+            credential = client.create(challenge: session[:webauthn_challenge])
+                               .merge("clientExtensionResults" => extension_results)
+
+            post account_second_factor_webauthn_credentials_path, params: {
+              public_key_credential: credential.to_json, name: "Key #{index}"
+            }
+
+            expect(user.second_factor_webauthn_credentials.find_by!(name: "Key #{index}").discoverable).to be_nil
+          end
+        end
       end
 
       context "with invalid credential" do
@@ -160,13 +188,15 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
   end
 
   describe "PATCH #update" do
+    let(:discoverable) { true }
     let!(:security_key) do
       user.second_factor_webauthn_credentials.create!(
         external_id: "external-id",
         name: "My Security Key",
         public_key: "public-key",
         sign_count: 0,
-        authentication_factor: "second_factor"
+        authentication_factor: "second_factor",
+        discoverable: discoverable
       )
     end
 
@@ -191,6 +221,20 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         expect(security_key.reload.authentication_factor).to eq("first_factor")
       end
+
+      [false, nil].each do |value|
+        context "when the security key has discoverable #{value.inspect}" do
+          let(:discoverable) { value }
+
+          it "does not promote it, sets an alert and redirects" do
+            patch account_second_factor_webauthn_credential_path(security_key)
+
+            expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
+            expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+            expect(security_key.reload).to be_second_factor
+          end
+        end
+      end
     end
 
     context "with a JSON request" do
@@ -200,6 +244,20 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         expect(response).to have_http_status(:no_content)
         expect(security_key.reload).to be_first_factor
+      end
+
+      context "when the security key is not discoverable" do
+        let(:discoverable) { false }
+
+        it "responds with 422 and an error message" do
+          sign_in user, scope: :account
+          patch account_second_factor_webauthn_credential_path(security_key), as: :json
+
+          expect(response).to have_http_status(422)
+          expect(response.parsed_body["errors"])
+            .to eq("base" => [I18n.t("devise.failure.security_key_promotion_failed")])
+          expect(security_key.reload).to be_second_factor
+        end
       end
 
       context "without a session" do

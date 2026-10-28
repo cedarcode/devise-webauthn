@@ -29,9 +29,10 @@ module Devise
     def update
       security_key = resource.second_factor_webauthn_credentials.find(params[:id])
 
-      if security_key.update(authentication_factor: 0)
+      if security_key.discoverable? && security_key.update(authentication_factor: 0)
         set_flash_message! :notice, :security_key_promoted
       else
+        add_security_key_promotion_error(security_key)
         set_flash_message! :alert, :security_key_promotion_failed, scope: :"devise.failure"
       end
       respond_with_navigational(security_key, location: after_update_path) { redirect_to after_update_path }
@@ -67,10 +68,21 @@ module Devise
         external_id: security_key_from_params.id,
         name: params[:name],
         public_key: security_key_from_params.public_key,
-        sign_count: security_key_from_params.sign_count
+        sign_count: security_key_from_params.sign_count,
+        discoverable: cred_props_rk(security_key_from_params)
       )
     rescue WebAuthn::Error
       security_key_with_verification_error
+    end
+
+    # The browser reports this, not the authenticator. It is nil when the browser does not know.
+    def cred_props_rk(credential)
+      outputs = credential.client_extension_outputs
+      outputs["credProps"]["rk"] if outputs.is_a?(Hash) && outputs["credProps"].is_a?(Hash)
+    end
+
+    def add_security_key_promotion_error(security_key)
+      security_key.errors.add(:base, find_message(:security_key_promotion_failed, scope: :"devise.failure"))
     end
 
     def security_key_with_verification_error

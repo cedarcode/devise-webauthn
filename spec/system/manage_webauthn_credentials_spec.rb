@@ -60,6 +60,19 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         expect(page).to have_current_path(new_account_second_factor_webauthn_credential_path)
         expect(page).to have_content("Security Key created successfully.")
       end
+
+      it "does not offer to upgrade it when the browser does not report it as discoverable" do
+        visit new_account_second_factor_webauthn_credential_path
+
+        fill_in "Security Key name", with: "My Security Key"
+        click_button_and_wait_for_page_load "Create Security Key"
+        visit root_path
+
+        within security_keys_section do
+          expect(page).to have_content("My Security Key")
+          expect(page).not_to have_button("Upgrade to Passkey")
+        end
+      end
     end
 
     context "when verification fails in the rp" do
@@ -80,9 +93,10 @@ RSpec.describe "Manage webauthn credentials", type: :system do
     end
 
     # rubocop:disable RSpec/MultipleExpectations
-    context "when user has existing security keys" do
+    context "when user has a security key that can sign in as a passkey" do
       before do
-        add_security_key_to_authenticator(authenticator, user, name: "Existing Key")
+        add_passkey_to_authenticator(authenticator, user, name: "Existing Key")
+          .update!(authentication_factor: :second_factor, discoverable: true)
       end
 
       it "allows upgrading security key to passkey" do
@@ -108,6 +122,17 @@ RSpec.describe "Manage webauthn credentials", type: :system do
           expect(page).not_to have_content("Existing Key")
           expect(page).not_to have_button("Upgrade to Passkey")
         end
+      end
+
+      it "allows signing in with it as a passkey after the upgrade" do
+        visit root_path
+        within(security_keys_section) { click_button_and_wait_for_page_load "Upgrade to Passkey" }
+
+        page.driver.browser.manage.delete_all_cookies
+        visit new_account_session_path
+        click_button "Log in with passkeys"
+
+        expect(page).to have_content("Signed in successfully.")
       end
     end
   end
