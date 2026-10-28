@@ -20,7 +20,8 @@ module Devise
           authenticator_selection: {
             resident_key: "discouraged",
             user_verification: "discouraged"
-          }
+          },
+          extensions: { credProps: true }
         )
 
       challenge_store.write(:registration, create_security_key_options.challenge)
