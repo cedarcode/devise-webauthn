@@ -204,47 +204,14 @@ RSpec.describe "Passkey authentication flow", type: :request do
       expect(session["warden.user.account.key"]).to be_present
     end
 
-    context "without a session" do
-      include_context "with a JSON client without a session"
+    context "when skip_session_storage includes :params_auth" do
+      before { allow(Account).to receive(:skip_session_storage).and_return(%i[http_auth params_auth]) }
 
-      let(:challenge) do
-        without_session_json_post account_passkey_authentication_options_path
-        response.parsed_body["challenge"]
-      end
-
-      it "signs in with the credential sent as a JSON object and does not store the user in the session" do
-        without_session_json_post account_session_path, public_key_credential: public_key_credential
+      it "signs in without storing the user in the session" do
+        post account_session_path, params: { public_key_credential: public_key_credential }, as: :json
 
         expect(response).to have_http_status(:created)
-        expect(response.parsed_body["email"]).to eq(user.email)
         expect(session["warden.user.account.key"]).to be_nil
-      end
-
-      it "rejects a challenge that was already used" do
-        without_session_json_post account_session_path, public_key_credential: public_key_credential
-
-        without_session_json_post account_session_path, public_key_credential: public_key_credential
-
-        expect(response).to have_http_status(:unauthorized)
-      end
-
-      it "rejects a challenge the server never issued" do
-        assertion = generate_assertion(
-          client,
-          challenge: WebAuthn.configuration.encoder.encode(SecureRandom.random_bytes(32)),
-          credential: passkey,
-          user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id)
-        )
-
-        without_session_json_post account_session_path, public_key_credential: assertion
-
-        expect(response).to have_http_status(:unauthorized)
-      end
-
-      it "rejects a malformed credential" do
-        without_session_json_post account_session_path, public_key_credential: "not json"
-
-        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

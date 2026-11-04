@@ -435,6 +435,7 @@ Used for authenticating with existing credentials.
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rspec` to run the tests.
+The tests for API clients run against an API-only app in `spec/internal_api`. Run them with `bundle exec rspec --options .rspec-api`, or run both suites with `bundle exec rake`.
 To run the linter, use `bundle exec rubocop`.
 
 Before submitting a pull request, ensure that tests and linter pass.
