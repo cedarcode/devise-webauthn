@@ -15,7 +15,7 @@ module Devise
         set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
       end
       redirect_to after_update_path
-    rescue WebAuthn::Error
+    rescue WebAuthn::Error, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       set_flash_message! :alert, :passkey_verification_failed, scope: :"devise.failure"
       redirect_to after_update_path
     ensure
@@ -45,7 +45,7 @@ module Devise
         user_verification: true
       )
 
-      resource.passkeys.create(
+      resource.passkeys.create!(
         external_id: passkey_from_params.id,
         name: params[:name],
         public_key: passkey_from_params.public_key,

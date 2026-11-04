@@ -15,7 +15,7 @@ module Devise
         set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       end
       redirect_to after_create_path
-    rescue WebAuthn::Error
+    rescue WebAuthn::Error, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_create_path
     ensure
@@ -54,7 +54,7 @@ module Devise
         session[:webauthn_challenge]
       )
 
-      resource.second_factor_webauthn_credentials.create(
+      resource.second_factor_webauthn_credentials.create!(
         external_id: security_key_from_params.id,
         name: params[:name],
         public_key: security_key_from_params.public_key,

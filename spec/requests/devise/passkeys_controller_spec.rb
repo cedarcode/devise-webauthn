@@ -77,6 +77,52 @@ RSpec.describe Devise::PasskeysController, type: :request do
           expect(session[:webauthn_challenge]).to be_nil
         end
       end
+
+      context "with a blank name" do
+        let(:credential) do
+          client.create(
+            challenge: session[:webauthn_challenge],
+            user_verified: true
+          )
+        end
+
+        it "does not create a new passkey and shows the failure alert" do
+          assert_difference("user.passkeys.count", 0) do
+            post account_passkeys_path, params: {
+              public_key_credential: credential.to_json,
+              name: "   "
+            }
+          end
+
+          expect(response).to redirect_to(new_account_passkey_path)
+          expect(flash[:notice]).to be_nil
+          expect(flash[:alert]).to eq I18n.t("devise.failure.passkey_verification_failed")
+        end
+      end
+
+      context "when a callback aborts the save" do
+        let(:credential) do
+          client.create(
+            challenge: session[:webauthn_challenge],
+            user_verified: true
+          )
+        end
+
+        before do
+          allow_any_instance_of(WebauthnCredential).to receive(:save!) # rubocop:disable RSpec/AnyInstance
+            .and_raise(ActiveRecord::RecordNotSaved)
+        end
+
+        it "shows the failure alert" do
+          post account_passkeys_path, params: {
+            public_key_credential: credential.to_json,
+            name: "My Passkey"
+          }
+
+          expect(response).to redirect_to(new_account_passkey_path)
+          expect(flash[:alert]).to eq I18n.t("devise.failure.passkey_verification_failed")
+        end
+      end
     end
 
     context "when user is not authenticated" do

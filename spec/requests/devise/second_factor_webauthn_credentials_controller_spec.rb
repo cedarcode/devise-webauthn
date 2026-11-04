@@ -87,6 +87,52 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
           expect(session[:webauthn_challenge]).to be_nil
         end
       end
+
+      context "with a blank name" do
+        let(:credential) do
+          client.create(
+            challenge: session[:webauthn_challenge],
+            user_verified: false
+          )
+        end
+
+        it "does not create a new security key and shows the failure alert" do
+          assert_difference("user.second_factor_webauthn_credentials.count", 0) do
+            post account_second_factor_webauthn_credentials_path, params: {
+              public_key_credential: credential.to_json,
+              name: "   "
+            }
+          end
+
+          expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
+          expect(flash[:notice]).to be_nil
+          expect(flash[:alert]).to eq "Webauthn credential verification failed."
+        end
+      end
+
+      context "when a callback aborts the save" do
+        let(:credential) do
+          client.create(
+            challenge: session[:webauthn_challenge],
+            user_verified: false
+          )
+        end
+
+        before do
+          allow_any_instance_of(WebauthnCredential).to receive(:save!) # rubocop:disable RSpec/AnyInstance
+            .and_raise(ActiveRecord::RecordNotSaved)
+        end
+
+        it "shows the failure alert" do
+          post account_second_factor_webauthn_credentials_path, params: {
+            public_key_credential: credential.to_json,
+            name: "My Security Key"
+          }
+
+          expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
+          expect(flash[:alert]).to eq "Webauthn credential verification failed."
+        end
+      end
     end
   end
 
