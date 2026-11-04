@@ -9,13 +9,13 @@ module Devise
     def create
       security_key_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
 
-      if verify_and_save_security_key(security_key_from_params)
+      if verify_and_save_security_key(security_key_from_params).persisted?
         set_flash_message! :notice, :security_key_created
       else
         set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       end
       redirect_to after_create_path
-    rescue WebAuthn::Error, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+    rescue WebAuthn::Error
       set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
       redirect_to after_create_path
     ensure
@@ -54,7 +54,7 @@ module Devise
         session[:webauthn_challenge]
       )
 
-      resource.second_factor_webauthn_credentials.create!(
+      resource.second_factor_webauthn_credentials.create(
         external_id: security_key_from_params.id,
         name: params[:name],
         public_key: security_key_from_params.public_key,

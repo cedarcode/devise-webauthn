@@ -119,8 +119,8 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         end
 
         before do
-          allow_any_instance_of(WebauthnCredential).to receive(:save!) # rubocop:disable RSpec/AnyInstance
-            .and_raise(ActiveRecord::RecordNotSaved)
+          allow_any_instance_of(WebauthnCredential).to receive(:save) # rubocop:disable RSpec/AnyInstance
+            .and_return(false)
         end
 
         it "shows the failure alert" do
