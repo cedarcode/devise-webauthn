@@ -33,8 +33,9 @@ module Devise
         end
       end
 
+      # `devise.skip_storage` is Devise's per-request switch for what `skip_session_storage` does for every request.
       def two_factor_token_stored_in_session?(scope)
-        Devise.mappings[scope].to.skip_session_storage.exclude?(:params_auth)
+        !request.env["devise.skip_storage"] && Devise.mappings[scope].to.skip_session_storage.exclude?(:params_auth)
       end
     end
   end
