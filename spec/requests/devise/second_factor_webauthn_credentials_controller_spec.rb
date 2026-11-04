@@ -88,6 +88,28 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         end
       end
 
+      context "with a blank name" do
+        let(:credential) do
+          client.create(
+            challenge: session[:webauthn_challenge],
+            user_verified: false
+          )
+        end
+
+        it "does not create a new security key and shows the failure alert" do
+          assert_difference("user.second_factor_webauthn_credentials.count", 0) do
+            post account_second_factor_webauthn_credentials_path, params: {
+              public_key_credential: credential.to_json,
+              name: "   "
+            }
+          end
+
+          expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
+          expect(flash[:notice]).to be_nil
+          expect(flash[:alert]).to eq I18n.t("devise.failure.webauthn_credential_verification_failed")
+        end
+      end
+
       context "when the credential cannot be parsed" do
         it "clears the challenge and redirects" do
           post account_second_factor_webauthn_credentials_path, params: { public_key_credential: "{}", name: "Key" }
@@ -116,6 +138,18 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         expect(response).to have_http_status(:created)
         expect(response.body).to be_empty
+      end
+
+      it "responds with 422 and the validation errors when the name is blank" do
+        sign_in user, scope: :account
+
+        expect do
+          post account_second_factor_webauthn_credentials_path,
+               params: { name: "", public_key_credential: public_key_credential }, as: :json
+        end.not_to change(user.second_factor_webauthn_credentials, :count)
+
+        expect(response).to have_http_status(422)
+        expect(response.parsed_body["errors"]).to eq("name" => [I18n.t("errors.messages.blank")])
       end
 
       context "without a session" do
