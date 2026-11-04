@@ -24,6 +24,12 @@
 - Two-factor sign-in runs only the `webauthn_two_factor_authenticatable` strategy. When a passkey challenge was pending in the session and the two-factor challenge was not, the passkey strategy took the request, consumed the passkey challenge and answered with a passkey error. [#164](https://github.com/cedarcode/devise-webauthn/pull/164) [@RenzoMinelli]
 - Passkey registration options send `requireResidentKey: true` next to `residentKey: "required"`. [#166](https://github.com/cedarcode/devise-webauthn/pull/166) [@RenzoMinelli]
 
+## [v0.5.1](https://github.com/cedarcode/devise-webauthn/compare/v0.5.0...v0.5.1/) - 2026-11-04
+
+### Fixed
+
+- The passkey and security key controllers show the failure alert when the credential is not saved, such as when its name is blank. Before, they showed the success notice. [#172](https://github.com/cedarcode/devise-webauthn/pull/172) [@RenzoMinelli]
+
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
 ### Added
