@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## [v0.5.1](https://github.com/cedarcode/devise-webauthn/compare/v0.5.0...v0.5.1/) - 2026-11-04
+
+### Fixed
+
+- The passkey and security key controllers show the failure alert when the credential is not saved, such as when its name is blank. Before, they showed the success notice. Overrides of `verify_and_save_passkey` and `verify_and_save_security_key` must return the credential record. [#172](https://github.com/cedarcode/devise-webauthn/pull/172) [@RenzoMinelli]
+
 ## [v0.5.0](https://github.com/cedarcode/devise-webauthn/compare/v0.4.0...v0.5.0/) - 2026-07-13
 
 ### Added

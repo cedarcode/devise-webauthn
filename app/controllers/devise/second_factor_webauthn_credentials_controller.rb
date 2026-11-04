@@ -8,8 +8,9 @@ module Devise
 
     def create
       security_key_from_params = WebAuthn::Credential.from_create(JSON.parse(params[:public_key_credential]))
+      security_key = verify_and_save_security_key(security_key_from_params)
 
-      if verify_and_save_security_key(security_key_from_params)
+      if security_key.persisted?
         set_flash_message! :notice, :security_key_created
       else
         set_flash_message! :alert, :webauthn_credential_verification_failed, scope: :"devise.failure"
