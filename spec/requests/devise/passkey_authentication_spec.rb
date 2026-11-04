@@ -181,6 +181,65 @@ RSpec.describe "Passkey authentication flow", type: :request do
     end
   end
 
+  describe "a passkey sent outside the sign-in" do
+    def assertion_for(challenge)
+      generate_assertion(client, challenge: challenge, credential: passkey,
+                                 user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
+    end
+
+    context "with the :session challenge store" do
+      around do |example|
+        original_store = Devise::Webauthn.challenge_store
+        Devise::Webauthn.challenge_store = :session
+        example.run
+      ensure
+        Devise::Webauthn.challenge_store = original_store
+      end
+
+      it "does not sign in from a protected page" do
+        post account_passkey_authentication_options_path
+        assertion = assertion_for(session[:authentication_challenge])
+
+        get new_account_passkey_path, params: { public_key_credential: assertion.to_json }
+
+        expect(response).to redirect_to(new_account_session_path)
+        expect(session["warden.user.account.key"]).to be_nil
+      end
+    end
+
+    context "with the :cache challenge store and a client without a session" do
+      around do |example|
+        original_store = Devise::Webauthn.challenge_store
+        original_cache = Devise::Webauthn::ChallengeStores::Cache.cache
+        Devise::Webauthn.challenge_store = :cache
+        Devise::Webauthn::ChallengeStores::Cache.cache = ActiveSupport::Cache::MemoryStore.new
+        example.run
+      ensure
+        Devise::Webauthn.challenge_store = original_store
+        Devise::Webauthn::ChallengeStores::Cache.cache = original_cache
+      end
+
+      it "does not authenticate a request to a protected endpoint" do
+        post account_passkey_authentication_options_path, as: :json
+        assertion = assertion_for(response.parsed_body["challenge"])
+
+        reset!
+        post account_passkey_registration_options_path, params: { public_key_credential: assertion }, as: :json
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    it "signs in from a controller that calls allow_params_authentication!" do
+      post account_passkey_authentication_options_path
+
+      post passkey_session_path, params: { public_key_credential: assertion_for(stored_challenge).to_json }
+
+      expect(response).to have_http_status(:created)
+      expect(session["warden.user.account.key"]).to be_present
+    end
+  end
+
   context "with a JSON request" do
     let(:challenge) do
       post account_passkey_authentication_options_path, as: :json
