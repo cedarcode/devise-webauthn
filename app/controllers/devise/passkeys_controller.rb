@@ -4,6 +4,7 @@ module Devise
   class PasskeysController < DeviseController
     include Devise::Webauthn::ChallengeStoreAccess
     include Devise::Webauthn::PublicKeyCredentialParam
+    include Devise::Webauthn::CredentialProperties
 
     before_action :authenticate_scope!
 
@@ -54,10 +55,8 @@ module Devise
       )
 
       resource.passkeys.create(
-        external_id: passkey_from_params.id,
         name: params[:name],
-        public_key: passkey_from_params.public_key,
-        sign_count: passkey_from_params.sign_count
+        **credential_record_attributes(passkey_from_params)
       )
     rescue WebAuthn::Error
       passkey_with_verification_error

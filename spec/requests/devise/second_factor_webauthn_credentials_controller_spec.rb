@@ -120,6 +120,61 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       end
     end
 
+    describe "the credential properties it stores" do
+      let(:user_verified) { false }
+      let(:extension_results) { { "credProps" => { "rk" => true } } }
+      let(:security_key) { user.second_factor_webauthn_credentials.last }
+
+      before do
+        sign_in user
+        post account_security_key_registration_options_path
+        credential = client.create(challenge: session[:webauthn_challenge], user_verified: user_verified)
+                           .merge("clientExtensionResults" => extension_results)
+
+        post account_second_factor_webauthn_credentials_path, params: {
+          public_key_credential: credential.to_json, name: "My Security Key"
+        }
+      end
+
+      it "stores the rk that the browser reports as discoverable" do
+        expect(security_key.discoverable).to be(true)
+      end
+
+      context "when the browser reports rk as false" do
+        let(:extension_results) { { "credProps" => { "rk" => false } } }
+
+        it { expect(security_key.discoverable).to be(false) }
+      end
+
+      context "when the browser does not report credProps" do
+        let(:extension_results) { nil }
+
+        it { expect(security_key.discoverable).to be_nil }
+      end
+
+      context "when credProps is malformed" do
+        let(:extension_results) { { "credProps" => "unknown" } }
+
+        it { expect(security_key.discoverable).to be_nil }
+      end
+
+      context "when rk is not a boolean" do
+        let(:extension_results) { { "credProps" => { "rk" => "yes" } } }
+
+        it { expect(security_key.discoverable).to be_nil }
+      end
+
+      context "when the key verifies the user" do
+        let(:user_verified) { true }
+
+        it { expect(security_key.uv_initialized).to be(true) }
+      end
+
+      context "when the key does not verify the user" do
+        it { expect(security_key.uv_initialized).to be(false) }
+      end
+    end
+
     context "with a JSON request" do
       let(:challenge) do
         post account_security_key_registration_options_path, as: :json
@@ -194,13 +249,17 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
   end
 
   describe "PATCH #update" do
+    let(:discoverable) { true }
+    let(:uv_initialized) { true }
     let!(:security_key) do
       user.second_factor_webauthn_credentials.create!(
         external_id: "external-id",
         name: "My Security Key",
         public_key: "public-key",
         sign_count: 0,
-        authentication_factor: "second_factor"
+        authentication_factor: "second_factor",
+        discoverable: discoverable,
+        uv_initialized: uv_initialized
       )
     end
 
@@ -225,6 +284,48 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         expect(security_key.reload.authentication_factor).to eq("first_factor")
       end
+
+      context "when the security key is not discoverable" do
+        let(:discoverable) { false }
+
+        it "does not promote it, sets an alert and redirects" do
+          patch account_second_factor_webauthn_credential_path(security_key)
+
+          expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
+          expect(flash[:alert]).to eq I18n.t("devise.failure.security_key_promotion_failed")
+          expect(security_key.reload).to be_second_factor
+        end
+      end
+
+      context "when the browser did not report whether the security key is discoverable" do
+        let(:discoverable) { nil }
+
+        it "does not promote it" do
+          patch account_second_factor_webauthn_credential_path(security_key)
+
+          expect(security_key.reload).to be_second_factor
+        end
+      end
+
+      context "when the security key did not verify the user when it was added" do
+        let(:uv_initialized) { false }
+
+        it "does not promote it" do
+          patch account_second_factor_webauthn_credential_path(security_key)
+
+          expect(security_key.reload).to be_second_factor
+        end
+      end
+
+      context "when the security key was added before uv_initialized existed" do
+        let(:uv_initialized) { nil }
+
+        it "does not promote it" do
+          patch account_second_factor_webauthn_credential_path(security_key)
+
+          expect(security_key.reload).to be_second_factor
+        end
+      end
     end
 
     context "with a JSON request" do
@@ -234,6 +335,20 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         expect(response).to have_http_status(:no_content)
         expect(security_key.reload).to be_first_factor
+      end
+
+      context "when the security key is not discoverable" do
+        let(:discoverable) { false }
+
+        it "responds with 422 and an error message" do
+          sign_in user, scope: :account
+          patch account_second_factor_webauthn_credential_path(security_key), as: :json
+
+          expect(response).to have_http_status(422)
+          expect(response.parsed_body["errors"])
+            .to eq("base" => [I18n.t("devise.failure.security_key_promotion_failed")])
+          expect(security_key.reload).to be_second_factor
+        end
       end
 
       context "without a session" do
