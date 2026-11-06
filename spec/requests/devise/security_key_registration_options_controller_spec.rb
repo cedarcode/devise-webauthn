@@ -34,6 +34,12 @@ RSpec.describe Devise::SecurityKeyRegistrationOptionsController, type: :request 
         expect(response.parsed_body["extensions"]).to eq("credProps" => true)
       end
 
+      it "asks the authenticator to verify the user when it can" do
+        post account_security_key_registration_options_path
+
+        expect(response.parsed_body.dig("authenticatorSelection", "userVerification")).to eq("preferred")
+      end
+
       it "names the user after the model's webauthn_user_name" do
         allow(user).to receive(:webauthn_user_name).and_return("ana")
 

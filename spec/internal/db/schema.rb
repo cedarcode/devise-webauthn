@@ -25,6 +25,7 @@ ActiveRecord::Schema.define do
     t.integer "account_id", null: false
     t.integer "authentication_factor", limit: 1, null: false
     t.boolean "discoverable"
+    t.boolean "uv_initialized"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_webauthn_credentials_on_external_id", unique: true

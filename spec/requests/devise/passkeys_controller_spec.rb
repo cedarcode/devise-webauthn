@@ -54,6 +54,16 @@ RSpec.describe Devise::PasskeysController, type: :request do
           expect(flash[:notice]).to eq I18n.t("devise.passkeys.passkey_created")
           expect(session[:webauthn_challenge]).to be_nil
         end
+
+        it "stores the rk that the browser reports and that the passkey verified the user" do
+          post account_passkeys_path, params: {
+            public_key_credential: credential.merge("clientExtensionResults" => { "credProps" => { "rk" => true } })
+                                             .to_json,
+            name: "My Passkey"
+          }
+
+          expect(user.passkeys.last).to have_attributes(discoverable: true, uv_initialized: true)
+        end
       end
 
       context "with invalid credential" do

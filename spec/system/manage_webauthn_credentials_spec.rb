@@ -61,7 +61,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         expect(page).to have_content("Security Key created successfully.")
       end
 
-      it "does not offer to upgrade it when the browser does not report it as discoverable" do
+      it "does not offer to upgrade a security key that is not discoverable" do
         visit new_account_second_factor_webauthn_credential_path
 
         fill_in "Security Key name", with: "My Security Key"
@@ -95,8 +95,7 @@ RSpec.describe "Manage webauthn credentials", type: :system do
     # rubocop:disable RSpec/MultipleExpectations
     context "when user has a security key that can sign in as a passkey" do
       before do
-        add_passkey_to_authenticator(authenticator, user, name: "Existing Key")
-          .update!(authentication_factor: :second_factor, discoverable: true)
+        add_security_key_to_authenticator(authenticator, user, name: "Existing Key", promotable: true)
       end
 
       it "allows upgrading security key to passkey" do

@@ -16,13 +16,14 @@ module Devise
           add_credential_to_authenticator(authenticator, resource, passkey: true, name: name)
         end
 
-        def add_security_key_to_authenticator(authenticator, resource, name: "My Security Key")
-          add_credential_to_authenticator(authenticator, resource, passkey: false, name: name)
+        def add_security_key_to_authenticator(authenticator, resource, name: "My Security Key", promotable: false)
+          add_credential_to_authenticator(authenticator, resource, passkey: false, name: name, discoverable: promotable)
         end
 
         # rubocop:disable Metrics/AbcSize
         # rubocop:disable Metrics/MethodLength
-        def add_credential_to_authenticator(authenticator, resource, passkey:, name: "My Credential")
+        def add_credential_to_authenticator(authenticator, resource, passkey:, name: "My Credential",
+                                            discoverable: passkey)
           credential_id = SecureRandom.random_bytes(16)
           encoded_credential_id = Base64.urlsafe_encode64(credential_id)
           key = OpenSSL::PKey.generate_key("ED25519")
@@ -34,12 +35,12 @@ module Devise
 
           credential_json = {
             "credentialId" => encoded_credential_id,
-            "isResidentCredential" => passkey,
+            "isResidentCredential" => discoverable,
             "rpId" => "localhost",
             "privateKey" => encoded_private_key,
             "signCount" => 0
           }
-          credential_json["userHandle"] = resource.ensure_webauthn_id! if passkey
+          credential_json["userHandle"] = resource.ensure_webauthn_id! if discoverable
 
           authenticator.add_credential(credential_json)
 
@@ -48,7 +49,9 @@ module Devise
             external_id: Base64.urlsafe_encode64(credential_id, padding: false),
             public_key: encoded_cose_public_key,
             sign_count: 0,
-            authentication_factor: passkey ? :first_factor : :second_factor
+            authentication_factor: passkey ? :first_factor : :second_factor,
+            discoverable: discoverable,
+            uv_initialized: discoverable
           )
         end
         # rubocop:enable Metrics/MethodLength

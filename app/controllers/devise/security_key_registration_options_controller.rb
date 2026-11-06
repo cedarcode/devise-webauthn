@@ -19,7 +19,7 @@ module Devise
           exclude: resource.webauthn_credentials.pluck(:external_id),
           authenticator_selection: {
             resident_key: "discouraged",
-            user_verification: "discouraged"
+            user_verification: "preferred"
           },
           extensions: { credProps: true }
         )
