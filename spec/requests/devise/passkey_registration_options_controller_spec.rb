@@ -29,6 +29,12 @@ RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
         expect(session[:webauthn_challenge]).to eq(json["challenge"])
       end
 
+      it "asks the browser to report whether the credential is discoverable" do
+        post account_passkey_registration_options_path
+
+        expect(response.parsed_body["extensions"]).to eq("credProps" => true)
+      end
+
       it "names the user after the model's webauthn_user_name" do
         allow(user).to receive(:webauthn_user_name).and_return("ana")
 

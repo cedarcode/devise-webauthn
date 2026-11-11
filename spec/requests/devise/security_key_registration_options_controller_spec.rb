@@ -28,6 +28,18 @@ RSpec.describe Devise::SecurityKeyRegistrationOptionsController, type: :request 
         expect(session[:webauthn_challenge]).to eq(json["challenge"])
       end
 
+      it "sets the credProps extension to true" do
+        post account_security_key_registration_options_path
+
+        expect(response.parsed_body["extensions"]).to eq("credProps" => true)
+      end
+
+      it "sets user_verification to 'preferred'" do
+        post account_security_key_registration_options_path
+
+        expect(response.parsed_body.dig("authenticatorSelection", "userVerification")).to eq("preferred")
+      end
+
       it "names the user after the model's webauthn_user_name" do
         allow(user).to receive(:webauthn_user_name).and_return("ana")
 

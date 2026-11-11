@@ -19,8 +19,9 @@ module Devise
           exclude: resource.webauthn_credentials.pluck(:external_id),
           authenticator_selection: {
             resident_key: "discouraged",
-            user_verification: "discouraged"
-          }
+            user_verification: "preferred"
+          },
+          extensions: { credProps: true }
         )
 
       challenge_store.write(:registration, create_security_key_options.challenge)
