@@ -98,12 +98,10 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         add_security_key_to_authenticator(authenticator, user, name: "Existing Key", promotable: true)
       end
 
-      it "allows upgrading security key to passkey" do
+      it "allows upgrading security key to passkey and signing in with it" do
         visit root_path
 
-        within passkeys_section do
-          expect(page).not_to have_content("Existing Key")
-        end
+        within(passkeys_section) { expect(page).not_to have_content("Existing Key") }
 
         within security_keys_section do
           expect(page).to have_content("Existing Key")
@@ -113,19 +111,12 @@ RSpec.describe "Manage webauthn credentials", type: :system do
         expect(page).to have_current_path(root_path)
         expect(page).to have_content("Security Key promoted to passkey successfully.")
 
-        within passkeys_section do
-          expect(page).to have_content("Existing Key")
-        end
+        within(passkeys_section) { expect(page).to have_content("Existing Key") }
 
         within security_keys_section do
           expect(page).not_to have_content("Existing Key")
           expect(page).not_to have_button("Upgrade to Passkey")
         end
-      end
-
-      it "allows signing in with it as a passkey after the upgrade" do
-        visit root_path
-        within(security_keys_section) { click_button_and_wait_for_page_load "Upgrade to Passkey" }
 
         page.driver.browser.manage.delete_all_cookies
         visit new_account_session_path

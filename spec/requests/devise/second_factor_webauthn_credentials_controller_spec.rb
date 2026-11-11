@@ -351,6 +351,20 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         end
       end
 
+      context "when the security key did not verify the user when it was added" do
+        let(:uv_initialized) { false }
+
+        it "responds with 422 and an error message" do
+          sign_in user, scope: :account
+          patch account_second_factor_webauthn_credential_path(security_key), as: :json
+
+          expect(response).to have_http_status(422)
+          expect(response.parsed_body["errors"])
+            .to eq("base" => [I18n.t("devise.failure.security_key_promotion_failed")])
+          expect(security_key.reload).to be_second_factor
+        end
+      end
+
       context "without a session" do
         include_context "with a JSON client without a session"
 

@@ -28,13 +28,13 @@ RSpec.describe Devise::SecurityKeyRegistrationOptionsController, type: :request 
         expect(session[:webauthn_challenge]).to eq(json["challenge"])
       end
 
-      it "asks the browser to report whether the credential is discoverable" do
+      it "sets the credProps extension to true" do
         post account_security_key_registration_options_path
 
         expect(response.parsed_body["extensions"]).to eq("credProps" => true)
       end
 
-      it "asks the authenticator to verify the user when it can" do
+      it "sets user_verification to 'preferred'" do
         post account_security_key_registration_options_path
 
         expect(response.parsed_body.dig("authenticatorSelection", "userVerification")).to eq("preferred")
