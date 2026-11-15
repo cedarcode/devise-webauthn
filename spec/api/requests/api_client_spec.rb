@@ -31,10 +31,19 @@ RSpec.describe "API client flows", type: :request do
     expect(response.parsed_body["email"]).to eq(user.email)
   end
 
+  it "responds to the password step with 401, an error and a two-factor token" do
+    register_credential(user.second_factor_webauthn_credentials)
+
+    post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
+
+    expect(response).to have_http_status(:unauthorized)
+    expect(response.parsed_body).to include("error" => I18n.t("devise.failure.two_factor_required"),
+                                            "two_factor_token" => be_present)
+  end
+
   it "signs in with a password, a two-factor token and a security key" do
     security_key = register_credential(user.second_factor_webauthn_credentials)
     post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
-    expect(response).to have_http_status(:unauthorized)
     token = response.parsed_body["two_factor_token"]
 
     post account_security_key_authentication_options_path, params: { two_factor_token: token }, as: :json

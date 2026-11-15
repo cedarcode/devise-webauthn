@@ -206,6 +206,29 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         expect(response).to have_http_status(422)
         expect(response.parsed_body["errors"]).to eq("name" => [I18n.t("errors.messages.blank")])
       end
+
+      it "responds with 422 and an error message when verification fails" do
+        sign_in user, scope: :account
+        challenge
+        credential = client.create(challenge: WebAuthn.configuration.encoder.encode("wrong"))
+
+        post account_second_factor_webauthn_credentials_path,
+             params: { name: "My key", public_key_credential: credential }, as: :json
+
+        expect(response).to have_http_status(422)
+        expect(response.parsed_body["errors"])
+          .to eq("base" => [I18n.t("devise.failure.webauthn_credential_verification_failed")])
+      end
+
+      it "responds with 422 when the credential has no response" do
+        sign_in user, scope: :account
+        challenge
+
+        post account_second_factor_webauthn_credentials_path,
+             params: { name: "My key", public_key_credential: { type: "public-key" } }, as: :json
+
+        expect(response).to have_http_status(422)
+      end
     end
   end
 
