@@ -277,6 +277,20 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(session["warden.user.account.key"]).to be_nil
     end
 
+    it "does not sign in by sending the second factor to the password sign-in" do
+      post account_session_path, params: { account: { email: user.email, password: password } }
+      post account_security_key_authentication_options_path
+      assertion = generate_assertion(
+        client,
+        challenge: session[:two_factor_authentication_challenge],
+        credential: security_key
+      )
+
+      post account_session_path, params: { public_key_credential: assertion.to_json }
+
+      expect(session["warden.user.account.key"]).to be_nil
+    end
+
     context "with a JSON request" do
       it "keeps the two-factor token in the session and completes authentication" do
         post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
