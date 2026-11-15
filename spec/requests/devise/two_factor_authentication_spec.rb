@@ -365,9 +365,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       end
     end
 
-    # An app that also signs in browsers with a cookie session keeps `:params_auth` out of `skip_session_storage`,
-    # and sets `devise.skip_storage` on API requests from a middleware instead.
-    context "when a middleware sets devise.skip_storage on API requests" do
+    context "when the request sets devise.skip_storage" do
       around do |example|
         original_store = Devise::Webauthn.challenge_store
         original_cache = Devise::Webauthn::ChallengeStores::Cache.cache
@@ -379,20 +377,20 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
         Devise::Webauthn::ChallengeStores::Cache.cache = original_cache
       end
 
-      def app
-        ApiRequestsWithoutSession.new(Rails.application)
-      end
+      let(:skip_storage) { { "devise.skip_storage" => true } }
 
       it "signs in with the two-factor token from the response and a security key" do
-        post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
+        post account_session_path,
+             params: { account: { email: user.email, password: password } }, env: skip_storage, as: :json
         token = response.parsed_body["two_factor_token"]
         expect(token).to be_present
         expect(session[:two_factor_token]).to be_nil
 
-        post account_security_key_authentication_options_path, params: { two_factor_token: token }, as: :json
+        post account_security_key_authentication_options_path,
+             params: { two_factor_token: token }, env: skip_storage, as: :json
         assertion = generate_assertion(client, challenge: response.parsed_body["challenge"], credential: security_key)
         post account_two_factor_authentication_path,
-             params: { two_factor_token: token, public_key_credential: assertion }, as: :json
+             params: { two_factor_token: token, public_key_credential: assertion }, env: skip_storage, as: :json
 
         expect(response).to have_http_status(:created)
         expect(session["warden.user.account.key"]).to be_nil
