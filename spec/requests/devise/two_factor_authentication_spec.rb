@@ -309,6 +309,47 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
           expect(response).to have_http_status(:created)
           expect(session["warden.user.account.key"]).to be_nil
         end
+
+        it "responds to the options step with 401 when the two-factor token is invalid" do
+          post account_security_key_authentication_options_path,
+               params: { two_factor_token: "#{request_two_factor_token}x" }, as: :json
+
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+        end
+
+        it "ignores a two-factor token in the query string" do
+          token = request_two_factor_token
+
+          post "#{account_security_key_authentication_options_path}?two_factor_token=#{CGI.escape(token)}", as: :json
+
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+        end
+
+        it "filters the two-factor token from the logged parameters" do
+          post account_security_key_authentication_options_path,
+               params: { two_factor_token: request_two_factor_token }, as: :json
+
+          expect(request.filtered_parameters["two_factor_token"]).to eq("[FILTERED]")
+        end
+
+        it "rejects a tampered two-factor token" do
+          token = request_two_factor_token
+          post account_security_key_authentication_options_path, params: { two_factor_token: token }, as: :json
+          assertion = generate_assertion(client, challenge: response.parsed_body["challenge"], credential: security_key)
+
+          post account_two_factor_authentication_path,
+               params: { two_factor_token: "#{token}x", public_key_credential: assertion.to_json }, as: :json
+
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.parsed_body["error"]).to eq(I18n.t("devise.failure.sign_in_not_initiated"))
+        end
+
+        def request_two_factor_token
+          post account_session_path, params: { account: { email: user.email, password: password } }, as: :json
+          response.parsed_body["two_factor_token"]
+        end
       end
     end
   end
