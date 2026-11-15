@@ -7,11 +7,8 @@ module Devise
       include Devise::Webauthn::PublicKeyCredentialParam
       include Devise::Webauthn::PendingTwoFactorSignIn
 
-      # Like Devise's password strategy, only in actions that call `allow_params_authentication!`, such as the
-      # two-factor step. Otherwise any request that authenticates the scope would finish a pending two-factor sign-in.
       def valid?
-        env["devise.allow_params_authentication"] &&
-          public_key_credential_param.present? &&
+        public_key_credential_param.present? &&
           two_factor_sign_in_attempt_for(scope).present? &&
           challenge_store.pending?(:two_factor_authentication)
       end
