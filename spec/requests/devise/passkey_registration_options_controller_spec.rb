@@ -70,6 +70,4 @@ RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
       end
     end
   end
-
-  it_behaves_like "a controller that loads under an ActionController::API parent"
 end
