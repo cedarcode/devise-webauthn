@@ -66,6 +66,14 @@ RSpec.describe "API client flows", type: :request do
     expect(response).to have_http_status(:created)
   end
 
+  it "rejects a passkey without a credential" do
+    authenticate_next_request_as(user)
+
+    post account_passkeys_path, params: { name: "My phone" }, as: :json
+
+    expect(response).to have_http_status(422)
+  end
+
   it "registers a security key" do
     challenge = registration_challenge(account_security_key_registration_options_path)
     authenticate_next_request_as(user)
@@ -75,6 +83,14 @@ RSpec.describe "API client flows", type: :request do
            params: { name: "My key", public_key_credential: client.create(challenge: challenge) }, as: :json
     end.to change(user.second_factor_webauthn_credentials, :count).by(1)
     expect(response).to have_http_status(:created)
+  end
+
+  it "rejects a security key without a credential" do
+    authenticate_next_request_as(user)
+
+    post account_second_factor_webauthn_credentials_path, params: { name: "My key" }, as: :json
+
+    expect(response).to have_http_status(422)
   end
 
   it "deletes a passkey" do
