@@ -31,6 +31,17 @@ RSpec.describe "API client flows", type: :request do
     expect(response.parsed_body["email"]).to eq(user.email)
   end
 
+  it "ignores a passkey sent to a protected endpoint" do
+    passkey = register_credential(user.passkeys)
+    post account_passkey_authentication_options_path, as: :json
+    assertion = client.get(challenge: response.parsed_body["challenge"], allow_credentials: [passkey.external_id],
+                           user_verified: true, user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
+
+    post account_passkey_registration_options_path, params: { public_key_credential: assertion }, as: :json
+
+    expect(response).to have_http_status(:unauthorized)
+  end
+
   it "responds to the password step with 401, an error and a two-factor token" do
     register_credential(user.second_factor_webauthn_credentials)
 

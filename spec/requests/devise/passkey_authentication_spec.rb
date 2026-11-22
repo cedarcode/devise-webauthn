@@ -207,29 +207,6 @@ RSpec.describe "Passkey authentication flow", type: :request do
       end
     end
 
-    context "with the :cache challenge store and a client without a session" do
-      around do |example|
-        original_store = Devise::Webauthn.challenge_store
-        original_cache = Devise::Webauthn::ChallengeStores::Cache.cache
-        Devise::Webauthn.challenge_store = :cache
-        Devise::Webauthn::ChallengeStores::Cache.cache = ActiveSupport::Cache::MemoryStore.new
-        example.run
-      ensure
-        Devise::Webauthn.challenge_store = original_store
-        Devise::Webauthn::ChallengeStores::Cache.cache = original_cache
-      end
-
-      it "does not authenticate a request to a protected endpoint" do
-        post account_passkey_authentication_options_path, as: :json
-        assertion = assertion_for(response.parsed_body["challenge"])
-
-        reset!
-        post account_passkey_registration_options_path, params: { public_key_credential: assertion }, as: :json
-
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
-
     it "signs in from a controller that calls allow_params_authentication!" do
       post account_passkey_authentication_options_path
 
