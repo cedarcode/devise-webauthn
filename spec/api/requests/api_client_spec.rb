@@ -31,7 +31,7 @@ RSpec.describe "API client flows", type: :request do
     expect(response.parsed_body["email"]).to eq(user.email)
   end
 
-  it "ignores a passkey sent to a protected endpoint" do
+  it "does not sign in with a passkey at an endpoint that does not allow authentication" do
     passkey = register_credential(user.passkeys)
     post account_passkey_authentication_options_path, as: :json
     assertion = client.get(challenge: response.parsed_body["challenge"], allow_credentials: [passkey.external_id],

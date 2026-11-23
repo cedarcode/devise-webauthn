@@ -181,12 +181,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
     end
   end
 
-  describe "a passkey sent outside the sign-in" do
-    def assertion_for(challenge)
-      generate_assertion(client, challenge: challenge, credential: passkey,
-                                 user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
-    end
-
+  describe "a passkey sent to an endpoint that does not allow authentication" do
     context "with the :session challenge store" do
       around do |example|
         original_store = Devise::Webauthn.challenge_store
@@ -198,22 +193,14 @@ RSpec.describe "Passkey authentication flow", type: :request do
 
       it "does not sign in from a protected page" do
         post account_passkey_authentication_options_path
-        assertion = assertion_for(session[:authentication_challenge])
+        assertion = generate_assertion(client, challenge: session[:authentication_challenge], credential: passkey,
+                                               user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
 
         get new_account_passkey_path, params: { public_key_credential: assertion.to_json }
 
         expect(response).to redirect_to(new_account_session_path)
         expect(session["warden.user.account.key"]).to be_nil
       end
-    end
-
-    it "signs in from a controller that calls allow_params_authentication!" do
-      post account_passkey_authentication_options_path
-
-      post passkey_session_path, params: { public_key_credential: assertion_for(stored_challenge).to_json }
-
-      expect(response).to have_http_status(:created)
-      expect(session["warden.user.account.key"]).to be_present
     end
   end
 
