@@ -136,7 +136,7 @@ When a security key is added, the browser reports in the [`credProps` extension]
 Security keys with user verification set up ask for it when they are added, but not at 2FA sign-in.
 
 #### 2FA Sign In with Security Keys
-When a user that has 2FA enabled (i.e., has registered passkeys or security keys) visits `/users/sign_in`, after entering their primary credentials (e.g., email and password), they will be prompted to complete the second factor authentication using WebAuthn. The authentication flow is handled by `WebauthnTwoFactorAuthenticatable` strategy.
+When a user that has 2FA enabled (i.e., has registered passkeys or security keys) visits `/users/sign_in`, after entering their primary credentials (e.g., email and password), they will be prompted to complete the second factor authentication using WebAuthn. `Devise::TwoFactorAuthenticationsController` handles the second step.
 
 In a browser, the two factor authentication flow with WebAuthn works as follows:
 1. User enters their primary credentials (e.g., email and password) and submits the form.
@@ -376,8 +376,6 @@ devise_for :users, controllers: {
 ```
 
 3. Change or extend the generated controllers as needed.
-
-The two-factor strategy is not one of the scope's default strategies. A two-factor controller that overrides `create` must run it by name, as `Devise::TwoFactorAuthenticationsController#create` does: `warden.authenticate!(:webauthn_two_factor_authenticatable, auth_options)`. Generated controllers call `super`, so they need no change.
 
 ### Customizing the WebAuthn user name
 When a passkey or a security key is added, the registration options send `webauthn_user_name` as both the WebAuthn `user.name` and `user.displayName`. A passkey keeps this name, and the browser or operating system shows it when the user picks a passkey to sign in.

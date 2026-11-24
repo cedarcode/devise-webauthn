@@ -73,6 +73,22 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       end.to change { security_key.reload.sign_count }.by(1)
     end
 
+    it "runs Warden's after_authentication callbacks when it signs in" do
+      allow(Warden::Manager).to receive(:_run_callbacks).and_call_original
+      post account_session_path, params: { account: { email: user.email, password: password } }
+      post account_security_key_authentication_options_path
+      assertion = generate_assertion(
+        client,
+        challenge: session[:two_factor_authentication_challenge],
+        credential: security_key
+      )
+
+      post account_two_factor_authentication_path, params: { public_key_credential: assertion.to_json }
+
+      expect(Warden::Manager).to have_received(:_run_callbacks)
+        .with(:after_set_user, user, anything, hash_including(event: :authentication))
+    end
+
     it "rejects sign-in with invalid password" do
       post account_session_path, params: { account: { email: user.email, password: "wrong password" } }
 
