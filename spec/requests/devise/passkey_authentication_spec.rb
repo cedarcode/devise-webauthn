@@ -191,7 +191,7 @@ RSpec.describe "Passkey authentication flow", type: :request do
         Devise::Webauthn.challenge_store = original_store
       end
 
-      it "does not sign in from a protected page" do
+      it "does not sign in" do
         post account_passkey_authentication_options_path
         assertion = generate_assertion(client, challenge: session[:authentication_challenge], credential: passkey,
                                                user_handle: WebAuthn.configuration.encoder.decode(user.webauthn_id))
