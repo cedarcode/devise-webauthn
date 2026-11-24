@@ -99,6 +99,34 @@ When the form is submitted:
 3. Upon successful authentication, the credential response is stored in the hidden input
 4. The form is submitted with the credential data
 
+## Upgrading
+
+### To v0.6.0
+
+v0.6.0 writes two new columns when a user adds a passkey or a security key: `webauthn_credentials.discoverable` and `webauthn_credentials.uv_initialized`. Without them, adding a passkey or a security key fails. Add them in a migration before you update the gem, or in the same deploy:
+
+```bash
+$ bin/rails generate migration AddDiscoverableAndUvInitializedToWebauthnCredentials
+$ bin/rails db:migrate
+```
+
+Fill in the generated migration:
+
+```ruby
+class AddDiscoverableAndUvInitializedToWebauthnCredentials < ActiveRecord::Migration[8.1]
+  def change
+    add_column :webauthn_credentials, :discoverable, :boolean, null: false, default: false
+    add_column :webauthn_credentials, :uv_initialized, :boolean, null: false, default: false
+  end
+end
+```
+
+Security keys added before the upgrade get `false` in both columns. They still work for two-factor sign-in, but they cannot be upgraded to passkeys. To use one as a passkey, a user can remove it and add the key again as a passkey. See [Upgrading Security Keys to Passkeys](#upgrading-security-keys-to-passkeys).
+
+New apps do not need this step. `devise:webauthn:install` creates both columns.
+
+v0.6.0 has other breaking changes for apps that customize the gem's controllers or views. See the [CHANGELOG](CHANGELOG.md).
+
 ## How It Works
 
 ### Passkey authentication
