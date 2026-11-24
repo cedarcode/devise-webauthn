@@ -149,19 +149,19 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       context "when the browser does not report credProps" do
         let(:extension_results) { nil }
 
-        it { expect(security_key.discoverable).to be_nil }
+        it { expect(security_key.discoverable).to be(false) }
       end
 
       context "when credProps is malformed" do
         let(:extension_results) { { "credProps" => "unknown" } }
 
-        it { expect(security_key.discoverable).to be_nil }
+        it { expect(security_key.discoverable).to be(false) }
       end
 
       context "when rk is not a boolean" do
         let(:extension_results) { { "credProps" => { "rk" => "yes" } } }
 
-        it { expect(security_key.discoverable).to be_nil }
+        it { expect(security_key.discoverable).to be(false) }
       end
 
       context "when the key verifies the user" do
@@ -281,28 +281,8 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
         end
       end
 
-      context "when the browser did not report whether the security key is discoverable" do
-        let(:discoverable) { nil }
-
-        it "does not promote it" do
-          patch account_second_factor_webauthn_credential_path(security_key)
-
-          expect(security_key.reload).to be_second_factor
-        end
-      end
-
       context "when the security key did not verify the user when it was added" do
         let(:uv_initialized) { false }
-
-        it "does not promote it" do
-          patch account_second_factor_webauthn_credential_path(security_key)
-
-          expect(security_key.reload).to be_second_factor
-        end
-      end
-
-      context "when the security key was added before uv_initialized existed" do
-        let(:uv_initialized) { nil }
 
         it "does not promote it" do
           patch account_second_factor_webauthn_credential_path(security_key)
