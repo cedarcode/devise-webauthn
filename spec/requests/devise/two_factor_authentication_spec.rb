@@ -262,7 +262,7 @@ RSpec.describe "Two-Factor authentication flow", type: :request do
       expect(session[:authentication_challenge]).to be_present
     end
 
-    it "does not sign in from a protected page with the second factor" do
+    it "does not sign in on an endpoint other than two-factor authentication" do
       post account_session_path, params: { account: { email: user.email, password: password } }
       post account_security_key_authentication_options_path
       assertion = generate_assertion(
