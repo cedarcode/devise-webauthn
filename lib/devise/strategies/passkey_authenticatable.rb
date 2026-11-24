@@ -6,8 +6,6 @@ module Devise
       include Devise::Webauthn::ChallengeStoreAccess
       include Devise::Webauthn::PublicKeyCredentialParam
 
-      # Runs only in actions that call `allow_params_authentication!`, as `sessions#create` does. Otherwise any
-      # request that authenticates the scope signs in whoever answers a pending challenge.
       def valid?
         env["devise.allow_params_authentication"] &&
           public_key_credential_param.present? &&
