@@ -19,7 +19,8 @@ module Devise
           :webauthn_two_factor_authenticatable,
           {
             model: "devise/models/webauthn_two_factor_authenticatable",
-            strategy: true,
+            # Not a default strategy, so only `TwoFactorAuthenticationsController#create` runs it, by name.
+            strategy: false,
             route: { two_factor_authentication: [] }
           }
         )
