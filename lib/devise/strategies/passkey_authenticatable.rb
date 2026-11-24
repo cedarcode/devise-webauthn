@@ -7,7 +7,8 @@ module Devise
       include Devise::Webauthn::PublicKeyCredentialParam
 
       def valid?
-        public_key_credential_param.present? &&
+        env["devise.allow_params_authentication"] &&
+          public_key_credential_param.present? &&
           challenge_store.pending?(:passkey_authentication)
       end
 
