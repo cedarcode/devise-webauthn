@@ -37,7 +37,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
       context "with valid parameters" do
         let(:credential) do
           client.create(
-            challenge: session[:webauthn_challenge],
+            challenge: session[:passkey_registration_challenge],
             user_verified: true
           )
         end
@@ -52,7 +52,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
 
           expect(response).to redirect_to(new_account_passkey_path)
           expect(flash[:notice]).to eq I18n.t("devise.passkeys.passkey_created")
-          expect(session[:webauthn_challenge]).to be_nil
+          expect(session[:passkey_registration_challenge]).to be_nil
         end
 
         it "stores the rk that the browser reports and that the passkey verified the user" do
@@ -69,7 +69,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
       context "with invalid credential" do
         let(:invalid_credential) do
           client.create(
-            challenge: session[:webauthn_challenge],
+            challenge: session[:passkey_registration_challenge],
             user_verified: false
           )
         end
@@ -84,14 +84,14 @@ RSpec.describe Devise::PasskeysController, type: :request do
 
           expect(response).to redirect_to(new_account_passkey_path)
           expect(flash[:alert]).to eq I18n.t("devise.failure.passkey_verification_failed")
-          expect(session[:webauthn_challenge]).to be_nil
+          expect(session[:passkey_registration_challenge]).to be_nil
         end
       end
 
       context "with a blank name" do
         let(:credential) do
           client.create(
-            challenge: session[:webauthn_challenge],
+            challenge: session[:passkey_registration_challenge],
             user_verified: true
           )
         end
@@ -115,7 +115,7 @@ RSpec.describe Devise::PasskeysController, type: :request do
           post account_passkeys_path, params: { public_key_credential: "{}", name: "My Passkey" }
 
           expect(response).to redirect_to(new_account_passkey_path)
-          expect(session[:webauthn_challenge]).to be_nil
+          expect(session[:passkey_registration_challenge]).to be_nil
         end
       end
     end
@@ -164,6 +164,19 @@ RSpec.describe Devise::PasskeysController, type: :request do
         credential = client.create(challenge: WebAuthn.configuration.encoder.encode("wrong"), user_verified: true)
 
         post account_passkeys_path, params: { name: "My phone", public_key_credential: credential }, as: :json
+
+        expect(response).to have_http_status(422)
+        expect(response.parsed_body["errors"]).to eq("base" => [I18n.t("devise.failure.passkey_verification_failed")])
+      end
+
+      it "responds with 422 when the credential answers the security key registration options" do
+        sign_in user, scope: :account
+        post account_security_key_registration_options_path, as: :json
+        credential = client.create(challenge: response.parsed_body["challenge"], user_verified: true)
+
+        expect do
+          post account_passkeys_path, params: { name: "My phone", public_key_credential: credential }, as: :json
+        end.not_to change(user.passkeys, :count)
 
         expect(response).to have_http_status(422)
         expect(response.parsed_body["errors"]).to eq("base" => [I18n.t("devise.failure.passkey_verification_failed")])

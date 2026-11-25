@@ -9,12 +9,14 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Session do
   it "keeps each purpose under its own session key" do
     store.write(:passkey_authentication, "passkey-challenge")
     store.write(:two_factor_authentication, "2fa-challenge")
-    store.write(:registration, "registration-challenge")
+    store.write(:passkey_registration, "passkey-registration-challenge")
+    store.write(:security_key_registration, "security-key-registration-challenge")
 
     expect(session).to eq(
       authentication_challenge: "passkey-challenge",
       two_factor_authentication_challenge: "2fa-challenge",
-      webauthn_challenge: "registration-challenge"
+      passkey_registration_challenge: "passkey-registration-challenge",
+      security_key_registration_challenge: "security-key-registration-challenge"
     )
   end
 
@@ -27,7 +29,7 @@ RSpec.describe Devise::Webauthn::ChallengeStores::Session do
   end
 
   it "returns nil when consuming a challenge that was never written" do
-    expect(store.consume(:registration)).to be_nil
+    expect(store.consume(:passkey_registration)).to be_nil
   end
 
   it "raises on an unknown purpose" do

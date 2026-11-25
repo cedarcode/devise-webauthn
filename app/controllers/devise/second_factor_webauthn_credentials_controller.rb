@@ -25,7 +25,7 @@ module Devise
         respond_with_navigational(security_key, location: -> { after_create_path }) { redirect_to after_create_path }
       end
     ensure
-      challenge_store.consume(:registration)
+      challenge_store.consume(:security_key_registration)
     end
 
     def update
@@ -63,7 +63,7 @@ module Devise
 
       security_key_from_params = WebAuthn::Credential.from_create(public_key_credential)
       security_key_from_params.verify(
-        challenge_store.consume(:registration)
+        challenge_store.consume(:security_key_registration)
       )
 
       resource.second_factor_webauthn_credentials.create(

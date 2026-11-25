@@ -25,7 +25,7 @@ module Devise
           extensions: { credProps: true }
         )
 
-      challenge_store.write(:registration, passkey_options.challenge)
+      challenge_store.write(:passkey_registration, passkey_options.challenge)
 
       render json: passkey_options
     end
