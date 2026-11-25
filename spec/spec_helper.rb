@@ -15,6 +15,7 @@ end
 require "rspec/rails"
 require "rspec/retry"
 require "capybara/rspec"
+require "support/chrome_reset_without_wildcard_origin"
 require "support/page_load_helpers"
 require "support/memory_challenge_store"
 
