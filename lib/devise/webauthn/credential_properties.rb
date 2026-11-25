@@ -5,12 +5,12 @@ module Devise
     module CredentialProperties
       private
 
-      def credential_record_attributes(credential)
+      def credential_record_attributes(credential, discoverable: reported_discoverable?(credential))
         {
           external_id: credential.id,
           public_key: credential.public_key,
           sign_count: credential.sign_count,
-          discoverable: reported_discoverable?(credential),
+          discoverable: discoverable,
           uv_initialized: credential.response.authenticator_data.user_verified?
         }
       end
