@@ -21,8 +21,7 @@ module Devise
             resident_key: "required",
             require_resident_key: true,
             user_verification: "required"
-          },
-          extensions: { credProps: true }
+          }
         )
 
       challenge_store.write(:passkey_registration, passkey_options.challenge)

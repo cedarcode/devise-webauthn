@@ -57,7 +57,7 @@ module Devise
 
       resource.passkeys.create(
         name: params[:name],
-        **credential_record_attributes(passkey_from_params)
+        **credential_record_attributes(passkey_from_params, discoverable: true)
       )
     rescue WebAuthn::Error
       passkey_with_verification_error
