@@ -55,7 +55,6 @@ module Devise
         user_verification: true
       )
 
-      # The registration options require a discoverable credential, so the browser fails rather than create another.
       resource.passkeys.create(
         name: params[:name],
         **credential_record_attributes(passkey_from_params, discoverable: true)
