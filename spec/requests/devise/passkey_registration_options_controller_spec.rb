@@ -26,7 +26,7 @@ RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
         json = response.parsed_body
         expect(json["challenge"]).to be_present
 
-        expect(session[:webauthn_challenge]).to eq(json["challenge"])
+        expect(session[:passkey_registration_challenge]).to eq(json["challenge"])
       end
 
       it "asks the browser to report whether the credential is discoverable" do
@@ -45,10 +45,10 @@ RSpec.describe Devise::PasskeyRegistrationOptionsController, type: :request do
 
       it "generates a new challenge on each request" do
         post account_passkey_registration_options_path
-        first_challenge = session[:webauthn_challenge]
+        first_challenge = session[:passkey_registration_challenge]
 
         post account_passkey_registration_options_path
-        second_challenge = session[:webauthn_challenge]
+        second_challenge = session[:passkey_registration_challenge]
 
         expect(first_challenge).to be_present
         expect(second_challenge).to be_present

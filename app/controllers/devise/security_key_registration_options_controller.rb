@@ -24,7 +24,7 @@ module Devise
           extensions: { credProps: true }
         )
 
-      challenge_store.write(:registration, create_security_key_options.challenge)
+      challenge_store.write(:security_key_registration, create_security_key_options.challenge)
 
       render json: create_security_key_options
     end

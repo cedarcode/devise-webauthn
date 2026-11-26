@@ -47,7 +47,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       context "with valid parameters" do
         let(:credential) do
           client.create(
-            challenge: session[:webauthn_challenge],
+            challenge: session[:security_key_registration_challenge],
             user_verified: false
           )
         end
@@ -62,14 +62,14 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
           expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
           expect(flash[:notice]).to eq "Security Key created successfully."
-          expect(session[:webauthn_challenge]).to be_nil
+          expect(session[:security_key_registration_challenge]).to be_nil
         end
       end
 
       context "with invalid credential" do
         let(:invalid_credential) do
           client.create(
-            challenge: session[:webauthn_challenge],
+            challenge: session[:security_key_registration_challenge],
             user_present: false
           )
         end
@@ -84,14 +84,14 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
           expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
           expect(flash[:alert]).to eq "Webauthn credential verification failed."
-          expect(session[:webauthn_challenge]).to be_nil
+          expect(session[:security_key_registration_challenge]).to be_nil
         end
       end
 
       context "with a blank name" do
         let(:credential) do
           client.create(
-            challenge: session[:webauthn_challenge],
+            challenge: session[:security_key_registration_challenge],
             user_verified: false
           )
         end
@@ -115,7 +115,7 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
           post account_second_factor_webauthn_credentials_path, params: { public_key_credential: "{}", name: "Key" }
 
           expect(response).to redirect_to(new_account_second_factor_webauthn_credential_path)
-          expect(session[:webauthn_challenge]).to be_nil
+          expect(session[:security_key_registration_challenge]).to be_nil
         end
       end
     end
@@ -128,7 +128,8 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
       before do
         sign_in user
         post account_security_key_registration_options_path
-        credential = client.create(challenge: session[:webauthn_challenge], user_verified: user_verified)
+        challenge = session[:security_key_registration_challenge]
+        credential = client.create(challenge: challenge, user_verified: user_verified)
                            .merge("clientExtensionResults" => extension_results)
 
         post account_second_factor_webauthn_credentials_path, params: {
@@ -214,6 +215,21 @@ RSpec.describe Devise::SecondFactorWebauthnCredentialsController, type: :request
 
         post account_second_factor_webauthn_credentials_path,
              params: { name: "My key", public_key_credential: credential }, as: :json
+
+        expect(response).to have_http_status(422)
+        expect(response.parsed_body["errors"])
+          .to eq("base" => [I18n.t("devise.failure.webauthn_credential_verification_failed")])
+      end
+
+      it "responds with 422 when the credential answers the passkey registration options" do
+        sign_in user, scope: :account
+        post account_passkey_registration_options_path, as: :json
+        credential = client.create(challenge: response.parsed_body["challenge"], user_verified: true)
+
+        expect do
+          post account_second_factor_webauthn_credentials_path,
+               params: { name: "My key", public_key_credential: credential }, as: :json
+        end.not_to change(user.second_factor_webauthn_credentials, :count)
 
         expect(response).to have_http_status(422)
         expect(response.parsed_body["errors"])
